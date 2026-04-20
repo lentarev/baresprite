@@ -81,21 +81,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         gProjectData->isExistAppConfig = false;
     }
 
-    // Show start screen dialog
-    INT_PTR startScreenDialog = DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG_START_SCREEN), nullptr, StartScreenDialogProc);
+    // === Startup Loop ===
+    bool launchEditor = false;
 
-    if (startScreenDialog == IDOK) // New Project
+    while (!launchEditor)
     {
-        // Show new project dialog
-        INT_PTR newProjectDialog =
-            DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_NEW_PROJECT), nullptr, NewProjectDialogProc, reinterpret_cast<LPARAM>(gProjectData.get()));
+        // 1. Show start screen dialog
+        INT_PTR startResult = DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG_START_SCREEN), nullptr, StartScreenDialogProc);
 
-        appSettings->Save();
-    }
-    else
-    {
-        // Start screen dialog (Cancel)
-        return 0;
+        // If you closed the start screen (cross / Esc / Cancel), exit the application
+        if (startResult == IDCANCEL || startResult == 0)
+        {
+            return 0;
+        }
+
+        if (startResult == IDOK) // New Project
+        {
+            // Show new project dialog
+            INT_PTR newProjectResult =
+                DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_NEW_PROJECT), nullptr, NewProjectDialogProc, reinterpret_cast<LPARAM>(gProjectData.get()));
+
+
+            if (newProjectResult == IDOK)
+            {
+                appSettings->Save();
+                
+
+                launchEditor = true;
+            }
+
+            
+        }
+        else if (startResult == IDC_BUTTON_LOAD_PROJECT)
+        {
+            MessageBox(nullptr, L"Load Project: Not implemented yet", L"Info", MB_OK);
+        }
     }
 
     // Perform application initialization:

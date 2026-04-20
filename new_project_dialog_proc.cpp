@@ -4,9 +4,10 @@
 #include "resource.h"
 
 #include <Windows.h>
-#include <windowsx.h>
-#include <shlobj.h>  
 #include <iostream>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <windowsx.h>
 
 namespace baresprite
 {
@@ -21,15 +22,6 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
         SetWindowLongPtr(hDlg, DWLP_USER, lParam);
         Project *projectData = reinterpret_cast<Project *>(lParam);
 
-        if (projectData->isExistAppConfig)
-        {
-            std::cout << "config is found: SUCCESS" << std::endl;
-        }
-        else
-        {
-            std::cout << "config not found" << std::endl;
-        }
-
         // Filling the ComboBox
         HWND hCombo = GetDlgItem(hDlg, IDC_COMBO_NEW_PROJECT_RESOLUTION);
 
@@ -42,7 +34,7 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
         if (projectData->isExistAppConfig)
         {
-            SetWindowTextW(hEdit, projectData->configPath.c_str());
+            SetWindowTextW(hEdit, projectData->projectPath.c_str());
         }
         else
         {
@@ -51,7 +43,9 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
             if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &docsPath)))
             {
                 std::wstring defaultPath = std::wstring(docsPath) + L"\\MySpriteProject";
+
                 SetWindowTextW(hEdit, defaultPath.c_str());
+                
                 CoTaskMemFree(docsPath); // Freeing up memory!
             }
             else
@@ -64,10 +58,95 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
     }
 
     case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+
+        // Handle button (Browse)
+        if (LOWORD(wParam) == IDC_BUTTON_NEW_PROJECT_BROWSE)
+        {
+            // Get the current path from the input field
+            HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_NEW_PROJECT_BROWSE);
+            wchar_t currentPath[MAX_PATH] = {0};
+            GetWindowTextW(hEdit, currentPath, MAX_PATH);
+
+            // Structure for dialogue
+            BROWSEINFOW bi = {};
+            bi.lpszTitle = L"Choose folder for project:";
+            bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE | BIF_USENEWUI;
+
+            // Callback for folder preselection after initialization
+            bi.lpfn = [](HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM pData) -> int {
+                UNREFERENCED_PARAMETER(lParam);
+
+                if (uMsg == BFFM_INITIALIZED && pData && wcslen((wchar_t *)pData) > 0)
+                {
+                    // Select the folder, but do not block navigation
+                    SendMessageW(hwnd, BFFM_SETSELECTIONW, TRUE, pData);
+                }
+                return 0;
+            };
+
+            bi.lParam = reinterpret_cast<LPARAM>(currentPath); // Passing the path to the callback
+
+            // Showing the dialogue
+            LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
+
+            // If the user has selected a folder, we update the input field.
+            if (pidl)
+            {
+                wchar_t path[MAX_PATH];
+                if (SHGetPathFromIDListW(pidl, path))
+                {
+                    SetWindowTextW(hEdit, path);
+                }
+                CoTaskMemFree(pidl); // Freeing up memory
+            }
+
+            return TRUE;
+        }
+
+        // Handle button (Ok)
+        if (LOWORD(wParam) == IDOK)
+        {
+            HWND hCombo = GetDlgItem(hDlg, IDC_COMBO_NEW_PROJECT_RESOLUTION);
+            HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_NEW_PROJECT_BROWSE);
+
+            // Read the pointer
+            Project *projectData = reinterpret_cast<Project *>(GetWindowLongPtr(hDlg, DWLP_USER));
+
+            if (projectData)
+            {
+
+                // Resolution
+                int sel = ComboBox_GetCurSel(hCombo);
+
+                if (sel == 0)
+                {
+                    projectData->imageSize = 64;
+                    projectData->checkerSize = 8;
+                }
+                else
+                {
+                    projectData->imageSize = 128;
+                    projectData->checkerSize = 4;
+                }
+
+                // Reading the path
+                wchar_t pathBuf[MAX_PATH];
+                GetWindowTextW(hEdit, pathBuf, MAX_PATH);
+
+                projectData->projectPath = pathBuf;
+            }
+
+            EndDialog(hDlg, LOWORD(wParam));
+
+            return (INT_PTR)TRUE;
+        }
+
+        // Handle button (Cancel)
+        if (LOWORD(wParam) == IDCANCEL)
         {
 
             EndDialog(hDlg, LOWORD(wParam));
+
             return (INT_PTR)TRUE;
         }
 

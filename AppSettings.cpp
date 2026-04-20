@@ -54,6 +54,7 @@ bool AppSettings::Load()
 
 void AppSettings::Save()
 {
+    WritePrivateProfileStringW(L"General", L"LastProjectPath", _projectData.projectPath.c_str(), _projectData.configPath.c_str());
 }
 
 } // namespace baresprite
