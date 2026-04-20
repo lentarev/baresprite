@@ -28,6 +28,12 @@
     <Filter Include="Source Files\Settings">
       <UniqueIdentifier>{e13fe75f-fb3b-4637-8671-ad084a0b82cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ChildWindows">
+      <UniqueIdentifier>{39004a90-855b-4eeb-a03b-5a899ac98e67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ChildWindows">
+      <UniqueIdentifier>{4741b583-b4e0-485c-8dec-217290c3eaaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -60,6 +66,12 @@
     <ClInclude Include="AppSettings.h">
       <Filter>Header Files\Settings</Filter>
     </ClInclude>
+    <ClInclude Include="LeftToolbar.h">
+      <Filter>Header Files\ChildWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildWindow.h">
+      <Filter>Header Files\ChildWindows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -76,6 +88,9 @@
     </ClCompile>
     <ClCompile Include="AppSettings.cpp">
       <Filter>Source Files\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="LeftToolbar.cpp">
+      <Filter>Source Files\ChildWindows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

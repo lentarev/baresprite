@@ -184,7 +184,9 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="baresprite.h" />
+    <ClInclude Include="ChildWindow.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="LeftToolbar.h" />
     <ClInclude Include="new_project_dialog_proc.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Resource.h" />
@@ -196,6 +198,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="baresprite.cpp" />
+    <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />
     <ClCompile Include="start_screen_dialog_proc.cpp" />
   </ItemGroup>

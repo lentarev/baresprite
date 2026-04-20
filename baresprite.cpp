@@ -8,6 +8,7 @@
 #include <shlwapi.h>
 
 #include "AppSettings.h"
+#include "LeftToolbar.h"
 #include "Project.h"
 #include "new_project_dialog_proc.h"
 #include "start_screen_dialog_proc.h"
@@ -31,6 +32,7 @@ WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
 
 // All data of project
 std::unique_ptr<Project> gProjectData;
+std::unique_ptr<LeftToolbar> gLeftToolbar;
 
 // Forward declarations of functions included in this code module:
 ATOM MyRegisterClass(HINSTANCE hInstance);
@@ -101,16 +103,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             INT_PTR newProjectResult =
                 DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_NEW_PROJECT), nullptr, NewProjectDialogProc, reinterpret_cast<LPARAM>(gProjectData.get()));
 
-
             if (newProjectResult == IDOK)
             {
                 appSettings->Save();
-                
 
                 launchEditor = true;
             }
-
-            
         }
         else if (startResult == IDC_BUTTON_LOAD_PROJECT)
         {
@@ -191,6 +189,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
+    // Create left toolbar child window
+    gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance);
+
+    RECT rc;
+
+    GetClientRect(hWnd, &rc); // Get the current size of the client area
+    
+    if (gLeftToolbar)
+    {
+        gLeftToolbar->OnSize(rc.right, rc.bottom);
+    }
+
     return TRUE;
 }
 
@@ -211,6 +221,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND: {
         int wmId = LOWORD(wParam);
         // Parse the menu selections:
+
+        // LeftToolbar
+        if (gLeftToolbar && gLeftToolbar->OnCommand(wmId))
+        {
+            return 0; // Command processed.
+        }
+
         switch (wmId)
         {
         case IDM_ABOUT:
@@ -224,6 +241,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
     }
     break;
+
+    case WM_SIZE:
+        if (wParam != SIZE_MINIMIZED && gLeftToolbar)
+        {
+            gLeftToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+        }
+
+        return 0;
+
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
