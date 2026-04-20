@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="ASan" />
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="baresprite.vcxproj" Id="a5231613-3b47-40f0-bb2c-76c8f992835c" />
+</Solution>

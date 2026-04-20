@@ -1,41 +1,63 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# ===========================
+# Visual Studio & MSBuild
+# ===========================
+## Build folders and intermediate files
+Debug/
+Release/
+x64/
+Win32/
+ARM/
+ARM64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.tlog
+*.lastbuildstate
+*.cache
+*.idb
+*.sdf
+*.opensdf
+*.ipch
+*.res
+*.manifest
+*.ilk
+*.pdb
+*.exp
+*.lib
 *.obj
 
-# Precompiled Headers
-*.gch
-*.pch
+## User and Cache Files VS
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+.vs/
+*.cache
 
-# Linker files
-*.ilk
+# ===========================
+# OS and Editors
+# ===========================
+Thumbs.db
+.DS_Store
+*.swp
+*~
 
-# Debugger Files
-*.pdb
+# ===========================
+# Package managers
+# ===========================
+packages/
+*.nupkg
+.nuget/
+vcpkg/
+build/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
+# ===========================
+# Tests and Coverage
+# ===========================
+*.coverage
+*.coveragexml
+_NCrunch_*
+.nCrunch*

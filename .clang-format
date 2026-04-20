@@ -1,0 +1,6 @@
+# .clang-format
+BasedOnStyle: Microsoft
+IndentWidth: 4
+ColumnLimit: 160
+AllowShortFunctionsOnASingleLine: false
+AlwaysBreakAfterDefinitionReturnType: false
