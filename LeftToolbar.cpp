@@ -1,5 +1,6 @@
 #include "LeftToolbar.h"
-
+#include "Palette.h"
+#include <iostream>
 
 namespace baresprite
 {
@@ -8,6 +9,9 @@ LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndPare
 {
     // Create a toolbar container window
     _hToolbar = CreateWindowEx(0, L"STATIC", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, WIDTH, 0, hWndParent, nullptr, hInstanceParent, nullptr);
+
+    // Create palette
+    _palette = std::make_unique<Palette>(hWndParent, hInstanceParent);
 }
 
 LeftToolbar::~LeftToolbar()
@@ -27,9 +31,29 @@ void LeftToolbar::OnSize(int clientW, int clientH)
     }
 }
 
-
 bool LeftToolbar::OnCommand(int commandId)
 {
+
+    // Палитра: ID от 3001 до 3025
+    if (commandId >= 3001 && commandId < 3001 + _palette->ColorsCount())
+    {
+        int index = commandId - 3001;
+
+        if (_palette)
+        {
+            _palette->SelectColor(index); // Визуально выделяем
+            std::cout << "Palette ID: " << commandId << std::endl;
+
+            // Получаем цвет и сохраняем в проекте (глобально)
+            // COLORREF color = _palette->GetSelectedColor();
+            // if (gProjectData)
+            //{
+            // gProjectData->SetBrushColor(color);
+            //}
+        }
+        return true;
+    }
+
     return false;
 }
 

@@ -2,10 +2,13 @@
 
 #include "ChildWindow.h"
 #include <Windows.h>
-#include <vector>
+#include <memory>
 
 namespace baresprite
 {
+
+// Forward declaration
+class Palette;
 
 class LeftToolbar : public ChildWindow
 {
@@ -22,6 +25,9 @@ class LeftToolbar : public ChildWindow
     HWND _hWndParent;
     HINSTANCE _hInstanceParent;
     HWND _hToolbar = nullptr;
+
+    // Toolbar Components
+    std::unique_ptr<Palette> _palette;
 
     // Configuration
     static constexpr int WIDTH = 180;

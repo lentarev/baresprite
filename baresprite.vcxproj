@@ -191,6 +191,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="LeftToolbar.h" />
     <ClInclude Include="new_project_dialog_proc.h" />
+    <ClInclude Include="Palette.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RightToolbar.h" />
@@ -207,6 +208,7 @@
     <ClCompile Include="FrameToolbar.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />
+    <ClCompile Include="Palette.cpp" />
     <ClCompile Include="RightToolbar.cpp" />
     <ClCompile Include="start_screen_dialog_proc.cpp" />
   </ItemGroup>

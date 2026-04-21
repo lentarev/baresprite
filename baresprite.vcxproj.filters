@@ -40,6 +40,12 @@
     <Filter Include="Source Files\Canvas">
       <UniqueIdentifier>{896d9b0d-7fc9-4103-ae11-dbcc9655fc8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\LeftToolbar">
+      <UniqueIdentifier>{bf01eb47-c178-4db9-a7d7-3fae087cb172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LeftToolbar">
+      <UniqueIdentifier>{ea91e1a6-5923-4307-9fb6-9b3658561160}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -90,6 +96,9 @@
     <ClInclude Include="ChessBackground.h">
       <Filter>Header Files\Canvas</Filter>
     </ClInclude>
+    <ClInclude Include="Palette.h">
+      <Filter>Header Files\LeftToolbar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -121,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="ChessBackground.cpp">
       <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="Palette.cpp">
+      <Filter>Source Files\LeftToolbar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
