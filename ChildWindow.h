@@ -7,7 +7,7 @@ class ChildWindow
   public:
     virtual ~ChildWindow() = default;
 
-    virtual void OnSize(int width, int height) = 0;
+    virtual void OnSize(int clientW, int clientH) = 0;
 
     virtual bool OnCommand(int commandId) = 0;
 };

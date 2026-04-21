@@ -1,16 +1,14 @@
-#include "LeftToolbar.h"
-
+#include "RightToolbar.h"
 
 namespace baresprite
 {
-
-LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent)
+RightToolbar::RightToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent)
 {
     // Create a toolbar container window
     _hToolbar = CreateWindowEx(0, L"STATIC", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, WIDTH, 0, hWndParent, nullptr, hInstanceParent, nullptr);
 }
 
-LeftToolbar::~LeftToolbar()
+RightToolbar::~RightToolbar()
 {
     if (_hToolbar)
     {
@@ -18,19 +16,17 @@ LeftToolbar::~LeftToolbar()
     }
 }
 
-void LeftToolbar::OnSize(int clientW, int clientH)
+void RightToolbar::OnSize(int clientW, int clientH)
 {
     if (_hToolbar)
     {
         // Растягиваем тулбар на всю высоту главного окна
-        SetWindowPos(_hToolbar, nullptr, 0, 0, WIDTH, clientH, SWP_NOZORDER | SWP_NOACTIVATE);
+        SetWindowPos(_hToolbar, nullptr, clientW - WIDTH, 0, WIDTH, clientH, SWP_NOZORDER | SWP_NOACTIVATE);
     }
 }
 
-
-bool LeftToolbar::OnCommand(int commandId)
+bool RightToolbar::OnCommand(int commandId)
 {
     return false;
 }
-
 } // namespace baresprite

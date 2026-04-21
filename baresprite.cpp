@@ -8,8 +8,11 @@
 #include <shlwapi.h>
 
 #include "AppSettings.h"
+#include "Canvas.h"
+#include "FrameToolbar.h"
 #include "LeftToolbar.h"
 #include "Project.h"
+#include "RightToolbar.h"
 #include "new_project_dialog_proc.h"
 #include "start_screen_dialog_proc.h"
 
@@ -33,6 +36,9 @@ WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
 // All data of project
 std::unique_ptr<Project> gProjectData;
 std::unique_ptr<LeftToolbar> gLeftToolbar;
+std::unique_ptr<FrameToolbar> gFrameToolbar;
+std::unique_ptr<RightToolbar> gRightToolbar;
+std::unique_ptr<Canvas> gCanvas;
 
 // Forward declarations of functions included in this code module:
 ATOM MyRegisterClass(HINSTANCE hInstance);
@@ -192,13 +198,37 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     // Create left toolbar child window
     gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance);
 
+    // Create frame toolbar child window
+    gFrameToolbar = std::make_unique<FrameToolbar>(hWnd, hInstance);
+
+    // Create right toolbar child window
+    gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
+
+    // Create canvas child window
+     gCanvas = std::make_unique<Canvas>(hWnd, hInstance);
+
     RECT rc;
 
     GetClientRect(hWnd, &rc); // Get the current size of the client area
-    
+
     if (gLeftToolbar)
     {
         gLeftToolbar->OnSize(rc.right, rc.bottom);
+    }
+
+    if (gFrameToolbar)
+    {
+        gFrameToolbar->OnSize(rc.right, rc.bottom);
+    }
+
+    if (gRightToolbar)
+    {
+        gRightToolbar->OnSize(rc.right, rc.bottom);
+    }
+
+    if (gCanvas)
+    {
+        gCanvas->OnSize(rc.right, rc.bottom);
     }
 
     return TRUE;
@@ -218,12 +248,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+
     case WM_COMMAND: {
         int wmId = LOWORD(wParam);
         // Parse the menu selections:
 
         // LeftToolbar
         if (gLeftToolbar && gLeftToolbar->OnCommand(wmId))
+        {
+            return 0; // Command processed.
+        }
+
+        // FrameToolbar
+        if (gFrameToolbar && gFrameToolbar->OnCommand(wmId))
+        {
+            return 0; // Command processed.
+        }
+
+        // RightToolbar
+        if (gRightToolbar && gRightToolbar->OnCommand(wmId))
         {
             return 0; // Command processed.
         }
@@ -243,9 +286,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
 
     case WM_SIZE:
-        if (wParam != SIZE_MINIMIZED && gLeftToolbar)
+
+        if (wParam != SIZE_MINIMIZED)
         {
-            gLeftToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+            }
+
+            if (gFrameToolbar)
+            {
+                gFrameToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+            }
+
+            if (gRightToolbar)
+            {
+                gRightToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+            }
+
+            if (gCanvas)
+            {
+                gCanvas->OnSize(LOWORD(lParam), HIWORD(lParam));
+            }
         }
 
         return 0;

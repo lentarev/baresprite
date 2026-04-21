@@ -2,17 +2,16 @@
 
 #include "ChildWindow.h"
 #include <Windows.h>
-#include <vector>
 
 namespace baresprite
 {
 
-class LeftToolbar : public ChildWindow
+class FrameToolbar : public ChildWindow
 {
   public:
-    LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent);
+    FrameToolbar(HWND hWndParent, HINSTANCE hInstanceParent);
 
-    ~LeftToolbar() override;
+    ~FrameToolbar() override;
 
     void OnSize(int clientW, int clientH) override;
 
@@ -24,7 +23,7 @@ class LeftToolbar : public ChildWindow
     HWND _hToolbar = nullptr;
 
     // Configuration
-    static constexpr int WIDTH = 180;
+    static constexpr int HEIGHT = 80;
 };
 
 } // namespace baresprite

@@ -72,6 +72,15 @@
     <ClInclude Include="ChildWindow.h">
       <Filter>Header Files\ChildWindows</Filter>
     </ClInclude>
+    <ClInclude Include="FrameToolbar.h">
+      <Filter>Header Files\ChildWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="RightToolbar.h">
+      <Filter>Header Files\ChildWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="Canvas.h">
+      <Filter>Header Files\ChildWindows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -90,6 +99,15 @@
       <Filter>Source Files\Settings</Filter>
     </ClCompile>
     <ClCompile Include="LeftToolbar.cpp">
+      <Filter>Source Files\ChildWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameToolbar.cpp">
+      <Filter>Source Files\ChildWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="RightToolbar.cpp">
+      <Filter>Source Files\ChildWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="Canvas.cpp">
       <Filter>Source Files\ChildWindows</Filter>
     </ClCompile>
   </ItemGroup>
