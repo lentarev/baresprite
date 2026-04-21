@@ -34,6 +34,12 @@
     <Filter Include="Source Files\ChildWindows">
       <UniqueIdentifier>{4741b583-b4e0-485c-8dec-217290c3eaaf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Canvas">
+      <UniqueIdentifier>{2ee2ea5e-5414-4d44-9ff3-2b0ca27a5efa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Canvas">
+      <UniqueIdentifier>{896d9b0d-7fc9-4103-ae11-dbcc9655fc8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -81,6 +87,9 @@
     <ClInclude Include="Canvas.h">
       <Filter>Header Files\ChildWindows</Filter>
     </ClInclude>
+    <ClInclude Include="ChessBackground.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -109,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="Canvas.cpp">
       <Filter>Source Files\ChildWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="ChessBackground.cpp">
+      <Filter>Source Files\Canvas</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

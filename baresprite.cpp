@@ -205,7 +205,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
 
     // Create canvas child window
-     gCanvas = std::make_unique<Canvas>(hWnd, hInstance);
+    gCanvas = std::make_unique<Canvas>(hWnd, hInstance, *gProjectData);
 
     RECT rc;
 

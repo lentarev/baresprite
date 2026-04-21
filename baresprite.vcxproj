@@ -185,6 +185,7 @@
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="baresprite.h" />
     <ClInclude Include="Canvas.h" />
+    <ClInclude Include="ChessBackground.h" />
     <ClInclude Include="ChildWindow.h" />
     <ClInclude Include="FrameToolbar.h" />
     <ClInclude Include="framework.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="baresprite.cpp" />
     <ClCompile Include="Canvas.cpp" />
+    <ClCompile Include="ChessBackground.cpp" />
     <ClCompile Include="FrameToolbar.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />

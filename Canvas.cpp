@@ -1,9 +1,11 @@
 #include "Canvas.h"
+#include "ChessBackground.h"
 #include <iostream>
 
 namespace baresprite
 {
-Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent)
+Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, Project &projectData)
+    : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent), _projectData(projectData)
 {
 
     // Registers the window class for canvas
@@ -23,13 +25,15 @@ Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndPar
     RegisterClassExW(&wcex);
 
     // Create a canvas window
-    _hCanvas = CreateWindowExW((DWORD)WS_EX_CLIENTEDGE, L"BareSpriteCanvasClass", L"", (DWORD)(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS), 0, 0, _canvasWidth,
+    _hCanvas = CreateWindowExW(0, L"BareSpriteCanvasClass", L"", (DWORD)(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS), 0, 0, _canvasWidth,
                                _canvasHeight, hWndParent, nullptr, hInstanceParent, this);
 
     if (!_hCanvas)
     {
         return; // Не удалось создать окно
     }
+
+    _chessBackground = std::make_unique<ChessBackground>(projectData);
 }
 
 Canvas::~Canvas()
@@ -86,15 +90,8 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-        // TODO: The drawing will be done here:
-        // 1. Chess background
-        // 2. Sprite from gProjectData
-        // 3. Grid (if zoom >= 4x)
-
-        // For now, just fill it with white for the dough.
-        RECT rc;
-        GetClientRect(hWnd, &rc);
-        FillRect(hdc, &rc, (HBRUSH)(COLOR_WINDOW + 1));
+        // Draw chess background
+        pCanvas->_chessBackground->Render(ps, hdc);
 
         EndPaint(hWnd, &ps);
         return 0;
