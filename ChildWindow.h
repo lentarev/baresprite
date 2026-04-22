@@ -9,7 +9,7 @@ class ChildWindow
 
     virtual void OnSize(int clientW, int clientH) = 0;
 
-    virtual bool OnCommand(int commandId) = 0;
+    virtual bool OnCommand(int commandId, int notifyCode) = 0;
 };
 
 } // namespace baresprite

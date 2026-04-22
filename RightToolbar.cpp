@@ -25,7 +25,7 @@ void RightToolbar::OnSize(int clientW, int clientH)
     }
 }
 
-bool RightToolbar::OnCommand(int commandId)
+bool RightToolbar::OnCommand(int commandId, int notifyCode)
 {
     return false;
 }

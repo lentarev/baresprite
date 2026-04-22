@@ -256,23 +256,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_COMMAND: {
         int wmId = LOWORD(wParam);
-        // Parse the menu selections:
+        int wmEvent = HIWORD(wParam); // notification code (BN_CLICKED or BN_DBLCLK)
 
         // LeftToolbar
-        if (gLeftToolbar && gLeftToolbar->OnCommand(wmId))
+        if (gLeftToolbar && gLeftToolbar->OnCommand(wmId, wmEvent))
         {
 
             return 0; // Command processed.
         }
 
         // FrameToolbar
-        if (gFrameToolbar && gFrameToolbar->OnCommand(wmId))
+        if (gFrameToolbar && gFrameToolbar->OnCommand(wmId, wmEvent))
         {
             return 0; // Command processed.
         }
 
         // RightToolbar
-        if (gRightToolbar && gRightToolbar->OnCommand(wmId))
+        if (gRightToolbar && gRightToolbar->OnCommand(wmId, wmEvent))
         {
             return 0; // Command processed.
         }

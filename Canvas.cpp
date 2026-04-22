@@ -59,7 +59,7 @@ void Canvas::OnSize(int clientW, int clientH)
     }
 }
 
-bool Canvas::OnCommand(int commandId)
+bool Canvas::OnCommand(int commandId, int notifyCode)
 {
     return false;
 }

@@ -50,7 +50,7 @@ void LeftToolbar::OnSize(int clientW, int clientH)
     }
 }
 
-bool LeftToolbar::OnCommand(int commandId)
+bool LeftToolbar::OnCommand(int commandId, int notifyCode)
 {
 
     // Palette: ID from 3001 to 3025
@@ -60,14 +60,33 @@ bool LeftToolbar::OnCommand(int commandId)
 
         if (_palette)
         {
-            // Visually highlight
-            _palette->SelectColor(index);
-            std::cout << "Palette ID: " << commandId << std::endl;
+            // Select color
+            if (notifyCode == BN_CLICKED)
+            {
+                _palette->SelectColor(index); // Visually highlight
 
-            _projectData.palette.color = _palette->GetSelectedColor();
-            _projectData.palette.index = index;
+                _projectData.palette.color = _palette->GetSelectedColor();
+                _projectData.palette.index = index;
+            }
+
+            // Double click (edit color)
+            if (notifyCode == BN_DBLCLK)
+            {
+
+                // Open the color selection dialog
+                if (_palette->EditColor(index, _hWndParent))
+                {
+                    // If the color has changed, update the selection
+                    _palette->SelectColor(index);
+
+                    // Updating project data
+                    _projectData.palette.color = _palette->GetSelectedColor();
+                    _projectData.palette.index = index;
+                }
+            }
+
+            return true;
         }
-        return true;
     }
 
     return false;

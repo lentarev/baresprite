@@ -1,11 +1,16 @@
 #include "Palette.h"
 #include <commctrl.h>
+#include <commdlg.h>  // For ChooseColor
 
 namespace baresprite
 {
 
 Palette::Palette(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent)
 {
+    _colors = {RGB(0, 0, 0),     RGB(127, 127, 127), RGB(255, 0, 0),     RGB(255, 127, 0),   RGB(255, 255, 0),   RGB(0, 255, 0),     RGB(0, 255, 255),
+               RGB(0, 0, 255),   RGB(127, 0, 255),   RGB(255, 255, 255), RGB(64, 64, 64),    RGB(191, 191, 191), RGB(127, 0, 0),     RGB(0, 127, 0),
+               RGB(0, 0, 127),   RGB(127, 127, 0),   RGB(255, 191, 191), RGB(255, 127, 127), RGB(127, 255, 127), RGB(127, 127, 255), RGB(127, 64, 0),
+               RGB(255, 0, 255), RGB(0, 127, 127),   RGB(255, 200, 150), RGB(64, 0, 0)};
 
     CreatePalette();
     SelectColor(0);
@@ -76,8 +81,6 @@ void Palette::SelectColor(int index)
     // 1. Освобождаем контекст окна, полученный через GetDC
     ReleaseDC(_hWndParent, hdc);
 
-    
-
     SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
 }
 
@@ -143,7 +146,7 @@ void Palette::CreatePalette()
         HBITMAP hBmp = CreateBitmap(_colors[i], _BTN_SIZE, _BTN_SIZE);
         _paletteBitmaps.push_back(hBmp);
 
-        HWND hBtn = CreateWindowExW(0, L"BUTTON", L"", WS_CHILD | WS_VISIBLE | BS_BITMAP | BS_FLAT, x, y, _BTN_SIZE, _BTN_SIZE, _hWndParent,
+        HWND hBtn = CreateWindowExW(0, L"BUTTON", L"", WS_CHILD | WS_VISIBLE | BS_BITMAP | BS_FLAT | BS_NOTIFY, x, y, _BTN_SIZE, _BTN_SIZE, _hWndParent,
                                     (HMENU)(INT_PTR)idCounter++, _hInstanceParent, nullptr);
 
         _paletteButtons.push_back(hBtn);
@@ -197,6 +200,33 @@ COLORREF Palette::InvertColor(COLORREF color)
 int Palette::ColorsCount() const
 {
     return _colorCount;
+}
+
+bool Palette::EditColor(int index, HWND hWndOwner)
+{
+    if (index < 0 || index >= static_cast<int>(_colors.size()))
+        return false;
+
+    // Setting up the dialogue
+    CHOOSECOLORW cc = {};
+    cc.lStructSize = sizeof(CHOOSECOLORW);
+    cc.hwndOwner = hWndOwner;
+    cc.rgbResult = _colors[index]; // Starting color
+    cc.Flags = CC_RGBINIT | CC_FULLOPEN;
+
+    // Массив кастомных цветов (опционально, для истории выбора)
+    static COLORREF custColors[16] = {};
+    cc.lpCustColors = custColors;
+
+    // Показываем диалог
+    if (ChooseColorW(&cc))
+    {
+        // Пользователь выбрал новый цвет!
+        _colors[index] = cc.rgbResult; // Обновляем массив
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace baresprite

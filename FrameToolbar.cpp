@@ -29,7 +29,7 @@ void FrameToolbar::OnSize(int clientW, int clientH)
     }
 }
 
-bool FrameToolbar::OnCommand(int commandId)
+bool FrameToolbar::OnCommand(int commandId, int notifyCode)
 {
     return false;
 }

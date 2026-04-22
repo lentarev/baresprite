@@ -15,7 +15,7 @@ class FrameToolbar : public ChildWindow
 
     void OnSize(int clientW, int clientH) override;
 
-    bool OnCommand(int commandId) override;
+    bool OnCommand(int commandId, int notifyCode) override;
 
   private:
     HWND _hWndParent;
