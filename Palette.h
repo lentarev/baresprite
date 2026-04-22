@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Project.h"
 #include <Windows.h>
 #include <vector>
 
@@ -9,7 +10,7 @@ namespace baresprite
 class Palette
 {
   public:
-    Palette(HWND hWndToolbar, HINSTANCE hInstanceParent);
+    Palette(HWND hWndToolbar, HINSTANCE hInstanceParent, Project &projectData);
     ~Palette();
 
     // Select color by index
@@ -26,6 +27,7 @@ class Palette
   private:
     HWND _hWndToolbar;
     HINSTANCE _hInstanceParent;
+    Project &_projectData;
 
     std::vector<HBITMAP> _paletteBitmaps;
     std::vector<HWND> _paletteButtons;
@@ -45,7 +47,7 @@ class Palette
     COLORREF _selectedColor = RGB(0, 0, 0);
     COLORREF _defaultBorder = RGB(255, 255, 255);
 
-    std::vector<COLORREF> _colors;
+    //std::vector<COLORREF> _colors;
 
     // METHODS
     void CreatePalette();

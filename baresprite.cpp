@@ -8,11 +8,13 @@
 #include <shlwapi.h>
 
 #include "AppSettings.h"
+#include "ProjectSettings.h"
 #include "Canvas.h"
 #include "FrameToolbar.h"
 #include "LeftToolbar.h"
 #include "Project.h"
 #include "RightToolbar.h"
+#include "ask_save_dialog.h"
 #include "new_project_dialog_proc.h"
 #include "start_screen_dialog_proc.h"
 
@@ -39,6 +41,7 @@ std::unique_ptr<LeftToolbar> gLeftToolbar;
 std::unique_ptr<FrameToolbar> gFrameToolbar;
 std::unique_ptr<RightToolbar> gRightToolbar;
 std::unique_ptr<Canvas> gCanvas;
+std::unique_ptr<ProjectSettings> gProjectSettings;
 
 // Forward declarations of functions included in this code module:
 ATOM MyRegisterClass(HINSTANCE hInstance);
@@ -82,6 +85,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     MyRegisterClass(hInstance);
 
     gProjectData = std::make_unique<Project>();
+    gProjectSettings = std::make_unique<ProjectSettings>(*gProjectData);
+
+    // Initializing the project data change flag
+    gProjectData->isDirty = false;
 
     auto appSettings = std::make_unique<AppSettings>(*gProjectData);
 
@@ -283,9 +290,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
             break;
+
         case IDM_EXIT:
-            DestroyWindow(hWnd);
-            break;
+            if (gProjectData && gProjectSettings && AskSaveDialog(hWnd, *gProjectData, *gProjectSettings))
+            {
+                DestroyWindow(hWnd);
+            }
+
+            return 0;
+
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
@@ -326,6 +339,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         EndPaint(hWnd, &ps);
     }
     break;
+
+    case WM_CLOSE: {
+        if (gProjectData && gProjectSettings && AskSaveDialog(hWnd, *gProjectData, *gProjectSettings))
+        {
+            DestroyWindow(hWnd);
+        }
+
+        return 0;
+    }
+
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

@@ -32,7 +32,7 @@ LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, Project &pr
                                hInstanceParent, nullptr);
 
     // Create palette
-    _palette = std::make_unique<Palette>(_hToolbar, hInstanceParent);
+    _palette = std::make_unique<Palette>(_hToolbar, hInstanceParent, projectData);
 }
 
 LeftToolbar::~LeftToolbar()
@@ -84,8 +84,14 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
                     // Updating project data
                     _projectData.palette.color = _palette->GetSelectedColor();
                     _projectData.palette.index = index;
+
+                    // Assign new color
+                    _projectData.palette.colors[index] = _palette->GetSelectedColor();
                 }
             }
+
+            // We note that the project data has been changed.
+            _projectData.isDirty = true;
 
             return true;
         }

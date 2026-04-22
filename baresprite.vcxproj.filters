@@ -16,12 +16,6 @@
     <Filter Include="Header Files\Structures">
       <UniqueIdentifier>{fd742bce-f751-4491-ac08-866f84d68394}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Dialogs">
-      <UniqueIdentifier>{3a25d0eb-6caa-46d3-93d7-a8b507a940cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Dialogs">
-      <UniqueIdentifier>{269afc35-ca21-43ce-be79-ddf815da3ea0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Settings">
       <UniqueIdentifier>{f673c62d-2ee0-457e-8d5e-fcac0c28f751}</UniqueIdentifier>
     </Filter>
@@ -46,6 +40,18 @@
     <Filter Include="Source Files\LeftToolbar">
       <UniqueIdentifier>{ea91e1a6-5923-4307-9fb6-9b3658561160}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\DialogsWndProc">
+      <UniqueIdentifier>{3a25d0eb-6caa-46d3-93d7-a8b507a940cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DialogsWndProc">
+      <UniqueIdentifier>{269afc35-ca21-43ce-be79-ddf815da3ea0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Dialogs">
+      <UniqueIdentifier>{e45764e6-a790-4d39-bd51-09239865ed1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Dialogs">
+      <UniqueIdentifier>{77347ae0-5433-422b-9a3c-8304bdda9cfd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -64,13 +70,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="start_screen_dialog_proc.h">
-      <Filter>Header Files\Dialogs</Filter>
+      <Filter>Header Files\DialogsWndProc</Filter>
     </ClInclude>
     <ClInclude Include="Project.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
     <ClInclude Include="new_project_dialog_proc.h">
-      <Filter>Header Files\Dialogs</Filter>
+      <Filter>Header Files\DialogsWndProc</Filter>
     </ClInclude>
     <ClInclude Include="Settings.h">
       <Filter>Header Files\Settings</Filter>
@@ -102,6 +108,12 @@
     <ClInclude Include="PaletteData.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
+    <ClInclude Include="ask_save_dialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectSettings.h">
+      <Filter>Header Files\Settings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -111,10 +123,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="start_screen_dialog_proc.cpp">
-      <Filter>Source Files\Dialogs</Filter>
+      <Filter>Source Files\DialogsWndProc</Filter>
     </ClCompile>
     <ClCompile Include="new_project_dialog_proc.cpp">
-      <Filter>Source Files\Dialogs</Filter>
+      <Filter>Source Files\DialogsWndProc</Filter>
     </ClCompile>
     <ClCompile Include="AppSettings.cpp">
       <Filter>Source Files\Settings</Filter>
@@ -136,6 +148,12 @@
     </ClCompile>
     <ClCompile Include="Palette.cpp">
       <Filter>Source Files\LeftToolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ask_save_dialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectSettings.cpp">
+      <Filter>Source Files\Settings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

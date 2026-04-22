@@ -185,6 +185,7 @@
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="baresprite.h" />
     <ClInclude Include="Canvas.h" />
+    <ClInclude Include="ask_save_dialog.h" />
     <ClInclude Include="ChessBackground.h" />
     <ClInclude Include="ChildWindow.h" />
     <ClInclude Include="FrameToolbar.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Palette.h" />
     <ClInclude Include="PaletteData.h" />
     <ClInclude Include="Project.h" />
+    <ClInclude Include="ProjectSettings.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RightToolbar.h" />
     <ClInclude Include="Settings.h" />
@@ -205,11 +207,13 @@
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="baresprite.cpp" />
     <ClCompile Include="Canvas.cpp" />
+    <ClCompile Include="ask_save_dialog.cpp" />
     <ClCompile Include="ChessBackground.cpp" />
     <ClCompile Include="FrameToolbar.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />
     <ClCompile Include="Palette.cpp" />
+    <ClCompile Include="ProjectSettings.cpp" />
     <ClCompile Include="RightToolbar.cpp" />
     <ClCompile Include="start_screen_dialog_proc.cpp" />
   </ItemGroup>
