@@ -60,11 +60,12 @@ bool LeftToolbar::OnCommand(int commandId)
 
         if (_palette)
         {
-            _palette->SelectColor(index); // Visually highlight
+            // Visually highlight
+            _palette->SelectColor(index);
             std::cout << "Palette ID: " << commandId << std::endl;
 
-            COLORREF color = _palette->GetSelectedColor();
-            _projectData.paletteColor = color;
+            _projectData.palette.color = _palette->GetSelectedColor();
+            _projectData.palette.index = index;
         }
         return true;
     }

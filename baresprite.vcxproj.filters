@@ -99,6 +99,9 @@
     <ClInclude Include="Palette.h">
       <Filter>Header Files\LeftToolbar</Filter>
     </ClInclude>
+    <ClInclude Include="PaletteData.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">

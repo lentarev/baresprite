@@ -192,6 +192,7 @@
     <ClInclude Include="LeftToolbar.h" />
     <ClInclude Include="new_project_dialog_proc.h" />
     <ClInclude Include="Palette.h" />
+    <ClInclude Include="PaletteData.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RightToolbar.h" />

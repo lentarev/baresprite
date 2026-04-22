@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <string>
+#include "PaletteData.h"
 
 namespace baresprite
 {
@@ -13,7 +14,7 @@ struct Project
     std::wstring projectPath;
     int imageSize;
     int checkerSize;
-    COLORREF paletteColor;
+    PaletteData palette;
 };
 
 } // namespace baresprite
