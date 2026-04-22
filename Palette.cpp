@@ -38,6 +38,8 @@ void Palette::SelectColor(int index)
 
     _oldIndex = index;
 
+    _selectedColor = _colors[index];
+
     HDC hdc = GetDC(_hWndParent);
     HDC hdcMem = CreateCompatibleDC(hdc);
 
@@ -73,6 +75,8 @@ void Palette::SelectColor(int index)
 
     // 1. Освобождаем контекст окна, полученный через GetDC
     ReleaseDC(_hWndParent, hdc);
+
+    
 
     SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
 }

@@ -3,6 +3,7 @@
 #include "ChildWindow.h"
 #include <Windows.h>
 #include <memory>
+#include "Project.h"
 
 namespace baresprite
 {
@@ -13,7 +14,7 @@ class Palette;
 class LeftToolbar : public ChildWindow
 {
   public:
-    LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent);
+    LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, Project &projectData);
 
     ~LeftToolbar() override;
 
@@ -25,12 +26,16 @@ class LeftToolbar : public ChildWindow
     HWND _hWndParent;
     HINSTANCE _hInstanceParent;
     HWND _hToolbar = nullptr;
+    Project &_projectData;
 
     // Toolbar Components
     std::unique_ptr<Palette> _palette;
 
     // Configuration
     static constexpr int WIDTH = 180;
+
+    // WndProc for LeftToolbar
+    static LRESULT CALLBACK _LeftToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 } // namespace baresprite

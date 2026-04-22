@@ -50,6 +50,11 @@ INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 #pragma comment(linker, "/subsystem:console")
 int main(int argc, const char **argv)
 {
+#if _DEBUG
+    // disable buffering
+    setvbuf(stdout, nullptr, _IONBF, 0);
+#endif
+
     return wWinMain(GetModuleHandle(NULL), NULL, GetCommandLine(), SW_SHOWDEFAULT);
 }
 #else
@@ -196,7 +201,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     UpdateWindow(hWnd);
 
     // Create left toolbar child window
-    gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance);
+    gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gProjectData);
 
     // Create frame toolbar child window
     gFrameToolbar = std::make_unique<FrameToolbar>(hWnd, hInstance);
