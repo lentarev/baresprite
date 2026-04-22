@@ -9,7 +9,7 @@ namespace baresprite
 class Palette
 {
   public:
-    Palette(HWND hWndParent, HINSTANCE hInstanceParent);
+    Palette(HWND hWndToolbar, HINSTANCE hInstanceParent);
     ~Palette();
 
     // Select color by index
@@ -24,25 +24,26 @@ class Palette
     bool EditColor(int index, HWND hWndOwner);
 
   private:
-    HWND _hWndParent;
+    HWND _hWndToolbar;
     HINSTANCE _hInstanceParent;
 
     std::vector<HBITMAP> _paletteBitmaps;
     std::vector<HWND> _paletteButtons;
 
     // Configuration
-    int _startX = 22;
+    int _startX = 17;
     int _startY = 20;
 
-    const int _BTN_SIZE = 24;
-    const int _BORDER_WIDTH = 2;
+    const int _BTN_SIZE = 26;
+    const int _BORDER_WIDTH = 5;
     const int _SPACING = 4;
     const int _COLS = 5;
     int _selectedIndex = 0;
     const int _colorCount = 25;
 
-    COLORREF _colorPen = RGB(255, 255, 255);
+    COLORREF _selectedBorder = RGB(255, 108, 0);
     COLORREF _selectedColor = RGB(0, 0, 0);
+    COLORREF _defaultBorder = RGB(255, 255, 255);
 
     std::vector<COLORREF> _colors;
 
@@ -53,6 +54,11 @@ class Palette
     void ResetColor(int index);
 
     int _oldIndex = 0;
+
+    // METHODS
+
+    // Hook function for the color picker dialog
+    static UINT_PTR CALLBACK _PickerColorDialogHook(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 } // namespace baresprite

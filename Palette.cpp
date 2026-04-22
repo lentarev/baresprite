@@ -1,11 +1,12 @@
 #include "Palette.h"
 #include <commctrl.h>
-#include <commdlg.h>  // For ChooseColor
+#include <commdlg.h> // For ChooseColor
+#include <iostream>
 
 namespace baresprite
 {
 
-Palette::Palette(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent)
+Palette::Palette(HWND hWndToolbar, HINSTANCE hInstanceParent) : _hWndToolbar(hWndToolbar), _hInstanceParent(hInstanceParent)
 {
     _colors = {RGB(0, 0, 0),     RGB(127, 127, 127), RGB(255, 0, 0),     RGB(255, 127, 0),   RGB(255, 255, 0),   RGB(0, 255, 0),     RGB(0, 255, 255),
                RGB(0, 0, 255),   RGB(127, 0, 255),   RGB(255, 255, 255), RGB(64, 64, 64),    RGB(191, 191, 191), RGB(127, 0, 0),     RGB(0, 127, 0),
@@ -45,7 +46,7 @@ void Palette::SelectColor(int index)
 
     _selectedColor = _colors[index];
 
-    HDC hdc = GetDC(_hWndParent);
+    HDC hdc = GetDC(_hWndToolbar);
     HDC hdcMem = CreateCompatibleDC(hdc);
 
     // Кнопка принимает владение битмапом. Удалять не нужно, кнопка удалит сама
@@ -56,7 +57,7 @@ void Palette::SelectColor(int index)
     // Задаём прямоугольник для заливки
     RECT rc = {0, 0, _BTN_SIZE, _BTN_SIZE};
 
-    HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _colorPen);
+    HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _selectedBorder);
     HPEN hOldPen = (HPEN)SelectObject(hdcMem, hPen);
 
     HBRUSH hBrush = CreateSolidBrush(_colors[index]);
@@ -79,7 +80,7 @@ void Palette::SelectColor(int index)
     DeleteDC(hdcMem);
 
     // 1. Освобождаем контекст окна, полученный через GetDC
-    ReleaseDC(_hWndParent, hdc);
+    ReleaseDC(_hWndToolbar, hdc);
 
     SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
 }
@@ -90,7 +91,7 @@ void Palette::SelectColor(int index)
 /// <param name="index"></param>
 void Palette::ResetColor(int index)
 {
-    HDC hdc = GetDC(_hWndParent);
+    HDC hdc = GetDC(_hWndToolbar);
 
     HDC hdcMem = CreateCompatibleDC(hdc);
 
@@ -102,7 +103,7 @@ void Palette::ResetColor(int index)
     // Задаём прямоугольник для заливки
     RECT rc = {0, 0, _BTN_SIZE, _BTN_SIZE};
 
-    HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _colors[index]);
+    HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _defaultBorder);
     HPEN hOldPen = (HPEN)SelectObject(hdcMem, hPen);
 
     HBRUSH hBrush = CreateSolidBrush(_colors[index]);
@@ -125,7 +126,7 @@ void Palette::ResetColor(int index)
     DeleteDC(hdcMem);
 
     // 1. Освобождаем контекст окна, полученный через GetDC
-    ReleaseDC(_hWndParent, hdc);
+    ReleaseDC(_hWndToolbar, hdc);
 
     SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
 }
@@ -146,7 +147,7 @@ void Palette::CreatePalette()
         HBITMAP hBmp = CreateBitmap(_colors[i], _BTN_SIZE, _BTN_SIZE);
         _paletteBitmaps.push_back(hBmp);
 
-        HWND hBtn = CreateWindowExW(0, L"BUTTON", L"", WS_CHILD | WS_VISIBLE | BS_BITMAP | BS_FLAT | BS_NOTIFY, x, y, _BTN_SIZE, _BTN_SIZE, _hWndParent,
+        HWND hBtn = CreateWindowExW(0, L"BUTTON", L"", WS_CHILD | WS_VISIBLE | BS_BITMAP | BS_FLAT | BS_NOTIFY, x, y, _BTN_SIZE, _BTN_SIZE, _hWndToolbar,
                                     (HMENU)(INT_PTR)idCounter++, _hInstanceParent, nullptr);
 
         _paletteButtons.push_back(hBtn);
@@ -157,7 +158,7 @@ void Palette::CreatePalette()
 HBITMAP Palette::CreateBitmap(COLORREF color, int width, int height) const
 {
     // 1.  Получаем контекст устройства родительского окна
-    HDC hdc = GetDC(_hWndParent);
+    HDC hdc = GetDC(_hWndToolbar);
 
     // 2. Создаём виртуальный холст в памяти
     HDC hdcMem = CreateCompatibleDC(hdc);
@@ -171,14 +172,26 @@ HBITMAP Palette::CreateBitmap(COLORREF color, int width, int height) const
     // Задаём прямоугольник для заливки
     RECT rc = {0, 0, width, height};
 
+    HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _defaultBorder);
+    HPEN hOldPen = (HPEN)SelectObject(hdcMem, hPen);
+
     // Создаём кисть (brush) нужного цвета
     HBRUSH hBrush = CreateSolidBrush(color);
+    HBRUSH hOldBrush = (HBRUSH)SelectObject(hdcMem, hBrush);
 
     // Заливаем прямоугольник в памяти DC нашей кистью
-    FillRect(hdcMem, &rc, hBrush);
+    //FillRect(hdcMem, &rc, hBrush);
+
+    Rectangle(hdcMem, 0, 0, _BTN_SIZE, _BTN_SIZE);
+
+    // Восстанавливаем состояние контекста (Pen)
+    SelectObject(hdcMem, hOldPen);
+    SelectObject(hdcMem, hOldBrush);
 
     // Удаляем ТОЛЬКО то, что создали мы
+    DeleteObject(hPen);
     DeleteObject(hBrush);
+    
 
     // Возвращаем старый объект обратно в hdcMem
     SelectObject(hdcMem, oldObj);
@@ -187,7 +200,7 @@ HBITMAP Palette::CreateBitmap(COLORREF color, int width, int height) const
     DeleteDC(hdcMem);
 
     // 1. Освобождаем контекст окна, полученный через GetDC
-    ReleaseDC(_hWndParent, hdc);
+    ReleaseDC(_hWndToolbar, hdc);
 
     return hBitmap;
 }
@@ -212,9 +225,10 @@ bool Palette::EditColor(int index, HWND hWndOwner)
     cc.lStructSize = sizeof(CHOOSECOLORW);
     cc.hwndOwner = hWndOwner;
     cc.rgbResult = _colors[index]; // Starting color
-    cc.Flags = CC_RGBINIT | CC_FULLOPEN;
+    cc.Flags = CC_RGBINIT | CC_FULLOPEN | CC_ENABLEHOOK;
+    cc.lpfnHook = _PickerColorDialogHook;
 
-    // Массив кастомных цветов (опционально, для истории выбора)
+    // Array of custom colors (optional, for selection history)
     static COLORREF custColors[16] = {};
     cc.lpCustColors = custColors;
 
@@ -227,6 +241,33 @@ bool Palette::EditColor(int index, HWND hWndOwner)
     }
 
     return false;
+}
+
+UINT_PTR CALLBACK Palette::_PickerColorDialogHook(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if (message == WM_INITDIALOG)
+    {
+
+        HWND hMainWindow = GetAncestor(hDlg, GA_ROOTOWNER);
+
+        int x = 250, y = 50;
+
+        if (hMainWindow)
+        {
+            RECT rcMain;
+            if (GetWindowRect(hMainWindow, &rcMain))
+            {
+                // Просто смещаем от левого верхнего угла главного окна
+                x = rcMain.left + 200;
+                y = rcMain.top + 50;
+            }
+        }
+
+        // Применяем позицию
+        SetWindowPos(hDlg, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+    }
+
+    return FALSE;
 }
 
 } // namespace baresprite

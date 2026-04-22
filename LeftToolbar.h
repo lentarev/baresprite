@@ -28,6 +28,8 @@ class LeftToolbar : public ChildWindow
     HWND _hToolbar = nullptr;
     Project &_projectData;
 
+    //HBRUSH _hToolbarBrush = nullptr;
+
     // Toolbar Components
     std::unique_ptr<Palette> _palette;
 

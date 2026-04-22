@@ -9,6 +9,8 @@ LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, Project &pr
     : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent), _projectData(projectData)
 {
 
+   
+
     // Registers the window class for canvas
     WNDCLASSEXW wcex = {};
 
