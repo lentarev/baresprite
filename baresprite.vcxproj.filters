@@ -111,6 +111,9 @@
     <ClInclude Include="ProjectSettings.h">
       <Filter>Header Files\Settings</Filter>
     </ClInclude>
+    <ClInclude Include="load_project_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -148,6 +151,9 @@
     </ClCompile>
     <ClCompile Include="ProjectSettings.cpp">
       <Filter>Source Files\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="load_project_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

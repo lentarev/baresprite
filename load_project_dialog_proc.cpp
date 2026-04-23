@@ -1,4 +1,4 @@
-#include "new_project_dialog_proc.h"
+#include "load_project_dialog_proc.h"
 
 #include "AppState.h"
 #include "resource.h"
@@ -10,26 +10,16 @@
 
 namespace baresprite
 {
-
-// Message handler for New Project Dialog box.
-INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK LoadProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-
     switch (message)
     {
     case WM_INITDIALOG: {
         SetWindowLongPtr(hDlg, DWLP_USER, lParam);
         AppState *appState = reinterpret_cast<AppState *>(lParam);
 
-        // Filling the ComboBox
-        HWND hCombo = GetDlgItem(hDlg, IDC_COMBO_NEW_PROJECT_RESOLUTION);
-
-        ComboBox_AddString(hCombo, L"64 x 64 pixels (Recommended)");
-        ComboBox_AddString(hCombo, L"128 x 128 pixels");
-        ComboBox_SetCurSel(hCombo, 0);
-
         // Location folder
-        HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_NEW_PROJECT_BROWSE);
+        HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_BROWSE_LOAD_PROJECT);
 
         if (appState->isExistAppConfig)
         {
@@ -59,16 +49,15 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
     case WM_COMMAND:
 
         // Handle button (Browse)
-        if (LOWORD(wParam) == IDC_BUTTON_NEW_PROJECT_BROWSE)
+        if (LOWORD(wParam) == IDC_BUTTON_BROWSE_LOAD_PROJECT)
         {
-
-            HWND hBtn = GetDlgItem(hDlg, IDC_BUTTON_NEW_PROJECT_BROWSE);
+            HWND hBtn = GetDlgItem(hDlg, IDC_BUTTON_BROWSE_LOAD_PROJECT);
 
             // Lock the button (Browse) to prevent repeated pressings
             EnableWindow(hBtn, FALSE);
 
             // Get the current path from the input field
-            HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_NEW_PROJECT_BROWSE);
+            HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_BROWSE_LOAD_PROJECT);
             wchar_t currentPath[MAX_PATH] = {0};
             GetWindowTextW(hEdit, currentPath, MAX_PATH);
 
@@ -115,29 +104,13 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
         // Handle button (Ok)
         if (LOWORD(wParam) == IDOK)
         {
-            HWND hCombo = GetDlgItem(hDlg, IDC_COMBO_NEW_PROJECT_RESOLUTION);
-            HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_NEW_PROJECT_BROWSE);
+            HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_BROWSE_LOAD_PROJECT);
 
             // Read the pointer
             AppState *appState = reinterpret_cast<AppState *>(GetWindowLongPtr(hDlg, DWLP_USER));
 
             if (appState)
             {
-
-                // Resolution
-                int sel = ComboBox_GetCurSel(hCombo);
-
-                if (sel == 0)
-                {
-                    appState->imageSize = 64;
-                    appState->checkerSize = 8;
-                }
-                else
-                {
-                    appState->imageSize = 128;
-                    appState->checkerSize = 4;
-                }
-
                 // Reading the path
                 wchar_t pathBuf[MAX_PATH];
                 GetWindowTextW(hEdit, pathBuf, MAX_PATH);
@@ -161,9 +134,6 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
         break;
     }
-
-    
-
 
     return (INT_PTR)FALSE;
 }

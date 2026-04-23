@@ -190,6 +190,7 @@
     <ClInclude Include="FrameToolbar.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="LeftToolbar.h" />
+    <ClInclude Include="load_project_dialog_proc.h" />
     <ClInclude Include="new_project_dialog_proc.h" />
     <ClInclude Include="Palette.h" />
     <ClInclude Include="PaletteData.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="ChessBackground.cpp" />
     <ClCompile Include="FrameToolbar.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />
+    <ClCompile Include="load_project_dialog_proc.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />
     <ClCompile Include="Palette.cpp" />
     <ClCompile Include="ProjectSettings.cpp" />

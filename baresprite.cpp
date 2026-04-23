@@ -17,6 +17,7 @@
 #include "ask_save_dialog.h"
 #include "new_project_dialog_proc.h"
 #include "start_screen_dialog_proc.h"
+#include "load_project_dialog_proc.h"
 
 // Manifesto and Libraries.
 #pragma comment(                                                                                                                                               \
@@ -142,12 +143,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         else if (startResult == IDC_BUTTON_LOAD_PROJECT)
         {
             // Show Load Project dialog
+            INT_PTR loadProjectResult =
+                DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_LOAD_PROJECT), nullptr, LoadProjectDialogProc, reinterpret_cast<LPARAM>(gAppState.get()));
 
-            // Load project
-            if (gProjectSettings->Load())
+            if (loadProjectResult == IDOK)
             {
-                launchEditor = true;
+                // Check is project exists
+                if (appSettings->IsProjectExist(gAppState->projectPath))
+                {
+                    // Load project
+                    if (gProjectSettings->Load())
+                    {
+                        launchEditor = true;
+                    }
+                }
+                else
+                {
+                    MessageBox(nullptr, L"The project you are trying to load is missing configuration data.", L"Error", MB_OK | MB_ICONEXCLAMATION);
+                }
             }
+
+            
             
         }
     }
