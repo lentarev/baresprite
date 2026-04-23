@@ -154,6 +154,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                     // Load project
                     if (gProjectSettings->Load())
                     {
+                        // Saves information in config.ini about the loaded project.
+                        appSettings->Save();
+
                         launchEditor = true;
                     }
                 }
