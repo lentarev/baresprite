@@ -3,7 +3,7 @@
 #include "ChildWindow.h"
 #include <Windows.h>
 #include <memory>
-#include "Project.h"
+#include "AppState.h"
 
 namespace baresprite
 {
@@ -14,7 +14,7 @@ class Palette;
 class LeftToolbar : public ChildWindow
 {
   public:
-    LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, Project &projectData);
+    LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState);
 
     ~LeftToolbar() override;
 
@@ -26,7 +26,7 @@ class LeftToolbar : public ChildWindow
     HWND _hWndParent;
     HINSTANCE _hInstanceParent;
     HWND _hToolbar = nullptr;
-    Project &_projectData;
+    AppState &_appState;
 
     //HBRUSH _hToolbarBrush = nullptr;
 

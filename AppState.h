@@ -7,15 +7,15 @@
 namespace baresprite
 {
 
-struct Project
+struct AppState
 {
     bool isExistAppConfig;
     bool isDirty;
     std::wstring configPath;
     std::wstring projectPath;
     std::wstring name;
-    int imageSize;
-    int checkerSize;
+    int imageSize = 64;
+    int checkerSize = 8;
     PaletteData palette;
 };
 

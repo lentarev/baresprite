@@ -8,11 +8,11 @@
 #include <shlwapi.h>
 
 #include "AppSettings.h"
-#include "ProjectSettings.h"
 #include "Canvas.h"
 #include "FrameToolbar.h"
 #include "LeftToolbar.h"
-#include "Project.h"
+#include "AppState.h"
+#include "ProjectSettings.h"
 #include "RightToolbar.h"
 #include "ask_save_dialog.h"
 #include "new_project_dialog_proc.h"
@@ -36,7 +36,7 @@ WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
 
 // All data of project
-std::unique_ptr<Project> gProjectData;
+std::unique_ptr<AppState> gAppState;
 std::unique_ptr<LeftToolbar> gLeftToolbar;
 std::unique_ptr<FrameToolbar> gFrameToolbar;
 std::unique_ptr<RightToolbar> gRightToolbar;
@@ -84,21 +84,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     LoadStringW(hInstance, IDC_BARESPRITE, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-    gProjectData = std::make_unique<Project>();
-    gProjectSettings = std::make_unique<ProjectSettings>(*gProjectData);
+    gAppState = std::make_unique<AppState>();
+    gProjectSettings = std::make_unique<ProjectSettings>(*gAppState);
 
     // Initializing the project data change flag
-    gProjectData->isDirty = false;
+    gAppState->isDirty = false;
 
-    auto appSettings = std::make_unique<AppSettings>(*gProjectData);
+    auto appSettings = std::make_unique<AppSettings>(*gAppState);
 
     if (appSettings->Load())
     {
-        gProjectData->isExistAppConfig = true;
+        gAppState->isExistAppConfig = true;
     }
     else
     {
-        gProjectData->isExistAppConfig = false;
+        gAppState->isExistAppConfig = false;
     }
 
     // === Startup Loop ===
@@ -119,18 +119,36 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         {
             // Show new project dialog
             INT_PTR newProjectResult =
-                DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_NEW_PROJECT), nullptr, NewProjectDialogProc, reinterpret_cast<LPARAM>(gProjectData.get()));
+                DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_NEW_PROJECT), nullptr, NewProjectDialogProc, reinterpret_cast<LPARAM>(gAppState.get()));
 
             if (newProjectResult == IDOK)
             {
-                appSettings->Save();
+                if (appSettings->IsProjectExist(gAppState->projectPath))
+                {
+                    MessageBox(nullptr, L"The project you are trying to create already exists.", L"Error", MB_OK | MB_ICONEXCLAMATION);
+                }
+                else
+                {
+                    // Сохраняет информацию в config.ini о новом проекте
+                    appSettings->Save();
 
-                launchEditor = true;
+                    // Создаем конфиг для нового проека
+                    gProjectSettings->Save();
+
+                    launchEditor = true;
+                }
             }
         }
         else if (startResult == IDC_BUTTON_LOAD_PROJECT)
         {
-            MessageBox(nullptr, L"Load Project: Not implemented yet", L"Info", MB_OK);
+            // Show Load Project dialog
+
+            // Load project
+            if (gProjectSettings->Load())
+            {
+                launchEditor = true;
+            }
+            
         }
     }
 
@@ -208,7 +226,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     UpdateWindow(hWnd);
 
     // Create left toolbar child window
-    gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gProjectData);
+    gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gAppState);
 
     // Create frame toolbar child window
     gFrameToolbar = std::make_unique<FrameToolbar>(hWnd, hInstance);
@@ -217,7 +235,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
 
     // Create canvas child window
-    gCanvas = std::make_unique<Canvas>(hWnd, hInstance, *gProjectData);
+    gCanvas = std::make_unique<Canvas>(hWnd, hInstance, *gAppState);
 
     RECT rc;
 
@@ -292,7 +310,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
         case IDM_EXIT:
-            if (gProjectData && gProjectSettings && AskSaveDialog(hWnd, *gProjectData, *gProjectSettings))
+            if (gAppState && gProjectSettings && AskSaveDialog(hWnd, *gAppState, *gProjectSettings))
             {
                 DestroyWindow(hWnd);
             }
@@ -341,7 +359,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
 
     case WM_CLOSE: {
-        if (gProjectData && gProjectSettings && AskSaveDialog(hWnd, *gProjectData, *gProjectSettings))
+        if (gAppState && gProjectSettings && AskSaveDialog(hWnd, *gAppState, *gProjectSettings))
         {
             DestroyWindow(hWnd);
         }

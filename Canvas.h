@@ -2,7 +2,7 @@
 #include "ChildWindow.h"
 #include <Windows.h>
 #include <memory>
-#include "Project.h"
+#include "AppState.h"
 
 namespace baresprite
 {
@@ -14,7 +14,7 @@ class ChessBackground;
 class Canvas : public ChildWindow
 {
   public:
-    Canvas(HWND hWndParent, HINSTANCE hInstanceParent, Project &projectData);
+    Canvas(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState);
 
     ~Canvas() override;
 
@@ -27,7 +27,7 @@ class Canvas : public ChildWindow
     HINSTANCE _hInstanceParent;
 
     // Link to the project data structure.
-    Project &_projectData;
+    AppState &_appState;
 
     HWND _hCanvas = nullptr;
 

@@ -66,13 +66,10 @@
     <ClInclude Include="baresprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="App.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="start_screen_dialog_proc.h">
       <Filter>Header Files\DialogsWndProc</Filter>
     </ClInclude>
-    <ClInclude Include="Project.h">
+    <ClInclude Include="AppState.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
     <ClInclude Include="new_project_dialog_proc.h">
@@ -117,9 +114,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="start_screen_dialog_proc.cpp">

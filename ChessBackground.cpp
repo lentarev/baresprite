@@ -3,7 +3,7 @@
 namespace baresprite
 {
 
-ChessBackground::ChessBackground(Project &projectData) : _projectData(projectData)
+ChessBackground::ChessBackground(AppState &appStat) : _appState(appStat)
 {
     _hBrushLight = CreateSolidBrush(RGB(245, 245, 245)); // Светло-серый
     _hBrushDark = CreateSolidBrush(RGB(215, 215, 215));  // Тёмно-серый
@@ -25,7 +25,7 @@ ChessBackground::~ChessBackground()
 void ChessBackground::Render(const PAINTSTRUCT &ps, HDC hdc) const
 {
     // Настройки шахматки
-    const int CELL_SIZE = _projectData.checkerSize;
+    const int CELL_SIZE = _appState.checkerSize;
 
     // Вычисляем диапазон клеток только для области обновления (ps.rcPaint)
     const int startX = ps.rcPaint.left / CELL_SIZE;

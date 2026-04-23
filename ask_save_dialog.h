@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Windows.h>
-#include "Project.h"
+#include "AppState.h"
 #include "ProjectSettings.h"
+#include <Windows.h>
 
 namespace baresprite
 {
@@ -10,6 +10,6 @@ namespace baresprite
 /// Save changes before closing dialog
 /// </summary>
 /// <returns></returns>
-bool AskSaveDialog(HWND hWnd, Project &projectData, ProjectSettings &projectSettings);
+bool AskSaveDialog(HWND hWnd, AppState &appState, ProjectSettings &projectSettings);
 
-}
+} // namespace baresprite

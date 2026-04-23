@@ -4,8 +4,7 @@
 
 namespace baresprite
 {
-Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, Project &projectData)
-    : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent), _projectData(projectData)
+Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent), _appState(appState)
 {
 
     // Registers the window class for canvas
@@ -33,7 +32,7 @@ Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, Project &projectData)
         return; // Не удалось создать окно
     }
 
-    _chessBackground = std::make_unique<ChessBackground>(projectData);
+    _chessBackground = std::make_unique<ChessBackground>(appState);
 }
 
 Canvas::~Canvas()

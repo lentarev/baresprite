@@ -6,17 +6,12 @@
 namespace baresprite
 {
 
-Palette::Palette(HWND hWndToolbar, HINSTANCE hInstanceParent, Project &projectData)
-    : _hWndToolbar(hWndToolbar), _hInstanceParent(hInstanceParent), _projectData(projectData)
+Palette::Palette(HWND hWndToolbar, HINSTANCE hInstanceParent, AppState &appState)
+    : _hWndToolbar(hWndToolbar), _hInstanceParent(hInstanceParent), _appState(appState)
 {
-    _projectData.palette.colors = {RGB(0, 0, 0),     RGB(127, 127, 127), RGB(255, 0, 0),     RGB(255, 127, 0),   RGB(255, 255, 0),
-                                   RGB(0, 255, 0),   RGB(0, 255, 255),   RGB(0, 0, 255),     RGB(127, 0, 255),   RGB(255, 255, 255),
-                                   RGB(64, 64, 64),  RGB(191, 191, 191), RGB(127, 0, 0),     RGB(0, 127, 0),     RGB(0, 0, 127),
-                                   RGB(127, 127, 0), RGB(255, 191, 191), RGB(255, 127, 127), RGB(127, 255, 127), RGB(127, 127, 255),
-                                   RGB(127, 64, 0),  RGB(255, 0, 255),   RGB(0, 127, 127),   RGB(255, 200, 150), RGB(64, 0, 0)};
 
     CreatePalette();
-    SelectColor(0);
+    SelectColor(_appState.palette.index);
 }
 
 Palette::~Palette()
@@ -46,7 +41,7 @@ void Palette::SelectColor(int index)
 
     _oldIndex = index;
 
-    _selectedColor = _projectData.palette.colors[index];
+    _selectedColor = _appState.palette.colors[index];
 
     HDC hdc = GetDC(_hWndToolbar);
     HDC hdcMem = CreateCompatibleDC(hdc);
@@ -62,7 +57,7 @@ void Palette::SelectColor(int index)
     HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _selectedBorder);
     HPEN hOldPen = (HPEN)SelectObject(hdcMem, hPen);
 
-    HBRUSH hBrush = CreateSolidBrush(_projectData.palette.colors[index]);
+    HBRUSH hBrush = CreateSolidBrush(_appState.palette.colors[index]);
     HBRUSH hOldBrush = (HBRUSH)SelectObject(hdcMem, hBrush);
 
     Rectangle(hdcMem, 0, 0, _BTN_SIZE, _BTN_SIZE);
@@ -108,7 +103,7 @@ void Palette::ResetColor(int index)
     HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _defaultBorder);
     HPEN hOldPen = (HPEN)SelectObject(hdcMem, hPen);
 
-    HBRUSH hBrush = CreateSolidBrush(_projectData.palette.colors[index]);
+    HBRUSH hBrush = CreateSolidBrush(_appState.palette.colors[index]);
     HBRUSH hOldBrush = (HBRUSH)SelectObject(hdcMem, hBrush);
 
     Rectangle(hdcMem, 0, 0, _BTN_SIZE, _BTN_SIZE);
@@ -146,7 +141,7 @@ void Palette::CreatePalette()
         int x = _startX + col * (_BTN_SIZE + _SPACING);
         int y = _startY + row * (_BTN_SIZE + _SPACING);
 
-        HBITMAP hBmp = CreateBitmap(_projectData.palette.colors[i], _BTN_SIZE, _BTN_SIZE);
+        HBITMAP hBmp = CreateBitmap(_appState.palette.colors[i], _BTN_SIZE, _BTN_SIZE);
         _paletteBitmaps.push_back(hBmp);
 
         HWND hBtn = CreateWindowExW(0, L"BUTTON", L"", WS_CHILD | WS_VISIBLE | BS_BITMAP | BS_FLAT | BS_NOTIFY, x, y, _BTN_SIZE, _BTN_SIZE, _hWndToolbar,
@@ -218,14 +213,14 @@ int Palette::ColorsCount() const
 
 bool Palette::EditColor(int index, HWND hWndOwner)
 {
-    if (index < 0 || index >= static_cast<int>(_projectData.palette.colors.size()))
+    if (index < 0 || index >= static_cast<int>(_appState.palette.colors.size()))
         return false;
 
     // Setting up the dialogue
     CHOOSECOLORW cc = {};
     cc.lStructSize = sizeof(CHOOSECOLORW);
     cc.hwndOwner = hWndOwner;
-    cc.rgbResult = _projectData.palette.colors[index]; // Starting color
+    cc.rgbResult = _appState.palette.colors[index]; // Starting color
     cc.Flags = CC_RGBINIT | CC_FULLOPEN | CC_ENABLEHOOK;
     cc.lpfnHook = _PickerColorDialogHook;
 
@@ -237,7 +232,7 @@ bool Palette::EditColor(int index, HWND hWndOwner)
     if (ChooseColorW(&cc))
     {
         // Пользователь выбрал новый цвет!
-        _projectData.palette.colors[index] = cc.rgbResult; // Обновляем массив
+        _appState.palette.colors[index] = cc.rgbResult; // Обновляем массив
         return true;
     }
 

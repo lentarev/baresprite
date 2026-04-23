@@ -8,10 +8,10 @@ namespace baresprite
 /// </summary>
 /// <param name="hWnd"></param>
 /// <returns></returns>
-bool AskSaveDialog(HWND hWnd, Project &projectData, ProjectSettings &projectSettings)
+bool AskSaveDialog(HWND hWnd, AppState &appState, ProjectSettings &projectSettings)
 {
     // If there are no changes, we immediately allow closure.
-    if (!projectData.isDirty)
+    if (!appState.isDirty)
     {
         return true;
     }

@@ -1,6 +1,6 @@
 #include "new_project_dialog_proc.h"
 
-#include "Project.h"
+#include "AppState.h"
 #include "resource.h"
 
 #include <Windows.h>
@@ -20,7 +20,7 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
     {
     case WM_INITDIALOG: {
         SetWindowLongPtr(hDlg, DWLP_USER, lParam);
-        Project *projectData = reinterpret_cast<Project *>(lParam);
+        AppState *appState = reinterpret_cast<AppState *>(lParam);
 
         // Filling the ComboBox
         HWND hCombo = GetDlgItem(hDlg, IDC_COMBO_NEW_PROJECT_RESOLUTION);
@@ -32,9 +32,9 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
         // Location folder
         HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_NEW_PROJECT_BROWSE);
 
-        if (projectData->isExistAppConfig)
+        if (appState->isExistAppConfig)
         {
-            SetWindowTextW(hEdit, projectData->projectPath.c_str());
+            SetWindowTextW(hEdit, appState->projectPath.c_str());
         }
         else
         {
@@ -110,9 +110,9 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
             HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_NEW_PROJECT_BROWSE);
 
             // Read the pointer
-            Project *projectData = reinterpret_cast<Project *>(GetWindowLongPtr(hDlg, DWLP_USER));
+            AppState *appState = reinterpret_cast<AppState *>(GetWindowLongPtr(hDlg, DWLP_USER));
 
-            if (projectData)
+            if (appState)
             {
 
                 // Resolution
@@ -120,20 +120,20 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
                 if (sel == 0)
                 {
-                    projectData->imageSize = 64;
-                    projectData->checkerSize = 8;
+                    appState->imageSize = 64;
+                    appState->checkerSize = 8;
                 }
                 else
                 {
-                    projectData->imageSize = 128;
-                    projectData->checkerSize = 4;
+                    appState->imageSize = 128;
+                    appState->checkerSize = 4;
                 }
 
                 // Reading the path
                 wchar_t pathBuf[MAX_PATH];
                 GetWindowTextW(hEdit, pathBuf, MAX_PATH);
 
-                projectData->projectPath = pathBuf;
+                appState->projectPath = pathBuf;
             }
 
             EndDialog(hDlg, LOWORD(wParam));

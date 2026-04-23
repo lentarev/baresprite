@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h>
 #include <filesystem>
 #include <string>
 
@@ -15,6 +16,9 @@ class Settings
     virtual void Save() = 0;
 
   protected:
+    // Config file name
+    std::wstring _configProjectFileName = L"baresprite.ini";
+
     /// <summary>
     /// Get project name from path
     /// </summary>
@@ -27,6 +31,21 @@ class Settings
         fs::path path(fullPath);
 
         return path.filename().wstring();
+    }
+
+
+    /// <summary>
+    /// Removes spaces and line breaks from the ends of a line.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    std::wstring Trim(const std::wstring &str)
+    {
+        size_t start = str.find_first_not_of(L" \t\r\n");
+        if (start == std::wstring::npos)
+            return L"";
+        size_t end = str.find_last_not_of(L" \t\r\n");
+        return str.substr(start, end - start + 1);
     }
 };
 

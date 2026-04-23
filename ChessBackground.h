@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "Project.h"
+#include "AppState.h"
 
 namespace baresprite
 {
@@ -9,7 +9,7 @@ namespace baresprite
 class ChessBackground
 {
   public:
-    ChessBackground(Project &projectData);
+    ChessBackground(AppState &appState);
 
     ~ChessBackground();
 
@@ -20,7 +20,7 @@ class ChessBackground
     HBRUSH _hBrushDark;
 
     // Link to the project data structure.
-    Project &_projectData;
+    AppState &_appState;
 };
 
 } // namespace baresprite

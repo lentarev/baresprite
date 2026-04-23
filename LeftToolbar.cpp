@@ -5,8 +5,8 @@
 namespace baresprite
 {
 
-LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, Project &projectData)
-    : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent), _projectData(projectData)
+LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState)
+    : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent), _appState(appState)
 {
 
    
@@ -32,7 +32,7 @@ LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, Project &pr
                                hInstanceParent, nullptr);
 
     // Create palette
-    _palette = std::make_unique<Palette>(_hToolbar, hInstanceParent, projectData);
+    _palette = std::make_unique<Palette>(_hToolbar, hInstanceParent, appState);
 }
 
 LeftToolbar::~LeftToolbar()
@@ -67,8 +67,8 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
             {
                 _palette->SelectColor(index); // Visually highlight
 
-                _projectData.palette.color = _palette->GetSelectedColor();
-                _projectData.palette.index = index;
+                _appState.palette.color = _palette->GetSelectedColor();
+                _appState.palette.index = index;
             }
 
             // Double click (edit color)
@@ -82,16 +82,16 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
                     _palette->SelectColor(index);
 
                     // Updating project data
-                    _projectData.palette.color = _palette->GetSelectedColor();
-                    _projectData.palette.index = index;
+                    _appState.palette.color = _palette->GetSelectedColor();
+                    _appState.palette.index = index;
 
                     // Assign new color
-                    _projectData.palette.colors[index] = _palette->GetSelectedColor();
+                    _appState.palette.colors[index] = _palette->GetSelectedColor();
                 }
             }
 
             // We note that the project data has been changed.
-            _projectData.isDirty = true;
+            _appState.isDirty = true;
 
             return true;
         }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Project.h"
+#include "AppState.h"
 #include <Windows.h>
 #include <vector>
 
@@ -10,7 +10,7 @@ namespace baresprite
 class Palette
 {
   public:
-    Palette(HWND hWndToolbar, HINSTANCE hInstanceParent, Project &projectData);
+    Palette(HWND hWndToolbar, HINSTANCE hInstanceParent, AppState &appState);
     ~Palette();
 
     // Select color by index
@@ -27,7 +27,7 @@ class Palette
   private:
     HWND _hWndToolbar;
     HINSTANCE _hInstanceParent;
-    Project &_projectData;
+    AppState &_appState;
 
     std::vector<HBITMAP> _paletteBitmaps;
     std::vector<HWND> _paletteButtons;
