@@ -24,6 +24,9 @@ class FrameToolbar : public ChildWindow
 
     // Configuration
     static constexpr int HEIGHT = 80;
+
+    // WndProc for FrameToolbar
+    static LRESULT CALLBACK _FrameToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 } // namespace baresprite
