@@ -1,5 +1,6 @@
 #include "LeftToolbar.h"
 #include "Palette.h"
+#include "Tools.h"
 #include <iostream>
 
 namespace baresprite
@@ -33,6 +34,10 @@ LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, AppState &a
 
     // Create palette
     _palette = std::make_unique<Palette>(_hToolbar, hInstanceParent, appState);
+
+    // Create button tools
+    _tools = std::make_unique<Tools>(_hToolbar, hInstanceParent, appState);
+
 }
 
 LeftToolbar::~LeftToolbar()

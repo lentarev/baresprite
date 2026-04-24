@@ -1,15 +1,16 @@
 #pragma once
 
+#include "AppState.h"
 #include "ChildWindow.h"
 #include <Windows.h>
 #include <memory>
-#include "AppState.h"
 
 namespace baresprite
 {
 
 // Forward declaration
 class Palette;
+class Tools;
 
 class LeftToolbar : public ChildWindow
 {
@@ -28,10 +29,11 @@ class LeftToolbar : public ChildWindow
     HWND _hToolbar = nullptr;
     AppState &_appState;
 
-    //HBRUSH _hToolbarBrush = nullptr;
+    // HBRUSH _hToolbarBrush = nullptr;
 
     // Toolbar Components
     std::unique_ptr<Palette> _palette;
+    std::unique_ptr<Tools> _tools;
 
     // Configuration
     static constexpr int WIDTH = 180;

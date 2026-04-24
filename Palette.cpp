@@ -16,12 +16,15 @@ Palette::Palette(HWND hWndToolbar, HINSTANCE hInstanceParent, AppState &appState
 
 Palette::~Palette()
 {
-    for (HBITMAP bmp : _paletteBitmaps)
+
+    for (HWND btn : _paletteButtons)
     {
-        if (bmp)
-            DeleteObject(bmp);
+        if (btn && IsWindow(btn))
+        {
+            DestroyWindow(btn);
+        }
     }
-    _paletteBitmaps.clear();
+
     _paletteButtons.clear();
 }
 
@@ -79,7 +82,13 @@ void Palette::SelectColor(int index)
     // 1. Освобождаем контекст окна, полученный через GetDC
     ReleaseDC(_hWndToolbar, hdc);
 
-    SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
+    HBITMAP hOldBitmap = (HBITMAP)SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
+
+    // Удаляем старый битмап
+    if (hOldBitmap && hOldBitmap != hBitmap)
+    {
+        DeleteObject(hOldBitmap);
+    }
 }
 
 /// <summary>
@@ -125,7 +134,13 @@ void Palette::ResetColor(int index)
     // 1. Освобождаем контекст окна, полученный через GetDC
     ReleaseDC(_hWndToolbar, hdc);
 
-    SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
+    HBITMAP hOldBitmap = (HBITMAP)SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
+
+    // Удаляем старый битмап
+    if (hOldBitmap && hOldBitmap != hBitmap)
+    {
+        DeleteObject(hOldBitmap);
+    }
 }
 
 void Palette::CreatePalette()
@@ -142,7 +157,6 @@ void Palette::CreatePalette()
         int y = _startY + row * (_BTN_SIZE + _SPACING);
 
         HBITMAP hBmp = CreateBitmap(_appState.palette.colors[i], _BTN_SIZE, _BTN_SIZE);
-        _paletteBitmaps.push_back(hBmp);
 
         HWND hBtn = CreateWindowExW(0, L"BUTTON", L"", WS_CHILD | WS_VISIBLE | BS_BITMAP | BS_FLAT | BS_NOTIFY, x, y, _BTN_SIZE, _BTN_SIZE, _hWndToolbar,
                                     (HMENU)(INT_PTR)idCounter++, _hInstanceParent, nullptr);
