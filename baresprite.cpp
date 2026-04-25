@@ -8,16 +8,16 @@
 #include <shlwapi.h>
 
 #include "AppSettings.h"
+#include "AppState.h"
 #include "Canvas.h"
 #include "FrameToolbar.h"
 #include "LeftToolbar.h"
-#include "AppState.h"
 #include "ProjectSettings.h"
 #include "RightToolbar.h"
 #include "ask_save_dialog.h"
+#include "load_project_dialog_proc.h"
 #include "new_project_dialog_proc.h"
 #include "start_screen_dialog_proc.h"
-#include "load_project_dialog_proc.h"
 
 // Manifesto and Libraries.
 #pragma comment(                                                                                                                                               \
@@ -165,9 +165,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                     MessageBox(nullptr, L"The project you are trying to load is missing configuration data.", L"Error", MB_OK | MB_ICONEXCLAMATION);
                 }
             }
-
-            
-            
         }
     }
 
@@ -297,6 +294,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+
+    case WM_KEYDOWN: {
+
+        int toolIndex = -1;
+
+        switch (wParam)
+        {
+        case 'B':
+            toolIndex = 0;
+
+            break; // Brush
+        case 'E':
+            toolIndex = 1;
+
+            break; // Eraser
+        case 'S':
+            toolIndex = 2;
+
+            break; // Select
+        case 'F':
+            toolIndex = 3;
+
+            break; // Fill
+        }
+
+        if (toolIndex != -1 && gLeftToolbar)
+        {
+            gLeftToolbar->SelectTool(toolIndex);
+            return 0; // Сообщение обработано
+        }
+    }
+    break;
 
     case WM_COMMAND: {
         int wmId = LOWORD(wParam);

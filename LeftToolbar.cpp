@@ -63,7 +63,7 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
     // Palette: ID from 3001 to 3025
     if (commandId >= 3001 && commandId < 3001 + _palette->ColorsCount())
     {
-        int index = commandId - 3001;
+        const int index = commandId - 3001;
 
         if (_palette)
         {
@@ -102,7 +102,28 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
         }
     }
 
+    // Tools: ID from 3031 to 3034
+    if (commandId >= 3031 && commandId < 3031 + _tools->ButtonCount())
+    {
+        const int index = commandId - 3031;
+
+        if (_tools)
+        {
+            if (notifyCode == BN_CLICKED)
+            {
+                std::cout << "Tools: " << index << std::endl;
+                _tools->SetActive(index);
+            }
+        }
+    }
+
+
     return false;
+}
+
+void LeftToolbar::SelectTool(int index)
+{
+    _tools->SetActive(index);
 }
 
 LRESULT CALLBACK LeftToolbar::_LeftToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

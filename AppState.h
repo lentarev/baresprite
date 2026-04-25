@@ -1,8 +1,9 @@
 #pragma once
 
+#include "PaletteData.h"
 #include <Windows.h>
 #include <string>
-#include "PaletteData.h"
+#include "ToolType.h"
 
 namespace baresprite
 {
@@ -17,6 +18,7 @@ struct AppState
     int imageSize = 64;
     int checkerSize = 8;
     PaletteData palette;
+    ToolType currentTool = ToolType::Brush;
 };
 
 } // namespace baresprite

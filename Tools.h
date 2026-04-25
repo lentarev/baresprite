@@ -13,6 +13,9 @@ class Tools
     Tools(HWND hWndToolbar, HINSTANCE hInstance, AppState &appState);
     ~Tools();
 
+    int ButtonCount() const;
+    void SetActive(const int index);
+
   private:
     HWND _hWndToolbar;
     HINSTANCE _hInstance;
@@ -30,7 +33,6 @@ class Tools
 
     // Tool buttons
     std::vector<HWND> _toolButtons;
-    std::vector<std::wstring> _labelButtons = {L"Brush", L"Eraser", L"Select", L"Fill"};
 
     // METHODS
     void CreateButtonTools();

@@ -23,6 +23,8 @@ class LeftToolbar : public ChildWindow
 
     bool OnCommand(int commandId, int notifyCode) override;
 
+    void SelectTool(int index);
+
   private:
     HWND _hWndParent;
     HINSTANCE _hInstanceParent;
