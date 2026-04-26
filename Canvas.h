@@ -22,6 +22,14 @@ class Canvas : public ChildWindow
 
     bool OnCommand(int commandId, int notifyCode) override;
 
+    void ZoomIn();
+
+    void ZoomOut();
+
+    int GetZoom() const;
+
+
+
   private:
     HWND _hWndParent;
     HINSTANCE _hInstanceParent;
@@ -32,11 +40,13 @@ class Canvas : public ChildWindow
     HWND _hCanvas = nullptr;
 
     // Canvas state
-    float _zoom = 1.0f;
     int _canvasWidth = 512;
     int _canvasHeight = 512;
+
+    int _zoom = 8;
     int _offsetX = 0;
     int _offsetY = 0;
+
 
     // Canvas Components
     std::unique_ptr<ChessBackground> _chessBackground;
@@ -50,6 +60,8 @@ class Canvas : public ChildWindow
 
     // WndProc for Canvas
     static LRESULT CALLBACK _CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+    void HandleDraw(WPARAM wParam, LPARAM lParam);
 };
 
 } // namespace baresprite

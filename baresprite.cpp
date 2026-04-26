@@ -9,7 +9,8 @@
 
 #include "AppSettings.h"
 #include "AppState.h"
-#include "Canvas.h"
+#include "CanvasScrollView.h"
+// #include "Canvas.h"
 #include "FrameToolbar.h"
 #include "LeftToolbar.h"
 #include "ProjectSettings.h"
@@ -26,6 +27,7 @@
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "shell32.lib")
+#pragma comment(lib, "Msimg32.lib")
 
 using namespace baresprite;
 
@@ -36,12 +38,17 @@ HINSTANCE hInst;                     // current instance
 WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
 
+// Глобальные переменные для скролла (или добавь в класс главного окна)
+static int g_ScrollX = 0;
+static int g_ScrollY = 0;
+
 // All data of project
 std::unique_ptr<AppState> gAppState;
 std::unique_ptr<LeftToolbar> gLeftToolbar;
 std::unique_ptr<FrameToolbar> gFrameToolbar;
 std::unique_ptr<RightToolbar> gRightToolbar;
-std::unique_ptr<Canvas> gCanvas;
+std::unique_ptr<CanvasScrollView> gCanvasScrollView;
+// std::unique_ptr<Canvas> gCanvas;
 std::unique_ptr<ProjectSettings> gProjectSettings;
 
 // Forward declarations of functions included in this code module:
@@ -130,11 +137,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                 }
                 else
                 {
-                    // Сохраняет информацию в config.ini о новом проекте
+                    // Saves information in config.ini about the new project.
                     appSettings->Save();
 
                     // Создаем конфиг для нового проека
                     gProjectSettings->Save();
+
+                    // Initialization
+                    gAppState->frames.emplace_back(gAppState->imageSize, gAppState->imageSize);
 
                     launchEditor = true;
                 }
@@ -156,6 +166,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                     {
                         // Saves information in config.ini about the loaded project.
                         appSettings->Save();
+
+                        // Initialization
 
                         launchEditor = true;
                     }
@@ -209,7 +221,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance = hInstance;
     wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_BARESPRITE));
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 2);
+    wcex.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
     wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_BARESPRITE);
     wcex.lpszClassName = szWindowClass;
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON_BARESPRITE));
@@ -250,8 +262,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     // Create right toolbar child window
     gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
 
+    // Create canvas scroll view container
+    gCanvasScrollView = std::make_unique<CanvasScrollView>(hWnd, hInstance, *gAppState);
+
     // Create canvas child window
-    gCanvas = std::make_unique<Canvas>(hWnd, hInstance, *gAppState);
+    // gCanvas = std::make_unique<Canvas>(hWnd, hInstance, *gAppState);
 
     RECT rc;
 
@@ -272,10 +287,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         gRightToolbar->OnSize(rc.right, rc.bottom);
     }
 
-    if (gCanvas)
+    if (gCanvasScrollView)
     {
-        gCanvas->OnSize(rc.right, rc.bottom);
+        gCanvasScrollView->OnSize(rc.right, rc.bottom);
     }
+
+    // if (gCanvas)
+    //{
+    //     gCanvas->OnSize(rc.right, rc.bottom);
+    // }
 
     return TRUE;
 }
@@ -390,10 +410,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 gRightToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
             }
 
-            if (gCanvas)
+            if (gCanvasScrollView)
             {
-                gCanvas->OnSize(LOWORD(lParam), HIWORD(lParam));
+                gCanvasScrollView->OnSize(LOWORD(lParam), HIWORD(lParam));
             }
+
+            // if (gCanvas)
+            //{
+            //     gCanvas->OnSize(LOWORD(lParam), HIWORD(lParam));
+            // }
         }
 
         return 0;

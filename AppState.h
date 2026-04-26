@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <string>
 #include "ToolType.h"
+#include "Frame.h"
 
 namespace baresprite
 {
@@ -19,6 +20,7 @@ struct AppState
     int checkerSize = 8;
     PaletteData palette;
     ToolType currentTool = ToolType::Brush;
+    std::vector<Frame> frames;
 };
 
 } // namespace baresprite

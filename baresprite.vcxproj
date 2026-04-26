@@ -185,8 +185,10 @@
     <ClInclude Include="baresprite.h" />
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="ask_save_dialog.h" />
+    <ClInclude Include="CanvasScrollView.h" />
     <ClInclude Include="ChessBackground.h" />
     <ClInclude Include="ChildWindow.h" />
+    <ClInclude Include="Frame.h" />
     <ClInclude Include="FrameToolbar.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="LeftToolbar.h" />
@@ -209,6 +211,7 @@
     <ClCompile Include="baresprite.cpp" />
     <ClCompile Include="Canvas.cpp" />
     <ClCompile Include="ask_save_dialog.cpp" />
+    <ClCompile Include="CanvasScrollView.cpp" />
     <ClCompile Include="ChessBackground.cpp" />
     <ClCompile Include="FrameToolbar.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />

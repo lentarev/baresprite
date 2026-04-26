@@ -120,6 +120,12 @@
     <ClInclude Include="ToolType.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
+    <ClInclude Include="Frame.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="CanvasScrollView.h">
+      <Filter>Header Files\ChildWindows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -163,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="Tools.cpp">
       <Filter>Source Files\LeftToolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="CanvasScrollView.cpp">
+      <Filter>Source Files\ChildWindows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
