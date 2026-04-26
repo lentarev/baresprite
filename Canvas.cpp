@@ -34,6 +34,8 @@ Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState) :
         return; // Не удалось создать окно
     }
 
+    _checkerSize = _appState.checkerSize;
+
     _chessBackground = std::make_unique<ChessBackground>(appState);
 }
 
@@ -49,12 +51,11 @@ void Canvas::OnSize(int clientW, int clientH)
 {
     if (_hCanvas)
     {
+        _canvasAreaW = clientW;
+        _canvasAreaH = clientH;
 
-        const int canvasAreaWidth = (clientW - LEFT_TOOLBAR_WIDTH - RIGHT_TOOLBAR_WIDTH);
-        const int canvasAreaHeight = (clientH - FRAME_TOOLBAR_HEIGHT);
-
-        _offsetX = LEFT_TOOLBAR_WIDTH + (canvasAreaWidth - _canvasWidth) / 2;
-        _offsetY = (canvasAreaHeight - _canvasHeight) / 2;
+        _offsetX = (_canvasAreaW - _canvasWidth) / 2;
+        _offsetY = (_canvasAreaH - _canvasHeight) / 2;
 
         SetWindowPos(_hCanvas, nullptr, _offsetX, _offsetY, _canvasWidth, _canvasHeight, SWP_NOZORDER | SWP_NOACTIVATE);
     }
@@ -145,7 +146,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         FillRect(hdcMem, &clientRect, hBrush);
 
         // Рисуем шахматный фон
-        pCanvas->_chessBackground->Render(ps, hdcMem);
+        pCanvas->_chessBackground->Render(ps, hdcMem, pCanvas->_checkerSize);
 
         // Рисуем кадр с прозрачностью
         if (!pCanvas->_appState.frames.empty())
@@ -162,8 +163,8 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
             int logicalW = frame.width;
             int logicalH = frame.height;
-            int screenW = logicalW * pCanvas->_zoom;
-            int screenH = logicalH * pCanvas->_zoom;
+            int screenW = logicalW * pCanvas->_checkerSize;
+            int screenH = logicalH * pCanvas->_checkerSize;
 
             // Создаём временный DC для кадра
             HDC hdcFrame = CreateCompatibleDC(hdcMem);
@@ -178,7 +179,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             blend.BlendOp = AC_SRC_OVER;
             blend.BlendFlags = 0;
             blend.SourceConstantAlpha = 255;  // Полная непрозрачность
-            blend.AlphaFormat = AC_SRC_ALPHA; // 🔥 Используем альфа-канал из пикселей
+            blend.AlphaFormat = AC_SRC_ALPHA; // Используем альфа-канал из пикселей
 
             // Растягиваем с альфа-смешиванием (прозрачные пиксели не перекроют шахматку)
             AlphaBlend(hdcMem, 0, 0, screenW, screenH, hdcFrame, 0, 0, logicalW, logicalH, blend);
@@ -221,8 +222,8 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
     int my = GET_Y_LPARAM(lParam);
 
     // Экран -> Логические координаты (делим на zoom)
-    int lx = mx / _zoom;
-    int ly = my / _zoom;
+    int lx = mx / _checkerSize;
+    int ly = my / _checkerSize;
 
     // Проверка границ холста
     if (lx >= 0 && lx < frame.width && ly >= 0 && ly < frame.height)
@@ -244,31 +245,73 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
         frame.SetPixel(lx, ly, color);
 
         // Перерисовываем ТОЛЬКО этот пиксель (оптимизация)
-        RECT r = {lx * _zoom, ly * _zoom, (lx + 1) * _zoom, (ly + 1) * _zoom};
+        RECT r = {lx * _checkerSize, ly * _checkerSize, (lx + 1) * _checkerSize, (ly + 1) * _checkerSize};
         InvalidateRect(_hCanvas, &r, FALSE); // FALSE = не стирать фон, используем двойную буферизацию
     }
 }
 
-void Canvas::ZoomIn()
+bool Canvas::ZoomIn()
 {
-    if (_zoom < 32)
+    if (_zoom < 3)
     { // Максимальный зум
         _zoom++;
+
+        _canvasWidth = MIN_CANVAS_SIZE * _zoom;
+        _canvasHeight = MIN_CANVAS_SIZE * _zoom;
+        _checkerSize = _appState.checkerSize * _zoom;
+
         // Здесь можно добавить логику центрирования при зуме, если нужно
+        ApplyZoom();
+
+        std::cout << "ZoomIn" << std::endl;
+
+        return true;
     }
+
+    return false;
 }
 
-void Canvas::ZoomOut()
+bool Canvas::ZoomOut()
 {
     if (_zoom > 1)
     { // Минимальный зум
         _zoom--;
+
+        _canvasWidth = MIN_CANVAS_SIZE * _zoom;
+        _canvasHeight = MIN_CANVAS_SIZE * _zoom;
+        _checkerSize = _appState.checkerSize * _zoom;
+
+        ApplyZoom();
+
+        std::cout << "ZoomOut" << std::endl;
+
+        return true;
     }
+
+    return false;
+}
+
+void Canvas::ApplyZoom()
+{
+    // Рассчитываем новый физический размер
+
+    _canvasWidth = MIN_CANVAS_SIZE * _zoom;
+    _canvasHeight = MIN_CANVAS_SIZE * _zoom;
+
+    _offsetX = (_canvasAreaW - _canvasWidth) / 2;
+    _offsetY = (_canvasAreaH - _canvasHeight) / 2;
+
+    SetWindowPos(_hCanvas, nullptr, _offsetX, _offsetY, _canvasWidth, _canvasHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 int Canvas::GetZoom() const
 {
     return _zoom;
+}
+
+HWND Canvas::GetHWndCanvas() const
+{
+    return _hCanvas;
 }
 
 } // namespace baresprite

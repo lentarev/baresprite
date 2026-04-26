@@ -1,4 +1,5 @@
 #include "CanvasScrollView.h"
+#include "Canvas.h"
 
 namespace baresprite
 {
@@ -22,8 +23,11 @@ CanvasScrollView::CanvasScrollView(HWND hWndMain, HINSTANCE hInstance, AppState 
     RegisterClassExW(&wcex);
 
     // Create a scroll view container for canvas window
-    _hCanvasScrollView = CreateWindowExW(0, L"CanvasScrollViewClass", L"", (DWORD)(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS), 0, 0, _containerW, _containerH,
-                                         hWndMain, nullptr, hInstance, this);
+    _hCanvasScrollView = CreateWindowExW(0, L"CanvasScrollViewClass", L"", (DWORD)(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_HSCROLL | WS_VSCROLL), 0, 0,
+                                         _containerW, _containerH, hWndMain, nullptr, hInstance, this);
+
+    // Create canvas
+    _canvas = std::make_unique<Canvas>(_hCanvasScrollView, hInstance, appState);
 }
 
 CanvasScrollView::~CanvasScrollView()
@@ -38,6 +42,7 @@ void CanvasScrollView::OnSize(int clientW, int clientH)
 {
     if (_hCanvasScrollView)
     {
+
         const int PADDING = 5;
 
         const int freeAreaW = (clientW - LEFT_TOOLBAR_WIDTH - RIGHT_TOOLBAR_WIDTH);
@@ -50,12 +55,96 @@ void CanvasScrollView::OnSize(int clientW, int clientH)
         _offsetY = (freeAreaH - _containerH) / 2;
 
         SetWindowPos(_hCanvasScrollView, nullptr, _offsetX, _offsetY, _containerW, _containerH, SWP_NOZORDER | SWP_NOACTIVATE);
+
+        if (_canvas)
+        {
+            _canvas->OnSize(freeAreaW, freeAreaH);
+
+            // Получаем размер canvas
+            HWND hCanvas = _canvas->GetHWndCanvas();
+            RECT rc;
+            GetClientRect(hCanvas, &rc);
+            int canvasW = rc.right;
+            int canvasH = rc.bottom;
+
+            // Вычисляем начальную позицию с центрированием
+            _canvasPosX = 0;
+            _canvasPosY = 0;
+
+            // Если canvas меньше контейнера — центрируем
+            if (canvasW < _containerW)
+            {
+                _canvasPosX = (_containerW - canvasW) / 2;
+            }
+            if (canvasH < _containerH)
+            {
+                _canvasPosY = (_containerH - canvasH) / 2;
+            }
+
+            // Устанавливаем позицию
+            SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+            // Сбрасываем скролл
+            _scrollX = 0;
+            _scrollY = 0;
+
+            UpdateScrollInfo();
+        }
     }
+}
+
+bool CanvasScrollView::ZoomIn()
+{
+    if (_canvas)
+    {
+        return _canvas->ZoomIn();
+    }
+
+    return false;
+}
+
+bool CanvasScrollView::ZoomOut()
+{
+    if (_canvas)
+    {
+        return _canvas->ZoomOut();
+    }
+
+    return false;
 }
 
 bool CanvasScrollView::OnCommand(int commandId, int notifyCode)
 {
     return false;
+}
+
+void CanvasScrollView::UpdateScrollInfo()
+{
+    if (!_canvas || !_hCanvasScrollView)
+        return;
+
+    HWND hCanvas = _canvas->GetHWndCanvas();
+
+    // Получаем размер клиентской области canvas
+    RECT rc;
+    GetClientRect(hCanvas, &rc);
+    int canvasW = rc.right;
+    int canvasH = rc.bottom;
+
+    SCROLLINFO si = {};
+    si.cbSize = sizeof(SCROLLINFO);
+    si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
+
+    si.nMin = 0;
+    si.nMax = canvasW - 1;
+    si.nPage = _containerW;
+    si.nPos = _scrollX;
+    SetScrollInfo(_hCanvasScrollView, SB_HORZ, &si, TRUE);
+
+    si.nMax = canvasH - 1;
+    si.nPage = _containerH;
+    si.nPos = _scrollY;
+    SetScrollInfo(_hCanvasScrollView, SB_VERT, &si, TRUE);
 }
 
 LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -79,6 +168,143 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
 
     switch (message)
     {
+    case WM_HSCROLL: {
+        SCROLLINFO si = {};
+        si.cbSize = sizeof(SCROLLINFO);
+        si.fMask = SIF_ALL;
+        GetScrollInfo(hWnd, SB_HORZ, &si);
+
+        int newPos = si.nPos;
+        switch (LOWORD(wParam))
+        {
+        case SB_LINEUP:
+            newPos -= 16;
+            break;
+        case SB_LINEDOWN:
+            newPos += 16;
+            break;
+        case SB_PAGEUP:
+            newPos -= si.nPage;
+            break;
+        case SB_PAGEDOWN:
+            newPos += si.nPage;
+            break;
+        case SB_THUMBTRACK:
+        case SB_THUMBPOSITION:
+            newPos = HIWORD(wParam);
+            break;
+        }
+
+        // Ограничиваем
+        int maxPos = max(0, si.nMax - (int)si.nPage + 1);
+        if (newPos < 0)
+            newPos = 0;
+        if (newPos > maxPos)
+            newPos = maxPos;
+
+        if (newPos != si.nPos)
+        {
+            if (pScrollView->_canvas)
+            {
+                pScrollView->_scrollX = newPos;
+
+                // Вычисляем начальную позицию (центрирование)
+                HWND hCanvas = pScrollView->_canvas->GetHWndCanvas();
+                RECT rc;
+                GetClientRect(hCanvas, &rc);
+                int canvasW = rc.right;
+
+                int initialX = 0;
+                if (canvasW < pScrollView->_containerW)
+                {
+                    initialX = (pScrollView->_containerW - canvasW) / 2;
+                }
+
+                // Формула: начальная_позиция - скролл
+                pScrollView->_canvasPosX = initialX - newPos;
+
+                SetWindowPos(hCanvas, nullptr, pScrollView->_canvasPosX, pScrollView->_canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+            }
+
+            si.nPos = newPos;
+            SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+        }
+        return 0;
+    }
+
+    case WM_VSCROLL: {
+        SCROLLINFO si = {};
+        si.cbSize = sizeof(SCROLLINFO);
+        si.fMask = SIF_ALL;
+        GetScrollInfo(hWnd, SB_VERT, &si);
+
+        int newPos = si.nPos;
+        switch (LOWORD(wParam))
+        {
+        case SB_LINEUP:
+            newPos -= 16;
+            break;
+        case SB_LINEDOWN:
+            newPos += 16;
+            break;
+        case SB_PAGEUP:
+            newPos -= si.nPage;
+            break;
+        case SB_PAGEDOWN:
+            newPos += si.nPage;
+            break;
+        case SB_THUMBTRACK:
+        case SB_THUMBPOSITION:
+            newPos = HIWORD(wParam);
+            break;
+        }
+
+        // Ограничиваем
+        int maxPos = max(0, si.nMax - (int)si.nPage + 1);
+        if (newPos < 0)
+            newPos = 0;
+        if (newPos > maxPos)
+            newPos = maxPos;
+
+        if (newPos != si.nPos)
+        {
+            if (pScrollView->_canvas)
+            {
+                pScrollView->_scrollY = newPos;
+
+                // Вычисляем начальную позицию (центрирование)
+                HWND hCanvas = pScrollView->_canvas->GetHWndCanvas();
+                RECT rc;
+                GetClientRect(hCanvas, &rc);
+                int canvasH = rc.bottom;
+
+                int initialY = 0;
+                if (canvasH < pScrollView->_containerH)
+                {
+                    initialY = (pScrollView->_containerH - canvasH) / 2;
+                }
+
+                // Формула: начальная_позиция - скролл
+                pScrollView->_canvasPosY = initialY - newPos;
+
+                SetWindowPos(hCanvas, nullptr, pScrollView->_canvasPosX, pScrollView->_canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+            }
+
+            si.nPos = newPos;
+            SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+        }
+        return 0;
+    }
+
+    case WM_ERASEBKGND:
+        HDC hdc = (HDC)wParam;
+        RECT rc;
+        GetClientRect(hWnd, &rc);
+
+        HBRUSH hBrush = CreateSolidBrush(RGB(200, 200, 200));
+        FillRect(hdc, &rc, hBrush);
+        DeleteObject(hBrush);
+        return TRUE;
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);

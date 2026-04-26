@@ -38,6 +38,8 @@ HINSTANCE hInst;                     // current instance
 WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
 
+HWND gHWnd = nullptr;
+
 // Глобальные переменные для скролла (или добавь в класс главного окна)
 static int g_ScrollX = 0;
 static int g_ScrollY = 0;
@@ -193,7 +195,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (!TranslateAccelerator(gHWnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
@@ -244,6 +246,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     hInst = hInstance; // Store instance handle in our global variable
 
     HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+
+    gHWnd = hWnd;
 
     if (!hWnd)
     {
@@ -321,10 +325,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         switch (wParam)
         {
-        case 'B':
-            toolIndex = 0;
+            // case 'B':
+            // toolIndex = 0;
 
-            break; // Brush
+            // break; // Brush
         case 'E':
             toolIndex = 1;
 
@@ -351,10 +355,52 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         int wmId = LOWORD(wParam);
         int wmEvent = HIWORD(wParam); // notification code (BN_CLICKED or BN_DBLCLK)
 
+        if (wmId == ID_ZOOM_IN)
+        {
+            RECT rc;
+            GetClientRect(hWnd, &rc);
+
+            if (gCanvasScrollView)
+            {
+                if (gCanvasScrollView->ZoomIn())
+                {
+                    gCanvasScrollView->OnSize(rc.right, rc.bottom);
+                }
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_ZOOM_OUT)
+        {
+            RECT rc;
+            GetClientRect(hWnd, &rc);
+
+            if (gCanvasScrollView)
+            {
+                if (gCanvasScrollView->ZoomOut())
+                {
+                    gCanvasScrollView->OnSize(rc.right, rc.bottom);
+                }
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_TOOL_BRUSH)
+        {
+
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->SelectTool(0);
+            }
+
+            return 0;
+        }
+
         // LeftToolbar
         if (gLeftToolbar && gLeftToolbar->OnCommand(wmId, wmEvent))
         {
-
             return 0; // Command processed.
         }
 
@@ -389,7 +435,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
     }
-    break;
+
+        SetFocus(hWnd);
+        break;
 
     case WM_SIZE:
 

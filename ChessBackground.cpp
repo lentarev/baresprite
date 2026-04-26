@@ -22,10 +22,10 @@ ChessBackground::~ChessBackground()
     }
 };
 
-void ChessBackground::Render(const PAINTSTRUCT &ps, HDC hdc) const
+void ChessBackground::Render(const PAINTSTRUCT &ps, HDC hdc, const int checkerSize) const
 {
     // Настройки шахматки
-    const int CELL_SIZE = _appState.checkerSize;
+    const int CELL_SIZE = checkerSize;
 
     // Вычисляем диапазон клеток только для области обновления (ps.rcPaint)
     const int startX = ps.rcPaint.left / CELL_SIZE;

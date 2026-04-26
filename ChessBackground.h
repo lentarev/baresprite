@@ -13,7 +13,7 @@ class ChessBackground
 
     ~ChessBackground();
 
-    void Render(const PAINTSTRUCT &ps, HDC hdc) const;
+    void Render(const PAINTSTRUCT &ps, HDC hdc, const int checkerSize) const;
 
   private:
     HBRUSH _hBrushLight;

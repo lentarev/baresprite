@@ -10,8 +10,6 @@ LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, AppState &a
     : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent), _appState(appState)
 {
 
-   
-
     // Registers the window class for canvas
     WNDCLASSEXW wcex = {};
 
@@ -37,7 +35,6 @@ LeftToolbar::LeftToolbar(HWND hWndParent, HINSTANCE hInstanceParent, AppState &a
 
     // Create button tools
     _tools = std::make_unique<Tools>(_hToolbar, hInstanceParent, appState);
-
 }
 
 LeftToolbar::~LeftToolbar()
@@ -111,12 +108,11 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
         {
             if (notifyCode == BN_CLICKED)
             {
-                std::cout << "Tools: " << index << std::endl;
+
                 _tools->SetActive(index);
             }
         }
     }
-
 
     return false;
 }

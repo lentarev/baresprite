@@ -1,15 +1,14 @@
 #pragma once
+#include "AppState.h"
 #include "ChildWindow.h"
 #include <Windows.h>
 #include <memory>
-#include "AppState.h"
 
 namespace baresprite
 {
 
 // Forward declaration
 class ChessBackground;
-
 
 class Canvas : public ChildWindow
 {
@@ -22,13 +21,15 @@ class Canvas : public ChildWindow
 
     bool OnCommand(int commandId, int notifyCode) override;
 
-    void ZoomIn();
+    bool ZoomIn();
 
-    void ZoomOut();
+    bool ZoomOut();
 
     int GetZoom() const;
 
+    void ApplyZoom();
 
+    HWND GetHWndCanvas() const;
 
   private:
     HWND _hWndParent;
@@ -39,14 +40,19 @@ class Canvas : public ChildWindow
 
     HWND _hCanvas = nullptr;
 
-    // Canvas state
-    int _canvasWidth = 512;
-    int _canvasHeight = 512;
+    int _canvasAreaW = 0;
+    int _canvasAreaH = 0;
 
-    int _zoom = 8;
+    static constexpr int MIN_CANVAS_SIZE = 512;
+
+    // Canvas state
+    int _canvasWidth = MIN_CANVAS_SIZE;
+    int _canvasHeight = MIN_CANVAS_SIZE;
+    int _checkerSize = 8;
+
+    int _zoom = 1;
     int _offsetX = 0;
     int _offsetY = 0;
-
 
     // Canvas Components
     std::unique_ptr<ChessBackground> _chessBackground;
@@ -55,8 +61,6 @@ class Canvas : public ChildWindow
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;
     static constexpr int RIGHT_TOOLBAR_WIDTH = 180;
     static constexpr int FRAME_TOOLBAR_HEIGHT = 80;
-
-    static constexpr int MIN_CANVAS_SIZE = 512;
 
     // WndProc for Canvas
     static LRESULT CALLBACK _CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
