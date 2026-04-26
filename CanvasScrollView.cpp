@@ -16,7 +16,7 @@ CanvasScrollView::CanvasScrollView(HWND hWndMain, HINSTANCE hInstance, AppState 
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
-    wcex.hCursor = LoadCursor(nullptr, IDC_CROSS);
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 2);
     wcex.lpszClassName = L"CanvasScrollViewClass";
 

@@ -189,6 +189,7 @@
     <ClInclude Include="ChessBackground.h" />
     <ClInclude Include="ChildWindow.h" />
     <ClInclude Include="Frame.h" />
+    <ClInclude Include="FrameRenderer.h" />
     <ClInclude Include="FrameToolbar.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="LeftToolbar.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="ask_save_dialog.cpp" />
     <ClCompile Include="CanvasScrollView.cpp" />
     <ClCompile Include="ChessBackground.cpp" />
+    <ClCompile Include="FrameRenderer.cpp" />
     <ClCompile Include="FrameToolbar.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="load_project_dialog_proc.cpp" />

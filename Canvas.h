@@ -9,6 +9,7 @@ namespace baresprite
 
 // Forward declaration
 class ChessBackground;
+class FrameRenderer;
 
 class Canvas : public ChildWindow
 {
@@ -56,6 +57,7 @@ class Canvas : public ChildWindow
 
     // Canvas Components
     std::unique_ptr<ChessBackground> _chessBackground;
+    std::unique_ptr<FrameRenderer> _frameRenderer;
 
     // Configuration
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;

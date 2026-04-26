@@ -126,6 +126,9 @@
     <ClInclude Include="CanvasScrollView.h">
       <Filter>Header Files\ChildWindows</Filter>
     </ClInclude>
+    <ClInclude Include="FrameRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -172,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="CanvasScrollView.cpp">
       <Filter>Source Files\ChildWindows</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameRenderer.cpp">
+      <Filter>Source Files\Canvas</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
