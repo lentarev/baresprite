@@ -263,8 +263,6 @@ bool Canvas::ZoomIn()
         // Здесь можно добавить логику центрирования при зуме, если нужно
         ApplyZoom();
 
-        std::cout << "ZoomIn" << std::endl;
-
         return true;
     }
 
@@ -282,8 +280,6 @@ bool Canvas::ZoomOut()
         _checkerSize = _appState.checkerSize * _zoom;
 
         ApplyZoom();
-
-        std::cout << "ZoomOut" << std::endl;
 
         return true;
     }

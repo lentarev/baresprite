@@ -398,6 +398,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0;
         }
 
+        if (wmId == ID_TOOL_ERASER)
+        {
+
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->SelectTool(1);
+            }
+
+            return 0;
+        }
+
         // LeftToolbar
         if (gLeftToolbar && gLeftToolbar->OnCommand(wmId, wmEvent))
         {
