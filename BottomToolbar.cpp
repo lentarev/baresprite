@@ -1,29 +1,29 @@
-#include "FrameToolbar.h"
+#include "BottomToolbar.h"
 
 namespace baresprite
 {
 
-FrameToolbar::FrameToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent)
+BottomToolbar::BottomToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent)
 {
 
-    // Registers the window class for FrameToolbar
+    // Registers the window class for BottomToolbar
     WNDCLASSEXW wcex = {};
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
     wcex.style = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc = _FrameToolbarWndProc;
+    wcex.lpfnWndProc = _BottomToolbarWndProc;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstanceParent;
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
-    wcex.lpszClassName = L"BareSpriteFrameToolbarClass";
+    wcex.lpszClassName = L"BareSpriteBottomToolbarClass";
 
     RegisterClassExW(&wcex);
 
     // Create a toolbar container window
-    _hToolbar = CreateWindowEx(0, L"BareSpriteFrameToolbarClass", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 0, 0, hWndParent, nullptr,
+    _hToolbar = CreateWindowEx(0, L"BareSpriteBottomToolbarClass", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 0, 0, hWndParent, nullptr,
                                hInstanceParent, nullptr);
 
     if (!_hToolbar)
@@ -32,7 +32,7 @@ FrameToolbar::FrameToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndPa
     }
 }
 
-FrameToolbar::~FrameToolbar()
+BottomToolbar::~BottomToolbar()
 {
     if (_hToolbar)
     {
@@ -40,7 +40,7 @@ FrameToolbar::~FrameToolbar()
     }
 }
 
-void FrameToolbar::OnSize(int clientW, int clientH)
+void BottomToolbar::OnSize(int clientW, int clientH)
 {
 
     if (_hToolbar)
@@ -50,12 +50,12 @@ void FrameToolbar::OnSize(int clientW, int clientH)
     }
 }
 
-bool FrameToolbar::OnCommand(int commandId, int notifyCode)
+bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 {
     return false;
 }
 
-LRESULT CALLBACK FrameToolbar::_FrameToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK BottomToolbar::_BottomToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     // Forwarding notifications from child controls to the parent
     if (message == WM_COMMAND || message == WM_NOTIFY)

@@ -11,7 +11,7 @@
 #include "AppState.h"
 #include "Canvas.h"
 #include "CanvasScrollView.h"
-#include "FrameToolbar.h"
+#include "BottomToolbar.h"
 #include "LeftToolbar.h"
 #include "ProjectSettings.h"
 #include "RightToolbar.h"
@@ -47,7 +47,7 @@ static int g_ScrollY = 0;
 // All data of project
 std::unique_ptr<AppState> gAppState;
 std::unique_ptr<LeftToolbar> gLeftToolbar;
-std::unique_ptr<FrameToolbar> gFrameToolbar;
+std::unique_ptr<BottomToolbar> gBottomToolbar;
 std::unique_ptr<RightToolbar> gRightToolbar;
 std::unique_ptr<CanvasScrollView> gCanvasScrollView;
 // std::unique_ptr<Canvas> gCanvas;
@@ -261,7 +261,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gAppState);
 
     // Create frame toolbar child window
-    gFrameToolbar = std::make_unique<FrameToolbar>(hWnd, hInstance);
+    gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance);
 
     // Create right toolbar child window
     gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
@@ -281,9 +281,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         gLeftToolbar->OnSize(rc.right, rc.bottom);
     }
 
-    if (gFrameToolbar)
+    if (gBottomToolbar)
     {
-        gFrameToolbar->OnSize(rc.right, rc.bottom);
+        gBottomToolbar->OnSize(rc.right, rc.bottom);
     }
 
     if (gRightToolbar)
@@ -422,7 +422,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
         // FrameToolbar
-        if (gFrameToolbar && gFrameToolbar->OnCommand(wmId, wmEvent))
+        if (gBottomToolbar && gBottomToolbar->OnCommand(wmId, wmEvent))
         {
             return 0; // Command processed.
         }
@@ -465,9 +465,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 gLeftToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
             }
 
-            if (gFrameToolbar)
+            if (gBottomToolbar)
             {
-                gFrameToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+                gBottomToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
             }
 
             if (gRightToolbar)

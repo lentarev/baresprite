@@ -190,8 +190,9 @@
     <ClInclude Include="ChildWindow.h" />
     <ClInclude Include="CursorRenderer.h" />
     <ClInclude Include="Frame.h" />
+    <ClInclude Include="FramePanel.h" />
     <ClInclude Include="FrameRenderer.h" />
-    <ClInclude Include="FrameToolbar.h" />
+    <ClInclude Include="BottomToolbar.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="LeftToolbar.h" />
     <ClInclude Include="load_project_dialog_proc.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="RightToolbar.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="start_screen_dialog_proc.h" />
+    <ClInclude Include="TagPanel.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Tools.h" />
     <ClInclude Include="ToolType.h" />
@@ -216,8 +218,9 @@
     <ClCompile Include="CanvasScrollView.cpp" />
     <ClCompile Include="ChessBackground.cpp" />
     <ClCompile Include="CursorRenderer.cpp" />
+    <ClCompile Include="FramePanel.cpp" />
     <ClCompile Include="FrameRenderer.cpp" />
-    <ClCompile Include="FrameToolbar.cpp" />
+    <ClCompile Include="BottomToolbar.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="load_project_dialog_proc.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />
@@ -225,6 +228,7 @@
     <ClCompile Include="ProjectSettings.cpp" />
     <ClCompile Include="RightToolbar.cpp" />
     <ClCompile Include="start_screen_dialog_proc.cpp" />
+    <ClCompile Include="TagPanel.cpp" />
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>

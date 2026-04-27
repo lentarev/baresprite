@@ -6,12 +6,12 @@
 namespace baresprite
 {
 
-class FrameToolbar : public ChildWindow
+class BottomToolbar : public ChildWindow
 {
   public:
-    FrameToolbar(HWND hWndParent, HINSTANCE hInstanceParent);
+    BottomToolbar(HWND hWndParent, HINSTANCE hInstanceParent);
 
-    ~FrameToolbar() override;
+    ~BottomToolbar() override;
 
     void OnSize(int clientW, int clientH) override;
 
@@ -25,8 +25,8 @@ class FrameToolbar : public ChildWindow
     // Configuration
     static constexpr int HEIGHT = 80;
 
-    // WndProc for FrameToolbar
-    static LRESULT CALLBACK _FrameToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    // WndProc for BottomToolbar
+    static LRESULT CALLBACK _BottomToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 } // namespace baresprite

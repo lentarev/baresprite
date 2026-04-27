@@ -52,6 +52,12 @@
     <Filter Include="Source Files\Dialogs">
       <UniqueIdentifier>{77347ae0-5433-422b-9a3c-8304bdda9cfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\BottomToolbar">
+      <UniqueIdentifier>{60746537-174a-4533-8273-da22b7ddb359}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BottomToolbar">
+      <UniqueIdentifier>{bed3c3fa-ec4b-4a42-acaf-66f11ae8df51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -87,7 +93,7 @@
     <ClInclude Include="ChildWindow.h">
       <Filter>Header Files\ChildWindows</Filter>
     </ClInclude>
-    <ClInclude Include="FrameToolbar.h">
+    <ClInclude Include="BottomToolbar.h">
       <Filter>Header Files\ChildWindows</Filter>
     </ClInclude>
     <ClInclude Include="RightToolbar.h">
@@ -132,6 +138,12 @@
     <ClInclude Include="CursorRenderer.h">
       <Filter>Header Files\Canvas</Filter>
     </ClInclude>
+    <ClInclude Include="FramePanel.h">
+      <Filter>Header Files\BottomToolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="TagPanel.h">
+      <Filter>Header Files\BottomToolbar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -149,7 +161,7 @@
     <ClCompile Include="LeftToolbar.cpp">
       <Filter>Source Files\ChildWindows</Filter>
     </ClCompile>
-    <ClCompile Include="FrameToolbar.cpp">
+    <ClCompile Include="BottomToolbar.cpp">
       <Filter>Source Files\ChildWindows</Filter>
     </ClCompile>
     <ClCompile Include="RightToolbar.cpp">
@@ -184,6 +196,12 @@
     </ClCompile>
     <ClCompile Include="CursorRenderer.cpp">
       <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="FramePanel.cpp">
+      <Filter>Source Files\BottomToolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="TagPanel.cpp">
+      <Filter>Source Files\BottomToolbar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
