@@ -2,6 +2,7 @@
 #include "ChessBackground.h"
 #include "Frame.h"
 #include "FrameRenderer.h"
+#include "CursorRenderer.h"
 #include <iostream>
 #include <windowsx.h>
 
@@ -39,6 +40,7 @@ Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState) :
 
     _chessBackground = std::make_unique<ChessBackground>(appState);
     _frameRenderer = std::make_unique<FrameRenderer>();
+    _cursorRenderer = std::make_unique<CursorRenderer>();
 }
 
 Canvas::~Canvas()
@@ -390,26 +392,11 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         // Рисуем кастомный курсор
         if (pCanvas->_showCustomCursor && pCanvas->_mousePos.x >= 0 && pCanvas->_mousePos.y >= 0)
         {
-
             int cursorSize = pCanvas->_brushSize * pCanvas->_checkerSize;
-
             int cursorX = pCanvas->_mousePosScreen.x - cursorSize / 2;
             int cursorY = pCanvas->_mousePosScreen.y - cursorSize / 2;
 
-            // Сохраняем состояние DC
-            int oldRop = SetROP2(hdcMem, R2_XORPEN);
-            HPEN hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
-            HPEN oldPen = (HPEN)SelectObject(hdcMem, hPen);
-            HBRUSH oldBrush = (HBRUSH)SelectObject(hdcMem, GetStockObject(NULL_BRUSH)); // Прозрачная заливка
-
-            // Рисуем ПРЯМО НА hdcMem (инверсия фона!)
-            Rectangle(hdcMem, cursorX, cursorY, cursorX + cursorSize, cursorY + cursorSize);
-
-            // Восстанавливаем состояние
-            SelectObject(hdcMem, oldBrush);
-            SelectObject(hdcMem, oldPen);
-            DeleteObject(hPen);
-            SetROP2(hdcMem, oldRop);
+            pCanvas->_cursorRenderer->Render(cursorSize, cursorX, cursorY, hdcMem);
         }
 
         // 5. Копируем на экран
