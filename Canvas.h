@@ -36,6 +36,7 @@ class Canvas : public ChildWindow
 
     void IncreaseBrushSize();
     void DecreaseBrushSize();
+    void InvalidateCursorArea(int oldSize) const;
 
   private:
     HWND _hWndParent;

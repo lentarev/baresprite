@@ -282,17 +282,6 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
         return 0;
     }
 
-        // case WM_SETCURSOR: {
-        //     // Если курсор над клиентской областью — скрываем системный
-        //     if (LOWORD(lParam) == HTCLIENT)
-        //     {
-        //         pScrollView->SetCustomCursor(false);
-        //
-        //         return TRUE;
-        //     }
-        // }
-        // break;
-
     case WM_ERASEBKGND:
         HDC hdc = (HDC)wParam;
         RECT rc;

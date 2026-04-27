@@ -484,29 +484,62 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return 0;
 
     case WM_SETCURSOR: {
-        // Если курсор над клиентской областью — скрываем системный
         if (LOWORD(lParam) != HTCLIENT)
         {
-
-            if (gCanvasScrollView)
+            if (gCanvasScrollView && gCanvasScrollView->GetCanvas())
             {
-                SetCursor(LoadCursor(nullptr, IDC_ARROW));
                 gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
             }
-
-            return TRUE;
+            // Системный курсор восстановится через DefWindowProc
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
 
-        if (LOWORD(lParam) == HTCLIENT)
+        // Курсор над клиентской областью — проверяем, над канвасом ли
+        POINT screenPos;
+        GetCursorPos(&screenPos);
+        HWND hwndUnderCursor = WindowFromPoint(screenPos);
+
+        if (gCanvasScrollView && gCanvasScrollView->GetCanvas() && hwndUnderCursor == gCanvasScrollView->GetCanvas()->GetHWndCanvas())
         {
 
-            if (gCanvasScrollView)
+            // Конвертируем в координаты канваса
+            POINT clientPos = screenPos;
+            ScreenToClient(gCanvasScrollView->GetCanvas()->GetHWndCanvas(), &clientPos);
+
+            // Логические координаты
+            int logX = clientPos.x / gAppState->checkerSize;
+            int logY = clientPos.y / gAppState->checkerSize;
+
+            // Проверка границ холста
+            bool isInside = false;
+            if (!gAppState->frames.empty())
             {
-                SetCursor(LoadCursor(nullptr, IDC_ARROW));
-                gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
+    
+                isInside = (logX >= 0 && logX < gAppState->imageSize && logY >= 0 && logY < gAppState->imageSize);
             }
 
+            if (isInside)
+            {
+                // Внутри холста: показываем кастомный курсор
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(true);
+                SetCursor(nullptr); // Скрыть системный
+            }
+            else
+            {
+                // На серой области: системный курсор
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
+                SetCursor(LoadCursor(nullptr, IDC_ARROW));
+            }
             return TRUE;
+        }
+        else
+        {
+            // Курсор над тулбаром или другой панелью — системный курсор
+            if (gCanvasScrollView && gCanvasScrollView->GetCanvas())
+            {
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
+            }
+            // Системный курсор восстановится автоматически
         }
 
         return DefWindowProc(hWnd, message, wParam, lParam);

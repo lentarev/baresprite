@@ -92,47 +92,59 @@ void Canvas::SetCustomCursor(bool isCustom)
             InvalidateRect(_hCanvas, &eraseRect, FALSE);
         }
     }
-    
 }
 
 void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
 {
+
     if (_appState.frames.empty())
         return;
 
-    // Пока работаем с первым кадром
     Frame &frame = _appState.frames[0];
 
     int mx = GET_X_LPARAM(lParam);
     int my = GET_Y_LPARAM(lParam);
 
-    // Экран -> Логические координаты (делим на zoom)
-    int lx = mx / _checkerSize;
-    int ly = my / _checkerSize;
+    // Экран → логические координаты (центр кисти)
+    int centerX = mx / _checkerSize;
+    int centerY = my / _checkerSize;
 
-    // Проверка границ холста
-    if (lx >= 0 && lx < frame.width && ly >= 0 && ly < frame.height)
+    // Определяем цвет
+    uint32_t color = 0x00000000;
+    if (_appState.currentTool == ToolType::Brush)
     {
-        uint32_t color = 0x00000000;
-
-        if (_appState.currentTool == ToolType::Brush)
-        {
-            COLORREF c = _appState.palette.color;
-            // COLORREF (0x00BBGGRR) → 0xAARRGGBB для GDI
-            color = 0xFF000000 | (GetRValue(c) << 16) | (GetGValue(c) << 8) | GetBValue(c);
-        }
-        else if (_appState.currentTool == ToolType::Eraser)
-        {
-            color = 0x00000000; // Полностью прозрачный
-        }
-
-        // Меняем пиксель в памяти
-        frame.SetPixel(lx, ly, color);
-
-        // Перерисовываем ТОЛЬКО этот пиксель (оптимизация)
-        RECT r = {lx * _checkerSize, ly * _checkerSize, (lx + 1) * _checkerSize, (ly + 1) * _checkerSize};
-        InvalidateRect(_hCanvas, &r, FALSE); // FALSE = не стирать фон, используем двойную буферизацию
+        COLORREF c = _appState.palette.color;
+        color = 0xFF000000 | (GetRValue(c) << 16) | (GetGValue(c) << 8) | GetBValue(c);
     }
+    else if (_appState.currentTool == ToolType::Eraser)
+    {
+        color = 0x00000000;
+    }
+
+    // Рисуем квадрат _brushSize × _brushSize вокруг центра
+    int radius = _brushSize / 2; // Для 1→0, 3→1, 5→2
+
+    // Собираем область для перерисовки (оптимизация)
+    RECT dirtyRect = {(centerX - radius) * _checkerSize, (centerY - radius) * _checkerSize, (centerX + radius + 1) * _checkerSize,
+                      (centerY + radius + 1) * _checkerSize};
+
+    for (int dy = -radius; dy <= radius; ++dy)
+    {
+        for (int dx = -radius; dx <= radius; ++dx)
+        {
+            int lx = centerX + dx;
+            int ly = centerY + dy;
+
+            // Проверка границ холста
+            if (lx >= 0 && lx < frame.width && ly >= 0 && ly < frame.height)
+            {
+                frame.SetPixel(lx, ly, color);
+            }
+        }
+    }
+
+    // Перерисовываем всю область кисти
+    InvalidateRect(_hCanvas, &dirtyRect, FALSE);
 }
 
 bool Canvas::ZoomIn()
@@ -195,13 +207,50 @@ HWND Canvas::GetHWndCanvas() const
     return _hCanvas;
 }
 
-
 void Canvas::IncreaseBrushSize()
 {
+    const int MAX_BRUSH_SIZE = 5;
+
+    if (_brushSize < MAX_BRUSH_SIZE)
+    {
+        int oldSize = _brushSize; // Запоминаем старый размер
+        _brushSize += 2;
+        InvalidateCursorArea(oldSize);
+    }
 }
 
 void Canvas::DecreaseBrushSize()
 {
+    const int MIN_BRUSH_SIZE = 1;
+
+    if (_brushSize > MIN_BRUSH_SIZE)
+    {
+        int oldSize = _brushSize; // Запоминаем старый размер
+        _brushSize -= 2;
+        InvalidateCursorArea(oldSize);
+    }
+}
+
+void Canvas::InvalidateCursorArea(int oldSize) const
+{
+    if (!_showCustomCursor || _mousePosScreen.x < 0)
+    {
+        return; // Если курсор скрыт или не в холсте, не перерисовываем
+    }
+
+    // Находим максимальный размер, чтобы стереть "хвост" от старого курсора
+    // и нарисовать новый.
+    int maxDim = (oldSize > _brushSize) ? oldSize : _brushSize;
+
+    int cursorSize = maxDim * _checkerSize;
+    int padding = 2; // Запас для рамки
+
+    // Вычисляем область, которая покрывает и старый, и новый курсор
+    RECT dirtyRect = {_mousePosScreen.x - cursorSize / 2 - padding, _mousePosScreen.y - cursorSize / 2 - padding, _mousePosScreen.x + cursorSize / 2 + padding,
+                      _mousePosScreen.y + cursorSize / 2 + padding};
+
+    // FALSE = не стирать фон (предотвращаем мерцание)
+    InvalidateRect(_hCanvas, &dirtyRect, FALSE);
 }
 
 LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -382,7 +431,5 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
-
-
 
 } // namespace baresprite
