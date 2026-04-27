@@ -21,9 +21,7 @@ class CanvasScrollView : public ChildWindow
 
     bool OnCommand(int commandId, int notifyCode) override;
 
-    bool ZoomIn();
-
-    bool ZoomOut();
+    Canvas *GetCanvas();
 
   private:
     HWND _hWndMain;

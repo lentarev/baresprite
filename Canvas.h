@@ -32,6 +32,11 @@ class Canvas : public ChildWindow
 
     HWND GetHWndCanvas() const;
 
+    void SetCustomCursor(bool isCustom);
+
+    void IncreaseBrushSize();
+    void DecreaseBrushSize();
+
   private:
     HWND _hWndParent;
     HINSTANCE _hInstanceParent;
@@ -54,6 +59,13 @@ class Canvas : public ChildWindow
     int _zoom = 1;
     int _offsetX = 0;
     int _offsetY = 0;
+
+    // Custom cursor
+    POINT _mousePosScreen = {-1, -1}; //  Точная позиция для плавного курсора
+    POINT _mousePos = {-1, -1};       // Позиция мыши в логических координатах
+    POINT _prevMousePos = {-1, -1};
+    int _brushSize = 1;             // Размер кисти: 1, 3, 5 (нечётные)
+    bool _showCustomCursor = false; // Показывать ли кастомный курсор
 
     // Canvas Components
     std::unique_ptr<ChessBackground> _chessBackground;

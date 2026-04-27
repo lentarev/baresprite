@@ -9,8 +9,8 @@
 
 #include "AppSettings.h"
 #include "AppState.h"
+#include "Canvas.h"
 #include "CanvasScrollView.h"
-// #include "Canvas.h"
 #include "FrameToolbar.h"
 #include "LeftToolbar.h"
 #include "ProjectSettings.h"
@@ -296,11 +296,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         gCanvasScrollView->OnSize(rc.right, rc.bottom);
     }
 
-    // if (gCanvas)
-    //{
-    //     gCanvas->OnSize(rc.right, rc.bottom);
-    // }
-
     return TRUE;
 }
 
@@ -325,14 +320,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         switch (wParam)
         {
-            // case 'B':
-            // toolIndex = 0;
 
-            // break; // Brush
-        case 'E':
-            toolIndex = 1;
-
-            break; // Eraser
         case 'S':
             toolIndex = 2;
 
@@ -355,6 +343,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         int wmId = LOWORD(wParam);
         int wmEvent = HIWORD(wParam); // notification code (BN_CLICKED or BN_DBLCLK)
 
+        if (wmId == ID_CURSOR_IN)
+        {
+            if (gCanvasScrollView)
+            {
+                gCanvasScrollView->GetCanvas()->IncreaseBrushSize();
+            }
+            return 0;
+        }
+
+        if (wmId == ID_CURSOR_OUT)
+        {
+            if (gCanvasScrollView)
+            {
+                gCanvasScrollView->GetCanvas()->DecreaseBrushSize();
+            }
+            return 0;
+        }
+
         if (wmId == ID_ZOOM_IN)
         {
             RECT rc;
@@ -362,7 +368,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             if (gCanvasScrollView)
             {
-                if (gCanvasScrollView->ZoomIn())
+                if (gCanvasScrollView->GetCanvas()->ZoomIn())
                 {
                     gCanvasScrollView->OnSize(rc.right, rc.bottom);
                 }
@@ -378,7 +384,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             if (gCanvasScrollView)
             {
-                if (gCanvasScrollView->ZoomOut())
+                if (gCanvasScrollView->GetCanvas()->ZoomOut())
                 {
                     gCanvasScrollView->OnSize(rc.right, rc.bottom);
                 }
@@ -473,14 +479,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 gCanvasScrollView->OnSize(LOWORD(lParam), HIWORD(lParam));
             }
-
-            // if (gCanvas)
-            //{
-            //     gCanvas->OnSize(LOWORD(lParam), HIWORD(lParam));
-            // }
         }
 
         return 0;
+
+    case WM_SETCURSOR: {
+        // Если курсор над клиентской областью — скрываем системный
+        if (LOWORD(lParam) != HTCLIENT)
+        {
+
+            if (gCanvasScrollView)
+            {
+                SetCursor(LoadCursor(nullptr, IDC_ARROW));
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
+            }
+
+            return TRUE;
+        }
+
+        if (LOWORD(lParam) == HTCLIENT)
+        {
+
+            if (gCanvasScrollView)
+            {
+                SetCursor(LoadCursor(nullptr, IDC_ARROW));
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
+            }
+
+            return TRUE;
+        }
+
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    break;
 
     case WM_PAINT: {
         PAINTSTRUCT ps;

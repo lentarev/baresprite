@@ -1,5 +1,6 @@
 #include "CanvasScrollView.h"
 #include "Canvas.h"
+#include <iostream>
 
 namespace baresprite
 {
@@ -93,26 +94,6 @@ void CanvasScrollView::OnSize(int clientW, int clientH)
     }
 }
 
-bool CanvasScrollView::ZoomIn()
-{
-    if (_canvas)
-    {
-        return _canvas->ZoomIn();
-    }
-
-    return false;
-}
-
-bool CanvasScrollView::ZoomOut()
-{
-    if (_canvas)
-    {
-        return _canvas->ZoomOut();
-    }
-
-    return false;
-}
-
 bool CanvasScrollView::OnCommand(int commandId, int notifyCode)
 {
     return false;
@@ -145,6 +126,11 @@ void CanvasScrollView::UpdateScrollInfo()
     si.nPage = _containerH;
     si.nPos = _scrollY;
     SetScrollInfo(_hCanvasScrollView, SB_VERT, &si, TRUE);
+}
+
+Canvas *CanvasScrollView::GetCanvas()
+{
+    return _canvas.get();
 }
 
 LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -295,6 +281,17 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
         }
         return 0;
     }
+
+        // case WM_SETCURSOR: {
+        //     // Если курсор над клиентской областью — скрываем системный
+        //     if (LOWORD(lParam) == HTCLIENT)
+        //     {
+        //         pScrollView->SetCustomCursor(false);
+        //
+        //         return TRUE;
+        //     }
+        // }
+        // break;
 
     case WM_ERASEBKGND:
         HDC hdc = (HDC)wParam;
