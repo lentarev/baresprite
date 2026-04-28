@@ -10,6 +10,7 @@ namespace baresprite
 
 // Forward declaration
 class FramePanel;
+class TagPanel;
 
 class BottomToolbar : public ChildWindow
 {
@@ -34,6 +35,7 @@ class BottomToolbar : public ChildWindow
 
     // Toolbar Components
     std::unique_ptr<FramePanel> _framePanel;
+    std::unique_ptr<TagPanel> _tagPanel;
 
     // WndProc for BottomToolbar
     static LRESULT CALLBACK _BottomToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

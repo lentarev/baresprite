@@ -14,14 +14,18 @@ class FramePanel
     FramePanel(HWND hWndBottomTolbar, HINSTANCE hInstance, AppState &appState);
     ~FramePanel();
 
-    void OnSize(int clientW, int clientH);
+    void SetBounds(const RECT &rc);
+    int GetRightEdge() const;
 
   private:
     HWND _hWndBottomTolbar;
     HINSTANCE _hInstance;
-    HWND _hFramePanel = nullptr;
 
     AppState &_appState;
+
+    std::vector<std::wstring> _labels = {L"<", L">", L"New", L"Clone", L"Delete"};
+    std::vector<HWND> _buttons;
+    HWND _hLabel = nullptr;
 
     // Configuration
     int _startX = 180;
@@ -34,11 +38,7 @@ class FramePanel
     static constexpr int _COLS = 1;
 
     // Единый оффсет для центрирования всей панели
-    static constexpr int _PANEL_OFFSET_X = -225;
-
-    std::vector<std::wstring> _labels = {L"<", L">", L"New", L"Clone", L"Delete"};
-    std::vector<HWND> _buttons;
-    HWND _hLabel = nullptr;
+    static constexpr int _PANEL_OFFSET_X = -433;
 
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;
     static constexpr int RIGHT_TOOLBAR_WIDTH = 180;

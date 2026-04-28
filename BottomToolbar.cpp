@@ -1,5 +1,6 @@
 #include "BottomToolbar.h"
 #include "FramePanel.h"
+#include "TagPanel.h"
 
 namespace baresprite
 {
@@ -24,7 +25,8 @@ BottomToolbar::BottomToolbar(HWND hWnd, HINSTANCE hInstance, AppState &appState)
     RegisterClassExW(&wcex);
 
     // Create a toolbar container window
-    _hToolbar = CreateWindowEx(0, L"BareSpriteBottomToolbarClass", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 0, 0, hWnd, nullptr, hInstance, nullptr);
+    _hToolbar = CreateWindowEx(0, L"BareSpriteBottomToolbarClass", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, 0, 0, 0, 0, hWnd, nullptr,
+                               hInstance, nullptr);
 
     if (!_hToolbar)
     {
@@ -32,6 +34,7 @@ BottomToolbar::BottomToolbar(HWND hWnd, HINSTANCE hInstance, AppState &appState)
     }
 
     _framePanel = std::make_unique<FramePanel>(_hToolbar, hInstance, appState);
+    _tagPanel = std::make_unique<TagPanel>(_hToolbar, hInstance, appState);
 }
 
 BottomToolbar::~BottomToolbar()
@@ -47,13 +50,21 @@ void BottomToolbar::OnSize(int clientW, int clientH)
 
     if (_hToolbar)
     {
-        // Растягиваем тулбар на всю высоту главного окна
         SetWindowPos(_hToolbar, nullptr, 0, clientH - HEIGHT, clientW, HEIGHT, SWP_NOZORDER | SWP_NOACTIVATE);
     }
 
     if (_framePanel)
     {
-        _framePanel->OnSize(clientW, clientH);
+        RECT rcFrame = {0, 0, clientW, HEIGHT};
+        _framePanel->SetBounds(rcFrame);
+    }
+
+    if (_tagPanel && _framePanel)
+    {
+
+        int tagPanelStartX = _framePanel->GetRightEdge() + 20; // 30px отступ между панелями
+        RECT rcTag = {tagPanelStartX, 0, clientW, HEIGHT};
+        _tagPanel->SetBounds(rcTag);
     }
 }
 

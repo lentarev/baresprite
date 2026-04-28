@@ -28,10 +28,32 @@ FramePanel::~FramePanel()
     _buttons.clear();
 }
 
-void FramePanel::OnSize(int clientW, int clientH)
+void FramePanel::SetBounds(const RECT &rc)
 {
-    ResizeControlButtons(clientW, clientH);
-    ResizeLabel(clientW, clientH);
+    // rc теперь — это область, выделенная родителем специально для FramePanel
+    // Пересчитываем _startX относительно левой границы этой области
+    _startX = rc.left;
+    //_startY = rc.top;
+
+    // Пересоздаём/перемещаем контролы внутри этих границ
+    ResizeControlButtons(rc.right - rc.left, rc.bottom - rc.top);
+    ResizeLabel(rc.right - rc.left, rc.bottom - rc.top);
+}
+
+int FramePanel::GetRightEdge() const
+{
+    if (_buttons.empty())
+        return _startX;
+
+    // Возвращаем правую границу последней кнопки
+    HWND hLastBtn = _buttons.back();
+    RECT rc;
+    GetWindowRect(hLastBtn, &rc);
+
+    POINT rightEdge = {rc.right, rc.top};
+    ScreenToClient(_hWndBottomTolbar, &rightEdge);
+
+    return rightEdge.x;
 }
 
 void FramePanel::CreateControlButtons()
@@ -88,7 +110,7 @@ void FramePanel::CreateLabel()
     ResizeLabel(rc.right - rc.left, rc.bottom - rc.top);
 }
 
-void FramePanel::ResizeLabel(int clientW, int clientH) 
+void FramePanel::ResizeLabel(int clientW, int clientH)
 {
     if (_buttons.size() < 2 || !_hLabel)
         return;
