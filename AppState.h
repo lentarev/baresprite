@@ -21,6 +21,7 @@ struct AppState
     PaletteData palette;
     ToolType currentTool = ToolType::Brush;
     std::vector<Frame> frames;
+    int currentFrameIndex = 0;
 };
 
 } // namespace baresprite

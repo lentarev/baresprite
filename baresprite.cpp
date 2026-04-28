@@ -421,7 +421,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0; // Command processed.
         }
 
-        // FrameToolbar
+        // BottomToolbar
         if (gBottomToolbar && gBottomToolbar->OnCommand(wmId, wmEvent))
         {
             return 0; // Command processed.

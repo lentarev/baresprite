@@ -16,6 +16,8 @@ class FramePanel
 
     void SetBounds(const RECT &rc);
     int GetRightEdge() const;
+    void UpdateFrameLabel();
+    bool OnButtonNew();
 
   private:
     HWND _hWndBottomTolbar;

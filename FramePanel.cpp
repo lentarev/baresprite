@@ -1,5 +1,6 @@
 #include "FramePanel.h"
-#include <iostream>
+#include "FrameService.h"
+#include <cstdio>
 
 namespace baresprite
 {
@@ -131,6 +132,47 @@ void FramePanel::ResizeLabel(int clientW, int clientH)
     int labelX = prevRight.x + (gap - LABEL_W) / 2;
 
     SetWindowPos(_hLabel, nullptr, labelX, _startY, LABEL_W, LABEL_H, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+void FramePanel::UpdateFrameLabel()
+{
+    if (!_hLabel)
+        return; // Защита от нулевого хэндла
+
+    // Берём данные напрямую из AppState
+    int current = _appState.currentFrameIndex + 1; // +1 для человеческого отображения
+    int total = static_cast<int>(_appState.frames.size());
+
+    // Фолбэк на случай, если список вдруг пуст
+    if (total < 1)
+        total = 1;
+    if (current < 1)
+        current = 1;
+    if (current > total)
+        current = total;
+
+    // Форматируем строку
+    wchar_t text[32];
+    swprintf_s(text, L"%d / %d", current, total);
+
+    // Обновляем Win32 контрол
+    SetWindowTextW(_hLabel, text);
+}
+
+/// <summary>
+/// New Frame
+/// </summary>
+/// <returns></returns>
+bool FramePanel::OnButtonNew()
+{
+    if (FrameService::NewFrame(_appState))
+    {
+        UpdateFrameLabel();
+
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace baresprite

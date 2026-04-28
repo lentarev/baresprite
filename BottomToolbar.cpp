@@ -1,6 +1,7 @@
 #include "BottomToolbar.h"
 #include "FramePanel.h"
 #include "TagPanel.h"
+#include <iostream>
 
 namespace baresprite
 {
@@ -62,7 +63,7 @@ void BottomToolbar::OnSize(int clientW, int clientH)
     if (_tagPanel && _framePanel)
     {
 
-        int tagPanelStartX = _framePanel->GetRightEdge() + 20; // 30px отступ между панелями
+        int tagPanelStartX = _framePanel->GetRightEdge() + 20; // 20px отступ между панелями
         RECT rcTag = {tagPanelStartX, 0, clientW, HEIGHT};
         _tagPanel->SetBounds(rcTag);
     }
@@ -70,6 +71,38 @@ void BottomToolbar::OnSize(int clientW, int clientH)
 
 bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 {
+    if (commandId >= 3041 && commandId < 3041 + 5)
+    {
+        const int index = commandId - 3041;
+
+        if (notifyCode == BN_CLICKED)
+        {
+            // Prev <
+            if (index == 0)
+            {
+            }
+            // Next >
+            else if (index == 1)
+            {
+            } 
+            // New
+            else if (index == 2)
+            {
+                return _framePanel->OnButtonNew();
+            }
+            // Clone
+             else if (index == 3)
+            {
+            }
+            // Delete
+            else if (index == 4)
+            {
+            }
+
+            std::cout << "index: " << index << std::endl;
+        }
+    }
+
     return false;
 }
 

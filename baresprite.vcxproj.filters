@@ -58,6 +58,12 @@
     <Filter Include="Header Files\BottomToolbar">
       <UniqueIdentifier>{bed3c3fa-ec4b-4a42-acaf-66f11ae8df51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Services">
+      <UniqueIdentifier>{5aa469db-cc92-46ad-b87e-b31bc1f0c850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Services">
+      <UniqueIdentifier>{7af86eb2-cd79-4093-b37c-847da81331da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -144,6 +150,9 @@
     <ClInclude Include="TagPanel.h">
       <Filter>Header Files\BottomToolbar</Filter>
     </ClInclude>
+    <ClInclude Include="FrameService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -202,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="TagPanel.cpp">
       <Filter>Source Files\BottomToolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameService.cpp">
+      <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
