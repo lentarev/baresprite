@@ -2,10 +2,15 @@
 
 namespace baresprite
 {
-TagPanel::TagPanel()
+TagPanel::TagPanel(HWND hWndBottomTolbar, HINSTANCE hInstance, AppState &appState)
+    : _hWndBottomTolbar(hWndBottomTolbar), _hInstance(hInstance), _appState(appState)
 {
 }
 
 TagPanel::~TagPanel() = default;
+
+void TagPanel::OnSize(int clientW, int clientH)
+{
+}
 
 } // namespace baresprite

@@ -261,7 +261,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gAppState);
 
     // Create frame toolbar child window
-    gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance);
+    gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance, *gAppState);
 
     // Create right toolbar child window
     gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);

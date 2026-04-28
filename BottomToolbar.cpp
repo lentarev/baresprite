@@ -1,9 +1,10 @@
 #include "BottomToolbar.h"
+#include "FramePanel.h"
 
 namespace baresprite
 {
 
-BottomToolbar::BottomToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWndParent(hWndParent), _hInstanceParent(hInstanceParent)
+BottomToolbar::BottomToolbar(HWND hWnd, HINSTANCE hInstance, AppState &appState) : _hWnd(hWnd), _hInstance(hInstance), _appState(appState)
 {
 
     // Registers the window class for BottomToolbar
@@ -15,7 +16,7 @@ BottomToolbar::BottomToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWnd
     wcex.lpfnWndProc = _BottomToolbarWndProc;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
-    wcex.hInstance = hInstanceParent;
+    wcex.hInstance = hInstance;
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
     wcex.lpszClassName = L"BareSpriteBottomToolbarClass";
@@ -23,13 +24,14 @@ BottomToolbar::BottomToolbar(HWND hWndParent, HINSTANCE hInstanceParent) : _hWnd
     RegisterClassExW(&wcex);
 
     // Create a toolbar container window
-    _hToolbar = CreateWindowEx(0, L"BareSpriteBottomToolbarClass", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 0, 0, hWndParent, nullptr,
-                               hInstanceParent, nullptr);
+    _hToolbar = CreateWindowEx(0, L"BareSpriteBottomToolbarClass", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 0, 0, hWnd, nullptr, hInstance, nullptr);
 
     if (!_hToolbar)
     {
         return; // Не удалось создать окно
     }
+
+    _framePanel = std::make_unique<FramePanel>(_hToolbar, hInstance, appState);
 }
 
 BottomToolbar::~BottomToolbar()
@@ -47,6 +49,11 @@ void BottomToolbar::OnSize(int clientW, int clientH)
     {
         // Растягиваем тулбар на всю высоту главного окна
         SetWindowPos(_hToolbar, nullptr, 0, clientH - HEIGHT, clientW, HEIGHT, SWP_NOZORDER | SWP_NOACTIVATE);
+    }
+
+    if (_framePanel)
+    {
+        _framePanel->OnSize(clientW, clientH);
     }
 }
 
