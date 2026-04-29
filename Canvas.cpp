@@ -3,6 +3,7 @@
 #include "CursorRenderer.h"
 #include "Frame.h"
 #include "FrameRenderer.h"
+#include "OnionFrameRenderer.h"
 #include <iostream>
 #include <windowsx.h>
 
@@ -41,6 +42,7 @@ Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState) :
     _chessBackground = std::make_unique<ChessBackground>(appState);
     _frameRenderer = std::make_unique<FrameRenderer>();
     _cursorRenderer = std::make_unique<CursorRenderer>();
+    _onionFrameRenderer = std::make_unique<OnionFrameRenderer>();
 }
 
 Canvas::~Canvas()
@@ -255,6 +257,10 @@ void Canvas::InvalidateCursorArea(int oldSize) const
     InvalidateRect(_hCanvas, &dirtyRect, FALSE);
 }
 
+/// <summary>
+/// Load Frame
+/// </summary>
+/// <param name="frame"></param>
 void Canvas::LoadFrame(const Frame &frame) const
 {
     if (_hCanvas)
@@ -398,6 +404,39 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
         // Рисуем шахматный фон
         pCanvas->_chessBackground->Render(ps, hdcMem, pCanvas->_checkerSize);
+
+        // Onion Skinning (предыдущие кадры)
+        if (pCanvas->_appState.onionSkinEnabled && !pCanvas->_appState.frames.empty())
+        {
+            int currentIndex = pCanvas->_appState.currentFrameIndex;
+            int total = static_cast<int>(pCanvas->_appState.frames.size());
+            float baseOp = pCanvas->_appState.onionSkinOpacity;
+
+            // Предыдущие кадры (затухание прозрачности)
+            for (int i = 1; i <= pCanvas->_appState.onionSkinPrevFrames; ++i)
+            {
+                int index = currentIndex - i;
+                if (index >= 0)
+                {
+                    float fade = 1.0f - (static_cast<float>(i - 1) / pCanvas->_appState.onionSkinPrevFrames);
+                    const Frame &frame = pCanvas->_appState.frames[index];
+
+                    pCanvas->_onionFrameRenderer->Render(index, baseOp * fade, frame, pCanvas->_checkerSize, hdcMem);
+                }
+            }
+
+            // Следующие кадры (фиксированная прозрачность)
+            for (int i = 1; i <= pCanvas->_appState.onionSkinNextFrames; ++i)
+            {
+                int index = currentIndex + i;
+                if (index < total)
+                {
+                    const Frame &frame = pCanvas->_appState.frames[index];
+
+                    pCanvas->_onionFrameRenderer->Render(index, baseOp * 0.5f, frame, pCanvas->_checkerSize, hdcMem);
+                }
+            }
+        }
 
         // Рисуем кадр с прозрачностью
         if (!pCanvas->_appState.frames.empty())

@@ -153,6 +153,9 @@
     <ClInclude Include="FrameService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="OnionFrameRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -214,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="FrameService.cpp">
       <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="OnionFrameRenderer.cpp">
+      <Filter>Source Files\Canvas</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

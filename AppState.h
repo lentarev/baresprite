@@ -25,6 +25,12 @@ struct AppState
     std::vector<Frame> frames;
     int currentFrameIndex = 0;
     Canvas *canvas = nullptr;
+
+    // Onion Skinning settings
+    bool onionSkinEnabled = true;
+    int onionSkinPrevFrames = 1;    
+    int onionSkinNextFrames = 0;    
+    float onionSkinOpacity = 0.35f;
 };
 
 } // namespace baresprite
