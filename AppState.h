@@ -13,6 +13,7 @@ class Canvas;
 
 struct AppState
 {
+    bool isProjectLoadedFromConfig = false;
     bool isExistAppConfig;
     bool isDirty;
     std::wstring configPath;

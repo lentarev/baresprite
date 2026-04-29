@@ -1,8 +1,8 @@
 #pragma once
 
+#include "AppState.h"
 #include "ChildWindow.h"
 #include <Windows.h>
-#include "AppState.h"
 #include <memory>
 
 namespace baresprite
@@ -24,6 +24,8 @@ class BottomToolbar : public ChildWindow
     bool OnCommand(int commandId, int notifyCode) override;
 
     HWND GetHWndBottomToolbar() const;
+
+    FramePanel *GetFramePanel() const;
 
   private:
     HWND _hWnd;

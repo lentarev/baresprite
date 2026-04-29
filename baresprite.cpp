@@ -10,6 +10,7 @@
 #include "AppSettings.h"
 #include "AppState.h"
 #include "BottomToolbar.h"
+#include "FramePanel.h"
 #include "Canvas.h"
 #include "CanvasScrollView.h"
 #include "LeftToolbar.h"
@@ -148,6 +149,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                     gAppState->frames.emplace_back(gAppState->imageSize, gAppState->imageSize);
 
                     launchEditor = true;
+
+                    gAppState->isProjectLoadedFromConfig = false;
                 }
             }
         }
@@ -169,8 +172,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                         appSettings->Save();
 
                         // Initialization
+                        if (gAppState->currentFrameIndex < 0 || gAppState->currentFrameIndex >= static_cast<int>(gAppState->frames.size()))
+                        {
+                            gAppState->currentFrameIndex = 0;
+                        }
 
                         launchEditor = true;
+
+                        gAppState->isProjectLoadedFromConfig = true;
                     }
                 }
                 else
@@ -260,13 +269,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gAppState);
 
     // Create right toolbar child window
-     gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
+    gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
 
     // Create canvas scroll view container
     gCanvasScrollView = std::make_unique<CanvasScrollView>(hWnd, hInstance, *gAppState);
 
     // Create frame toolbar child window
     gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance, *gAppState);
+
+    // Если проект был загружен из файла конфигурации
+    if (gAppState->isProjectLoadedFromConfig)
+    {
+        if (gAppState->canvas && !gAppState->frames.empty())
+        {
+            gAppState->canvas->LoadFrame(gAppState->frames[gAppState->currentFrameIndex]);
+        }
+    }
 
     RECT rc;
 
@@ -338,6 +356,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND: {
         int wmId = LOWORD(wParam);
         int wmEvent = HIWORD(wParam); // notification code (BN_CLICKED or BN_DBLCLK)
+
+        if (wmId == ID_PREV_FRAME)
+        {
+            if (gBottomToolbar)
+            {
+                gBottomToolbar->GetFramePanel()->OnButtonPrev();
+            
+            }
+            return 0;
+        }
+
+        // ID_NEXT_FRAME
+        if (wmId == ID_NEXT_FRAME)
+        {
+            if (gBottomToolbar)
+            {
+                gBottomToolbar->GetFramePanel()->OnButtonNext();
+                
+            }
+            return 0;
+        }
 
         if (wmId == ID_CURSOR_IN)
         {

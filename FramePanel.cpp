@@ -11,6 +11,7 @@ FramePanel::FramePanel(HWND hWndBottomTolbar, HINSTANCE hInstance, AppState &app
 {
     CreateControlButtons();
     CreateLabel();
+    UpdateFrameLabel();
 }
 
 FramePanel::~FramePanel()

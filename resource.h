@@ -25,8 +25,12 @@
 #define ID_TOOL_BRUSH                   32775
 #define ID_TOOL_ERASER                  32781
 #define ID_CURSOR_IN                    32782
-#define ID_ACCELERATOR32783             32783
 #define ID_CURSOR_OUT                   32783
+#define ID_PREV_FRAME                   32785
+#define ID_NEXT_FRAME                   32787
+#define ID_FILE_NEWPROJECT              32789
+#define ID_FILE_LOADPROJECT             32790
+#define ID_FILE_SAVEPROJECT             32791
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -35,7 +39,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        135
-#define _APS_NEXT_COMMAND_VALUE         32785
+#define _APS_NEXT_COMMAND_VALUE         32792
 #define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
