@@ -9,9 +9,9 @@
 
 #include "AppSettings.h"
 #include "AppState.h"
+#include "BottomToolbar.h"
 #include "Canvas.h"
 #include "CanvasScrollView.h"
-#include "BottomToolbar.h"
 #include "LeftToolbar.h"
 #include "ProjectSettings.h"
 #include "RightToolbar.h"
@@ -50,7 +50,6 @@ std::unique_ptr<LeftToolbar> gLeftToolbar;
 std::unique_ptr<BottomToolbar> gBottomToolbar;
 std::unique_ptr<RightToolbar> gRightToolbar;
 std::unique_ptr<CanvasScrollView> gCanvasScrollView;
-// std::unique_ptr<Canvas> gCanvas;
 std::unique_ptr<ProjectSettings> gProjectSettings;
 
 // Forward declarations of functions included in this code module:
@@ -260,17 +259,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     // Create left toolbar child window
     gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gAppState);
 
-    // Create frame toolbar child window
-    gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance, *gAppState);
-
     // Create right toolbar child window
-    gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
+     gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
 
     // Create canvas scroll view container
     gCanvasScrollView = std::make_unique<CanvasScrollView>(hWnd, hInstance, *gAppState);
 
-    // Create canvas child window
-    // gCanvas = std::make_unique<Canvas>(hWnd, hInstance, *gAppState);
+    // Create frame toolbar child window
+    gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance, *gAppState);
 
     RECT rc;
 
@@ -514,7 +510,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             bool isInside = false;
             if (!gAppState->frames.empty())
             {
-    
+
                 isInside = (logX >= 0 && logX < gAppState->imageSize && logY >= 0 && logY < gAppState->imageSize);
             }
 
@@ -553,6 +549,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         EndPaint(hWnd, &ps);
     }
     break;
+
+    case WM_GETMINMAXINFO: {
+        MINMAXINFO *mmi = reinterpret_cast<MINMAXINFO *>(lParam);
+
+        // Минимальный размер клиентской области (без рамок)
+        constexpr int MIN_CLIENT_W = 900;
+        constexpr int MIN_CLIENT_H = 650;
+
+        RECT rc = {0, 0, MIN_CLIENT_W, MIN_CLIENT_H};
+
+        AdjustWindowRect(&rc, (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE), FALSE);
+
+        mmi->ptMinTrackSize.x = rc.right - rc.left;
+        mmi->ptMinTrackSize.y = rc.bottom - rc.top;
+
+        return 0;
+    }
 
     case WM_CLOSE: {
         if (gAppState && gProjectSettings && AskSaveDialog(hWnd, *gAppState, *gProjectSettings))

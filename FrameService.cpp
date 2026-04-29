@@ -38,14 +38,20 @@ bool FrameService::NewFrame(AppState &appState)
 /// <returns></returns>
 bool FrameService::PrevFrame(AppState &appState)
 {
-    // Если кадров нет или мы уже на первом
-    if (appState.frames.empty() || appState.currentFrameIndex <= 0)
+    if (appState.frames.empty())
     {
         return false;
     }
 
-    // Сдвигаем индекс назад
-    --appState.currentFrameIndex;
+    // Если на первом кадре, переходим на последний (loop)
+    if (appState.currentFrameIndex <= 0)
+    {
+        appState.currentFrameIndex = static_cast<int>(appState.frames.size()) - 1;
+    }
+    else
+    {
+        --appState.currentFrameIndex;
+    }
     return true;
 }
 
@@ -56,24 +62,23 @@ bool FrameService::PrevFrame(AppState &appState)
 /// <returns></returns>
 bool FrameService::NextFrame(AppState &appState)
 {
-    // Защита от пустого списка
     if (appState.frames.empty())
     {
         return false;
     }
 
-    // Вычисляем индекс последнего кадра
     int lastIndex = static_cast<int>(appState.frames.size()) - 1;
 
-    // Если мы ещё не в конце, то переключаемся
-    if (appState.currentFrameIndex < lastIndex)
+    // Если на последнем кадре, переходим на первый (loop)
+    if (appState.currentFrameIndex >= lastIndex)
+    {
+        appState.currentFrameIndex = 0;
+    }
+    else
     {
         ++appState.currentFrameIndex;
-        return true;
     }
-
-    // Уже на последнем кадре, движение невозможно
-    return false;
+    return true;
 }
 
 /// <summary>

@@ -37,6 +37,7 @@ class LeftToolbar : public ChildWindow
 
     // Configuration
     static constexpr int WIDTH = 180;
+    static constexpr int BOTTOM = 80;
 
     // WndProc for LeftToolbar
     static LRESULT CALLBACK _LeftToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

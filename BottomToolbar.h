@@ -23,6 +23,8 @@ class BottomToolbar : public ChildWindow
 
     bool OnCommand(int commandId, int notifyCode) override;
 
+    HWND GetHWndBottomToolbar() const;
+
   private:
     HWND _hWnd;
     HINSTANCE _hInstance;

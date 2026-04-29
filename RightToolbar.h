@@ -24,6 +24,7 @@ class RightToolbar : public ChildWindow
 
     // Configuration
     static constexpr int WIDTH = 180;
+    static constexpr int BOTTOM = 80;
 };
 
 } // namespace baresprite

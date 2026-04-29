@@ -50,7 +50,7 @@ void LeftToolbar::OnSize(int clientW, int clientH)
     if (_hToolbar)
     {
         // Stretch the toolbar to the full height of the main window
-        SetWindowPos(_hToolbar, nullptr, 0, 0, WIDTH, clientH, SWP_NOZORDER | SWP_NOACTIVATE);
+        SetWindowPos(_hToolbar, nullptr, 0, 0, WIDTH, clientH - BOTTOM, SWP_NOZORDER | SWP_NOACTIVATE);
     }
 }
 

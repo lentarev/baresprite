@@ -45,7 +45,7 @@ class FramePanel
     static constexpr int _COLS = 1;
 
     // Единый оффсет для центрирования всей панели
-    static constexpr int _PANEL_OFFSET_X = -433;
+    static constexpr int _PANEL_OFFSET_X = -442;
 
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;
     static constexpr int RIGHT_TOOLBAR_WIDTH = 180;

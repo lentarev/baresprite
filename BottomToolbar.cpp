@@ -86,16 +86,16 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             else if (index == 1)
             {
                 return _framePanel->OnButtonNext();
-            } 
+            }
             // New
             else if (index == 2)
             {
                 return _framePanel->OnButtonNew();
             }
             // Clone
-             else if (index == 3)
+            else if (index == 3)
             {
-                 return _framePanel->OnButtonClone();
+                return _framePanel->OnButtonClone();
             }
             // Delete
             else if (index == 4)
@@ -108,6 +108,11 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
     }
 
     return false;
+}
+
+HWND BottomToolbar::GetHWndBottomToolbar() const
+{
+    return _hToolbar;
 }
 
 LRESULT CALLBACK BottomToolbar::_BottomToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
