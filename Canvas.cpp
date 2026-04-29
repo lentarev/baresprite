@@ -1,8 +1,8 @@
 #include "Canvas.h"
 #include "ChessBackground.h"
+#include "CursorRenderer.h"
 #include "Frame.h"
 #include "FrameRenderer.h"
-#include "CursorRenderer.h"
 #include <iostream>
 #include <windowsx.h>
 
@@ -102,7 +102,7 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
     if (_appState.frames.empty())
         return;
 
-    Frame &frame = _appState.frames[0];
+    Frame &frame = _appState.frames[_appState.currentFrameIndex];
 
     int mx = GET_X_LPARAM(lParam);
     int my = GET_Y_LPARAM(lParam);
@@ -255,6 +255,23 @@ void Canvas::InvalidateCursorArea(int oldSize) const
     InvalidateRect(_hCanvas, &dirtyRect, FALSE);
 }
 
+void Canvas::LoadFrame(const Frame &frame) const
+{
+    if (_hCanvas)
+    {
+
+        InvalidateRect(_hCanvas, nullptr, TRUE);
+    }
+}
+
+/// <summary>
+/// Window function
+/// </summary>
+/// <param name="hWnd"></param>
+/// <param name="message"></param>
+/// <param name="wParam"></param>
+/// <param name="lParam"></param>
+/// <returns></returns>
 LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
@@ -385,7 +402,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         // Рисуем кадр с прозрачностью
         if (!pCanvas->_appState.frames.empty())
         {
-            const Frame &frame = pCanvas->_appState.frames[0];
+            const Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
             pCanvas->_frameRenderer->Render(frame, pCanvas->_checkerSize, hdcMem);
         }
 

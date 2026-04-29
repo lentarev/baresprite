@@ -36,8 +36,12 @@ class Canvas : public ChildWindow
     void SetCustomCursor(bool isCustom);
 
     void IncreaseBrushSize();
+
     void DecreaseBrushSize();
+
     void InvalidateCursorArea(int oldSize) const;
+
+    void LoadFrame(const Frame &frame) const;
 
   private:
     HWND _hWndParent;

@@ -80,10 +80,12 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             // Prev <
             if (index == 0)
             {
+                return _framePanel->OnButtonPrev();
             }
             // Next >
             else if (index == 1)
             {
+                return _framePanel->OnButtonNext();
             } 
             // New
             else if (index == 2)
@@ -93,6 +95,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             // Clone
              else if (index == 3)
             {
+                 return _framePanel->OnButtonClone();
             }
             // Delete
             else if (index == 4)

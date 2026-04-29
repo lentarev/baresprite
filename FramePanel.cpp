@@ -1,9 +1,11 @@
 #include "FramePanel.h"
+#include "Canvas.h"
 #include "FrameService.h"
 #include <cstdio>
 
 namespace baresprite
 {
+
 FramePanel::FramePanel(HWND hWndBottomTolbar, HINSTANCE hInstance, AppState &appState)
     : _hWndBottomTolbar(hWndBottomTolbar), _hInstance(hInstance), _appState(appState)
 {
@@ -65,8 +67,8 @@ void FramePanel::CreateControlButtons()
 
     for (int i = 0; i < _labels.size(); ++i)
     {
-        HWND hBtn = CreateWindowExW(0, L"BUTTON", _labels[i].c_str(), WS_CHILD | WS_VISIBLE | BS_FLAT | BS_NOTIFY | BS_DEFPUSHBUTTON, currentX, _startY,
-                                    _BTN_SIZE_W, _BTN_SIZE_H, _hWndBottomTolbar, (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
+        HWND hBtn = CreateWindowExW(0, L"BUTTON", _labels[i].c_str(), WS_CHILD | WS_VISIBLE | BS_FLAT | BS_PUSHBUTTON, currentX, _startY, _BTN_SIZE_W,
+                                    _BTN_SIZE_H, _hWndBottomTolbar, (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
 
         _buttons.push_back(hBtn);
 
@@ -168,6 +170,78 @@ bool FramePanel::OnButtonNew()
     if (FrameService::NewFrame(_appState))
     {
         UpdateFrameLabel();
+
+        if (_appState.canvas)
+        {
+            const Frame &current = FrameService::GetCurrentFrame(_appState);
+            _appState.canvas->LoadFrame(current);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+/// <summary>
+/// Prev frame
+/// </summary>
+/// <returns></returns>
+bool FramePanel::OnButtonPrev()
+{
+    if (FrameService::PrevFrame(_appState))
+    {
+        UpdateFrameLabel();
+
+        if (_appState.canvas)
+        {
+            const Frame &current = FrameService::GetCurrentFrame(_appState);
+            _appState.canvas->LoadFrame(current);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+/// <summary>
+/// Next Frame
+/// </summary>
+/// <returns></returns>
+bool FramePanel::OnButtonNext()
+{
+    if (FrameService::NextFrame(_appState))
+    {
+        UpdateFrameLabel();
+
+        if (_appState.canvas)
+        {
+            const Frame &current = FrameService::GetCurrentFrame(_appState);
+            _appState.canvas->LoadFrame(current);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+/// <summary>
+/// Clone Frame
+/// </summary>
+/// <returns></returns>
+bool FramePanel::OnButtonClone()
+{
+    if (FrameService::CloneFrame(_appState))
+    {
+        UpdateFrameLabel();
+
+        if (_appState.canvas)
+        {
+            const Frame &current = _appState.frames[_appState.currentFrameIndex];
+            _appState.canvas->LoadFrame(current);
+        }
 
         return true;
     }

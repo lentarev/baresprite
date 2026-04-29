@@ -1,13 +1,15 @@
 #pragma once
 
+#include "Frame.h"
 #include "PaletteData.h"
+#include "ToolType.h"
 #include <Windows.h>
 #include <string>
-#include "ToolType.h"
-#include "Frame.h"
 
 namespace baresprite
 {
+
+class Canvas;
 
 struct AppState
 {
@@ -22,6 +24,7 @@ struct AppState
     ToolType currentTool = ToolType::Brush;
     std::vector<Frame> frames;
     int currentFrameIndex = 0;
+    Canvas *canvas = nullptr;
 };
 
 } // namespace baresprite

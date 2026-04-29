@@ -14,6 +14,13 @@ class FrameService
     FrameService &operator=(const FrameService &) = delete;
 
     static bool NewFrame(AppState &appState);
+    static bool PrevFrame(AppState &appState);
+    static bool NextFrame(AppState &appState);
+    static bool CloneFrame(AppState &appState);
+    static bool DeleteFrame(AppState &appState);
+
+    static Frame &GetCurrentFrame(AppState &state);
+    static const Frame &GetCurrentFrame(const AppState &state);
 };
 
 } // namespace baresprite

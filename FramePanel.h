@@ -17,7 +17,11 @@ class FramePanel
     void SetBounds(const RECT &rc);
     int GetRightEdge() const;
     void UpdateFrameLabel();
+
     bool OnButtonNew();
+    bool OnButtonPrev();
+    bool OnButtonNext();
+    bool OnButtonClone();
 
   private:
     HWND _hWndBottomTolbar;
@@ -46,9 +50,9 @@ class FramePanel
     static constexpr int RIGHT_TOOLBAR_WIDTH = 180;
 
     // Константы для лейбла
-    static constexpr int LABEL_W = 40;
+    static constexpr int LABEL_W = 70;
     static constexpr int LABEL_H = _BTN_SIZE_H;
-    static constexpr int GAP_AFTER_FIRST_BTN = 50; // Отступ после кнопки "<"
+    static constexpr int GAP_AFTER_FIRST_BTN = 70; // Отступ после кнопки "<"
 
     // METHODS
     void CreateControlButtons();

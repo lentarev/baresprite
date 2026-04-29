@@ -29,6 +29,12 @@ CanvasScrollView::CanvasScrollView(HWND hWndMain, HINSTANCE hInstance, AppState 
 
     // Create canvas
     _canvas = std::make_unique<Canvas>(_hCanvasScrollView, hInstance, appState);
+
+    if (_canvas)
+    {
+        // We pass a raw pointer to the appState structure to access the canvas.
+        appState.canvas = _canvas.get();
+    }
 }
 
 CanvasScrollView::~CanvasScrollView()

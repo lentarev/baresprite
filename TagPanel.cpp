@@ -59,7 +59,7 @@ void TagPanel::CreateControls()
                                  0, _COMBO_W, _COMBO_H, _hWndBottomTolbar, nullptr, _hInstance, nullptr);
 
     // Button - Manage tags
-    _hButton = CreateWindowExW(0, L"BUTTON", L"Manage tags", WS_CHILD | WS_VISIBLE | BS_FLAT | BS_NOTIFY | BS_DEFPUSHBUTTON, 0, 0, _BTN_SIZE_W, _BTN_SIZE_H,
+    _hButton = CreateWindowExW(0, L"BUTTON", L"Manage tags", WS_CHILD | WS_VISIBLE | BS_FLAT | BS_PUSHBUTTON, 0, 0, _BTN_SIZE_W, _BTN_SIZE_H,
                                 _hWndBottomTolbar, nullptr, _hInstance, nullptr);
 }
 
