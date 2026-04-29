@@ -249,4 +249,26 @@ bool FramePanel::OnButtonClone()
     return false;
 }
 
+/// <summary>
+/// Delete Frame
+/// </summary>
+/// <returns></returns>
+bool FramePanel::OnButtonDelete()
+{
+    if (FrameService::DeleteFrame(_appState))
+    {
+        UpdateFrameLabel();
+
+        if (_appState.canvas)
+        {
+            const Frame &current = _appState.frames[_appState.currentFrameIndex];
+            _appState.canvas->LoadFrame(current);
+        }
+
+        return true;
+    }
+
+    return false; // Удаление отклонено (остался последний кадр)
+}
+
 } // namespace baresprite

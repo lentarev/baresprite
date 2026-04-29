@@ -113,6 +113,34 @@ bool FrameService::CloneFrame(AppState &appState)
     }
 }
 
+
+/// <summary>
+/// Delete Frame
+/// </summary>
+/// <param name="appState"></param>
+/// <returns></returns>
+bool FrameService::DeleteFrame(AppState &appState)
+{
+    // в проекте всегда должен оставаться минимум 1 кадр
+    if (appState.frames.size() <= 1)
+    {
+        return false;
+    }
+
+    // Удаляем текущий кадр
+    appState.frames.erase(appState.frames.begin() + appState.currentFrameIndex);
+
+    // Корректировка индекса:
+    // Если мы удалили последний кадр в списке, currentFrameIndex станет равен size() (out of bounds).
+    // Сдвигаем его на предыдущий (теперь последний) кадр.
+    if (appState.currentFrameIndex >= static_cast<int>(appState.frames.size()))
+    {
+        --appState.currentFrameIndex;
+    }
+
+    return true; // Кадр успешно удалён
+}
+
 Frame &FrameService::GetCurrentFrame(AppState &state)
 {
     // Простая защита от дурака (если кадров вдруг нет)

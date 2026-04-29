@@ -100,6 +100,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             // Delete
             else if (index == 4)
             {
+                return _framePanel->OnButtonDelete();
             }
 
             std::cout << "index: " << index << std::endl;

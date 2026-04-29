@@ -22,6 +22,7 @@ class FramePanel
     bool OnButtonPrev();
     bool OnButtonNext();
     bool OnButtonClone();
+    bool OnButtonDelete();
 
   private:
     HWND _hWndBottomTolbar;
