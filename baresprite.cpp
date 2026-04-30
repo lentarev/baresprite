@@ -403,7 +403,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 if (gCanvasScrollView->GetCanvas()->ZoomIn())
                 {
-                    gCanvasScrollView->OnSize(rc.right, rc.bottom);
+                    gCanvasScrollView->RecalculateCanvasCentering();
                 }
             }
 
@@ -419,7 +419,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 if (gCanvasScrollView->GetCanvas()->ZoomOut())
                 {
-                    gCanvasScrollView->OnSize(rc.right, rc.bottom);
+                    gCanvasScrollView->RecalculateCanvasCentering();
                 }
             }
 

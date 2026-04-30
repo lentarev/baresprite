@@ -21,6 +21,8 @@ class CanvasScrollView : public ChildWindow
 
     bool OnCommand(int commandId, int notifyCode) override;
 
+    void RecalculateCanvasCentering();
+
     Canvas *GetCanvas();
 
   private:

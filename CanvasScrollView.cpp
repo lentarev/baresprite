@@ -127,6 +127,38 @@ void CanvasScrollView::UpdateScrollInfo()
     SetScrollInfo(_hCanvasScrollView, SB_VERT, &si, TRUE);
 }
 
+void CanvasScrollView::RecalculateCanvasCentering()
+{
+    if (!_canvas || !_hCanvasScrollView)
+        return;
+
+    HWND hCanvas = _canvas->GetHWndCanvas();
+
+    // Обновляем скролл-инфо
+    UpdateScrollInfo();
+
+    // Форсируем применение изменений
+    UpdateWindow(_hCanvasScrollView);
+
+    // Берём реальную доступную область
+    RECT clientRect;
+    GetClientRect(_hCanvasScrollView, &clientRect);
+    int availableW = clientRect.right;
+    int availableH = clientRect.bottom;
+
+    // Размер канваса
+    RECT canvasRect;
+    GetClientRect(hCanvas, &canvasRect);
+    int canvasW = canvasRect.right;
+    int canvasH = canvasRect.bottom;
+
+    // Центрируем
+    _canvasPosX = (canvasW < availableW) ? (availableW - canvasW) / 2 : 0;
+    _canvasPosY = (canvasH < availableH) ? (availableH - canvasH) / 2 : 0;
+
+    SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+}
+
 Canvas *CanvasScrollView::GetCanvas()
 {
     return _canvas.get();
