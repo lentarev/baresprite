@@ -1,6 +1,8 @@
 #include "BottomToolbar.h"
+#include "Canvas.h"
 #include "FramePanel.h"
 #include "TagPanel.h"
+#include <commctrl.h>
 #include <iostream>
 
 namespace baresprite
@@ -76,6 +78,7 @@ void BottomToolbar::OnSize(int clientW, int clientH)
 
 bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 {
+
     if (commandId >= 3041 && commandId < 3041 + 5)
     {
         const int index = commandId - 3041;
@@ -107,8 +110,50 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             {
                 return _framePanel->OnButtonDelete();
             }
+        }
+    }
 
-            std::cout << "index: " << index << std::endl;
+    // Onion command
+    if (commandId >= 3051 && commandId < 3052)
+    {
+        const int index = commandId - 3051;
+
+        // Onion Checkbox
+        if (index == 0)
+        {
+            return _framePanel->OnOnionChecked();
+        }
+    }
+
+    return false;
+}
+
+bool BottomToolbar::OnHScroll(int scrollCode, HWND hSlider)
+{
+    // Получаем ID контрола из его хэндла
+    int controlId = GetDlgCtrlID(hSlider);
+
+    // Onion slider
+    if (controlId >= 3052 && controlId < 3053)
+    {
+        const int index = controlId - 3052;
+
+        // Onion Trackbar
+        if (index == 0)
+        {
+            if (scrollCode == TB_ENDTRACK || scrollCode == TB_THUMBPOSITION)
+            {
+                int pos = static_cast<int>(SendMessageW(hSlider, TBM_GETPOS, 0, 0));
+                _appState.onionSkinOpacity = pos / 100.0f;
+
+                _framePanel->UpdateOnionLabel();
+
+                if (_appState.canvas)
+                {
+                    InvalidateRect(_appState.canvas->GetHWndCanvas(), nullptr, TRUE);
+                }
+                return true;
+            }
         }
     }
 
@@ -123,7 +168,7 @@ HWND BottomToolbar::GetHWndBottomToolbar() const
 LRESULT CALLBACK BottomToolbar::_BottomToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     // Forwarding notifications from child controls to the parent
-    if (message == WM_COMMAND || message == WM_NOTIFY)
+    if (message == WM_COMMAND || message == WM_NOTIFY || message == WM_HSCROLL)
     {
         HWND hParent = GetParent(hWnd);
         if (hParent)

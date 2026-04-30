@@ -23,6 +23,8 @@ class BottomToolbar : public ChildWindow
 
     bool OnCommand(int commandId, int notifyCode) override;
 
+    bool OnHScroll(int scrollCode, HWND hSlider);
+
     HWND GetHWndBottomToolbar() const;
 
     FramePanel *GetFramePanel() const;

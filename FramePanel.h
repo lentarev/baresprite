@@ -17,6 +17,7 @@ class FramePanel
     void SetBounds(const RECT &rc);
     int GetRightEdge() const;
     void UpdateFrameLabel();
+    void UpdateOnionLabel();
 
     bool OnButtonNew();
     bool OnButtonPrev();
@@ -24,19 +25,28 @@ class FramePanel
     bool OnButtonClone();
     bool OnButtonDelete();
 
+    // Onion
+    bool OnOnionChecked();
+
   private:
     HWND _hWndBottomTolbar;
     HINSTANCE _hInstance;
 
     AppState &_appState;
 
+    // Row 1
     std::vector<std::wstring> _labels = {L"<", L">", L"New", L"Clone", L"Delete"};
     std::vector<HWND> _buttons;
     HWND _hLabel = nullptr;
 
+    // Row 2 (Onion Skin)
+    HWND _hCheckOnion = nullptr;
+    HWND _hSliderOpacity = nullptr;
+    HWND _hLabelOpacity = nullptr;
+
     // Configuration
     int _startX = 180;
-    int _startY = 20;
+    int _startY = 10;
 
     static constexpr int _BTN_SIZE_W = 68;
     static constexpr int _BTN_SIZE_H = 30;
@@ -61,6 +71,9 @@ class FramePanel
 
     void CreateLabel();
     void ResizeLabel(int clientW, int clientH);
+
+    void CreateOnionControls();
+    void ResizeOnionControls(int clientW, int clientH) const;
 };
 
 } // namespace baresprite

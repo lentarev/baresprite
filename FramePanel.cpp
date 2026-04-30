@@ -1,6 +1,7 @@
 #include "FramePanel.h"
 #include "Canvas.h"
 #include "FrameService.h"
+#include <commctrl.h>
 #include <cstdio>
 
 namespace baresprite
@@ -12,6 +13,9 @@ FramePanel::FramePanel(HWND hWndBottomTolbar, HINSTANCE hInstance, AppState &app
     CreateControlButtons();
     CreateLabel();
     UpdateFrameLabel();
+
+    CreateOnionControls();
+    UpdateOnionLabel();
 }
 
 FramePanel::~FramePanel()
@@ -42,6 +46,7 @@ void FramePanel::SetBounds(const RECT &rc)
     // Пересоздаём/перемещаем контролы внутри этих границ
     ResizeControlButtons(rc.right - rc.left, rc.bottom - rc.top);
     ResizeLabel(rc.right - rc.left, rc.bottom - rc.top);
+    ResizeOnionControls(rc.right - rc.left, rc.bottom - rc.top);
 }
 
 int FramePanel::GetRightEdge() const
@@ -107,11 +112,6 @@ void FramePanel::CreateLabel()
     // Создаём лейбл временно (позиция будет исправлена в ResizeLabel)
     _hLabel = CreateWindowExW(0, L"STATIC", L"1 / 1", WS_CHILD | WS_VISIBLE | SS_CENTER | SS_CENTERIMAGE, 0, 0, LABEL_W, LABEL_H, _hWndBottomTolbar, nullptr,
                               _hInstance, nullptr);
-
-    // Сразу вызываем ResizeLabel для правильной позиции
-    RECT rc;
-    GetClientRect(_hWndBottomTolbar, &rc);
-    ResizeLabel(rc.right - rc.left, rc.bottom - rc.top);
 }
 
 void FramePanel::ResizeLabel(int clientW, int clientH)
@@ -137,6 +137,80 @@ void FramePanel::ResizeLabel(int clientW, int clientH)
     SetWindowPos(_hLabel, nullptr, labelX, _startY, LABEL_W, LABEL_H, SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
+/// <summary>
+/// Onion Skin
+/// </summary>
+void FramePanel::CreateOnionControls()
+{
+    int idCounter = 3051;
+
+    // Checkbox "Onion Skin"
+    _hCheckOnion = CreateWindowExW(0, L"BUTTON", L"Onion Skin", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, 0, 0, 0, 0, _hWndBottomTolbar,
+                                   (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
+    // Set value
+    SendMessageW(_hCheckOnion, BM_SETCHECK, _appState.onionSkinEnabled ? BST_CHECKED : BST_UNCHECKED, 0);
+
+    // 3. Label for percent
+    _hLabelOpacity =
+        CreateWindowExW(0, L"STATIC", L"35%", WS_CHILD | WS_VISIBLE | SS_CENTER | SS_CENTERIMAGE, 0, 0, 0, 0, _hWndBottomTolbar, nullptr, _hInstance, nullptr);
+
+    // Slider (TrackBar)
+    _hSliderOpacity = CreateWindowExW(0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | TBS_HORZ | TBS_NOTICKS | TBS_TOOLTIPS, 0, 0, 0, 0,
+                                      _hWndBottomTolbar, (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
+
+    // Настройка диапазона (0 - 100)
+    SendMessageW(_hSliderOpacity, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
+
+    // Установка текущей позиции
+    int startPos = static_cast<int>(_appState.onionSkinOpacity * 100);
+    SendMessageW(_hSliderOpacity, TBM_SETPOS, TRUE, startPos);
+}
+
+/// <summary>
+/// Resize Onion
+/// </summary>
+/// <param name="clientW"></param>
+/// <param name="clientH"></param>
+void FramePanel::ResizeOnionControls(int clientW, int clientH) const
+{
+    const int offsetY = 37;
+    const int width = 90;
+    const int size = 50;
+
+    // Checkbox
+    int currentX = _startX + _PANEL_OFFSET_X;
+    SetWindowPos(_hCheckOnion, nullptr, currentX, _startY + offsetY, width, 20, SWP_NOZORDER | SWP_NOACTIVATE);
+
+    // Label
+    currentX += width + _SPACING;
+    SetWindowPos(_hLabelOpacity, nullptr, currentX, _startY + offsetY, width - size, 20, SWP_NOZORDER | SWP_NOACTIVATE);
+
+    // Trackbar
+    currentX += width - size + _SPACING;
+    SetWindowPos(_hSliderOpacity, nullptr, currentX, _startY + offsetY, width + size, 20, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+/// <summary>
+/// Set Onion Checked
+/// </summary>
+bool FramePanel::OnOnionChecked()
+{
+    // Получаем текущее состояние чекбокса из окна
+    LRESULT isChecked = SendMessageW(_hCheckOnion, BM_GETCHECK, 0, 0);
+    bool newState = (isChecked == BST_CHECKED);
+
+    // Обновляем AppState
+    _appState.onionSkinEnabled = newState;
+
+    // 3. Перерисовываем холст, чтобы применить изменения
+    if (_appState.canvas)
+    {
+        InvalidateRect(_appState.canvas->GetHWndCanvas(), nullptr, TRUE);
+    }
+
+    return true;
+}
+
 void FramePanel::UpdateFrameLabel()
 {
     if (!_hLabel)
@@ -160,6 +234,25 @@ void FramePanel::UpdateFrameLabel()
 
     // Обновляем Win32 контрол
     SetWindowTextW(_hLabel, text);
+}
+
+/// <summary>
+/// Update Onion Label
+/// </summary>
+void FramePanel::UpdateOnionLabel()
+{
+    if (!_hLabelOpacity)
+        return; // Защита от нулевого хэндла
+
+    // 0.35 to 35
+    int percent = static_cast<int>(_appState.onionSkinOpacity * 100);
+
+    // Format the string
+    wchar_t text[32];
+    swprintf_s(text, L"%d%%", percent); // %% outputs one character '%'
+
+    // Updating Win32 control
+    SetWindowTextW(_hLabelOpacity, text);
 }
 
 /// <summary>

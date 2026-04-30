@@ -10,9 +10,9 @@
 #include "AppSettings.h"
 #include "AppState.h"
 #include "BottomToolbar.h"
-#include "FramePanel.h"
 #include "Canvas.h"
 #include "CanvasScrollView.h"
+#include "FramePanel.h"
 #include "LeftToolbar.h"
 #include "ProjectSettings.h"
 #include "RightToolbar.h"
@@ -362,7 +362,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (gBottomToolbar)
             {
                 gBottomToolbar->GetFramePanel()->OnButtonPrev();
-            
             }
             return 0;
         }
@@ -373,7 +372,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (gBottomToolbar)
             {
                 gBottomToolbar->GetFramePanel()->OnButtonNext();
-                
             }
             return 0;
         }
@@ -490,6 +488,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         SetFocus(hWnd);
         break;
+
+    case WM_HSCROLL: {
+        int csrollCode = LOWORD(wParam);
+        HWND hSlider = (HWND)lParam; 
+
+        // BottomToolbar
+        if (gBottomToolbar && gBottomToolbar->OnHScroll(csrollCode, hSlider))
+        {
+            return 0; // HScroll processed.
+        }
+    }
+
+    break;
 
     case WM_SIZE:
 

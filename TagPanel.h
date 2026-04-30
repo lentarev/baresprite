@@ -34,7 +34,7 @@ class TagPanel
 
     // Configuration
     int _startX = 180;
-    int _startY = 20;
+    int _startY = 10;
 
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;
     static constexpr int RIGHT_TOOLBAR_WIDTH = 180;
