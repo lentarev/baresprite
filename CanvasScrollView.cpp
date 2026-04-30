@@ -47,56 +47,49 @@ CanvasScrollView::~CanvasScrollView()
 
 void CanvasScrollView::OnSize(int clientW, int clientH)
 {
-    if (_hCanvasScrollView)
+    if (!_hCanvasScrollView)
+        return;
+
+    const int PADDING = 5;
+    const int freeAreaW = (clientW - LEFT_TOOLBAR_WIDTH - RIGHT_TOOLBAR_WIDTH);
+    const int freeAreaH = (clientH - FRAME_TOOLBAR_HEIGHT);
+
+    _containerW = freeAreaW - PADDING;
+    _containerH = freeAreaH - PADDING;
+
+    _offsetX = LEFT_TOOLBAR_WIDTH + (freeAreaW - _containerW) / 2;
+    _offsetY = (freeAreaH - _containerH) / 2;
+
+    // 1. Сначала позиционируем контейнер
+    SetWindowPos(_hCanvasScrollView, nullptr, _offsetX, _offsetY, _containerW, _containerH, SWP_NOZORDER | SWP_NOACTIVATE);
+
+    if (_canvas)
     {
+        _canvas->OnSize(freeAreaW, freeAreaH);
+        HWND hCanvas = _canvas->GetHWndCanvas();
 
-        const int PADDING = 5;
+        // Получаем РЕАЛЬНЫЙ размер клиентской области (уже со скроллбарами!)
+        RECT clientRect;
+        GetClientRect(_hCanvasScrollView, &clientRect);
+        int availableW = clientRect.right;  // Реальная ширина без скролла
+        int availableH = clientRect.bottom; // Реальная высота без скролла
 
-        const int freeAreaW = (clientW - LEFT_TOOLBAR_WIDTH - RIGHT_TOOLBAR_WIDTH);
-        const int freeAreaH = (clientH - FRAME_TOOLBAR_HEIGHT);
+        // 3. Получаем размер самого канваса
+        RECT canvasRect;
+        GetClientRect(hCanvas, &canvasRect);
+        int canvasW = canvasRect.right;
+        int canvasH = canvasRect.bottom;
 
-        _containerW = freeAreaW - PADDING;
-        _containerH = freeAreaH - PADDING;
+        // 4. Центрируем относительно availableW/H, а не _containerW/H
+        _canvasPosX = (canvasW < availableW) ? (availableW - canvasW) / 2 : 0;
+        _canvasPosY = (canvasH < availableH) ? (availableH - canvasH) / 2 : 0;
 
-        _offsetX = LEFT_TOOLBAR_WIDTH + (freeAreaW - _containerW) / 2;
-        _offsetY = (freeAreaH - _containerH) / 2;
+        SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
-        SetWindowPos(_hCanvasScrollView, nullptr, _offsetX, _offsetY, _containerW, _containerH, SWP_NOZORDER | SWP_NOACTIVATE);
-
-        if (_canvas)
-        {
-            _canvas->OnSize(freeAreaW, freeAreaH);
-
-            // Получаем размер canvas
-            HWND hCanvas = _canvas->GetHWndCanvas();
-            RECT rc;
-            GetClientRect(hCanvas, &rc);
-            int canvasW = rc.right;
-            int canvasH = rc.bottom;
-
-            // Вычисляем начальную позицию с центрированием
-            _canvasPosX = 0;
-            _canvasPosY = 0;
-
-            // Если canvas меньше контейнера — центрируем
-            if (canvasW < _containerW)
-            {
-                _canvasPosX = (_containerW - canvasW) / 2;
-            }
-            if (canvasH < _containerH)
-            {
-                _canvasPosY = (_containerH - canvasH) / 2;
-            }
-
-            // Устанавливаем позицию
-            SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-
-            // Сбрасываем скролл
-            _scrollX = 0;
-            _scrollY = 0;
-
-            UpdateScrollInfo();
-        }
+        // 5. Сброс и обновление скролла
+        _scrollX = 0;
+        _scrollY = 0;
+        UpdateScrollInfo();
     }
 }
 
@@ -200,19 +193,21 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
             {
                 pScrollView->_scrollX = newPos;
 
-                // Вычисляем начальную позицию (центрирование)
                 HWND hCanvas = pScrollView->_canvas->GetHWndCanvas();
-                RECT rc;
-                GetClientRect(hCanvas, &rc);
-                int canvasW = rc.right;
 
-                int initialX = 0;
-                if (canvasW < pScrollView->_containerW)
-                {
-                    initialX = (pScrollView->_containerW - canvasW) / 2;
-                }
+                // Получаем актуальную клиентскую область (со скроллбарами)
+                RECT clientRect;
+                GetClientRect(hWnd, &clientRect); // hWnd — это сам CanvasScrollView
+                int availableW = clientRect.right;
 
-                // Формула: начальная_позиция - скролл
+                RECT canvasRect;
+                GetClientRect(hCanvas, &canvasRect);
+                int canvasW = canvasRect.right;
+
+                // Центрируем относительно availableW
+                int initialX = (canvasW < availableW) ? (availableW - canvasW) / 2 : 0;
+
+                // центр - скролл
                 pScrollView->_canvasPosX = initialX - newPos;
 
                 SetWindowPos(hCanvas, nullptr, pScrollView->_canvasPosX, pScrollView->_canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
