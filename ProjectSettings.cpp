@@ -120,6 +120,36 @@ bool ProjectSettings::Load()
                     _appState.palette.index = std::stoi(value);
                 }
             }
+            // === СЕКЦИЯ [ONION_SKIN] ===
+            else if (currentSection == L"ONION_SKIN")
+            {
+                if (key == L"onionSkinEnabled")
+                {
+                    _appState.onionSkinEnabled = (std::stoi(value) != 0);
+                }
+                else if (key == L"onionSkinPrevFrames")
+                {
+                    _appState.onionSkinPrevFrames = std::stoi(value);
+                }
+                else if (key == L"onionSkinNextFrames")
+                {
+                    _appState.onionSkinNextFrames = std::stoi(value);
+                }
+                else if (key == L"onionSkinOpacity")
+                {
+
+                    try
+                    {
+                        int percent = std::stoi(value);
+                        _appState.onionSkinOpacity = percent / 100.0f;
+                        _appState.onionSkinOpacity = std::clamp(_appState.onionSkinOpacity, 0.0f, 1.0f);
+                    }
+                    catch (...)
+                    {
+                        _appState.onionSkinOpacity = 0.35f;
+                    }
+                }
+            }
             // === СЕКЦИЯ [FRAMES] ===
             else if (currentSection == L"FRAMES")
             {
@@ -269,6 +299,13 @@ void ProjectSettings::Save()
         swprintf_s(idxStr, L"%d", _appState.palette.index);
         file << L"SelectedColorIndex=" << idxStr << L"\n";
     }
+
+    // Section [ONION_SKIN]
+    file << L"\n[ONION_SKIN]\n";
+    file << L"onionSkinEnabled=" << _appState.onionSkinEnabled << L"\n";
+    file << L"onionSkinPrevFrames=" << _appState.onionSkinPrevFrames << L"\n";
+    file << L"onionSkinNextFrames=" << _appState.onionSkinNextFrames << L"\n";
+    file << L"onionSkinOpacity=" << static_cast<int>(_appState.onionSkinOpacity * 100) << L"\n";
 
     for (size_t i = 0; i < _appState.frames.size(); ++i)
     {

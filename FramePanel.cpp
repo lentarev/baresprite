@@ -3,6 +3,7 @@
 #include "FrameService.h"
 #include <commctrl.h>
 #include <cstdio>
+#include <iostream>
 
 namespace baresprite
 {
@@ -234,6 +235,25 @@ bool FramePanel::OnSliderOpacity()
     return true;
 }
 
+/// <summary>
+/// Update Onion Label
+/// </summary>
+void FramePanel::UpdateOnionLabel()
+{
+    if (!_hLabelOpacity)
+        return; // Защита от нулевого хэндла
+
+    // 0.35 to 35
+    int percent = static_cast<int>(_appState.onionSkinOpacity * 100);
+
+    // Format the string
+    wchar_t text[32];
+    swprintf_s(text, L"%d%%", percent); // %% outputs one character '%'
+
+    // Updating Win32 control
+    SetWindowTextW(_hLabelOpacity, text);
+}
+
 void FramePanel::UpdateFrameLabel()
 {
     if (!_hLabel)
@@ -257,25 +277,6 @@ void FramePanel::UpdateFrameLabel()
 
     // Обновляем Win32 контрол
     SetWindowTextW(_hLabel, text);
-}
-
-/// <summary>
-/// Update Onion Label
-/// </summary>
-void FramePanel::UpdateOnionLabel()
-{
-    if (!_hLabelOpacity)
-        return; // Защита от нулевого хэндла
-
-    // 0.35 to 35
-    int percent = static_cast<int>(_appState.onionSkinOpacity * 100);
-
-    // Format the string
-    wchar_t text[32];
-    swprintf_s(text, L"%d%%", percent); // %% outputs one character '%'
-
-    // Updating Win32 control
-    SetWindowTextW(_hLabelOpacity, text);
 }
 
 /// <summary>
