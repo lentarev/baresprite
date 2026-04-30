@@ -257,6 +257,20 @@ void Canvas::InvalidateCursorArea(int oldSize) const
     InvalidateRect(_hCanvas, &dirtyRect, FALSE);
 }
 
+void Canvas::InvalidateCursorArea() const
+{
+    if (!_showCustomCursor || _mousePosScreen.x < 0)
+        return;
+
+    int cursorSize = _brushSize * _checkerSize;
+    int padding = 2;
+
+    RECT dirtyRect = {_mousePosScreen.x - cursorSize / 2 - padding, _mousePosScreen.y - cursorSize / 2 - padding, _mousePosScreen.x + cursorSize / 2 + padding,
+                      _mousePosScreen.y + cursorSize / 2 + padding};
+
+    InvalidateRect(_hCanvas, &dirtyRect, FALSE);
+}
+
 /// <summary>
 /// Load Frame
 /// </summary>
@@ -268,6 +282,19 @@ void Canvas::LoadFrame(const Frame &frame) const
 
         InvalidateRect(_hCanvas, nullptr, TRUE);
     }
+}
+
+void Canvas::ShiftCursorPos(int dx, int dy)
+{
+    if (!_showCustomCursor)
+        return;
+
+    // Сдвигаем сохранённые клиентские координаты
+    _mousePosScreen.x += dx;
+    _mousePosScreen.y += dy;
+
+    // Перерисовываем только область курсора (без стирания фона)
+    InvalidateCursorArea();
 }
 
 /// <summary>

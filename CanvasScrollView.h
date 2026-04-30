@@ -23,6 +23,8 @@ class CanvasScrollView : public ChildWindow
 
     void RecalculateCanvasCentering();
 
+    void ScrollVertical(int delta);
+
     Canvas *GetCanvas();
 
   private:

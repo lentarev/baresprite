@@ -502,26 +502,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     break;
 
-    case WM_MOUSEWHEEL: {
-        // Проверяем, зажат ли Ctrl
-        if (GetKeyState(VK_CONTROL) & 0x8000)
-        {
-            int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-            bool zoomed = false;
-
-            if (delta > 0 && gCanvasScrollView)
-                zoomed = gCanvasScrollView->GetCanvas()->ZoomIn();
-            else if (delta < 0 && gCanvasScrollView)
-                zoomed = gCanvasScrollView->GetCanvas()->ZoomOut();
-
-            if (zoomed && gCanvasScrollView)
-                gCanvasScrollView->RecalculateCanvasCentering();
-
-            return 0; // Event processed
-        }
-        break;
-    }
-
     case WM_SIZE:
 
         if (wParam != SIZE_MINIMIZED)

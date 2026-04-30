@@ -24,8 +24,9 @@ CanvasScrollView::CanvasScrollView(HWND hWndMain, HINSTANCE hInstance, AppState 
     RegisterClassExW(&wcex);
 
     // Create a scroll view container for canvas window
-    _hCanvasScrollView = CreateWindowExW(0, L"CanvasScrollViewClass", L"", (DWORD)(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_HSCROLL | WS_VSCROLL), 0, 0,
-                                         _containerW, _containerH, hWndMain, nullptr, hInstance, this);
+    _hCanvasScrollView =
+        CreateWindowExW(0, L"CanvasScrollViewClass", L"", (DWORD)(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_HSCROLL | WS_VSCROLL), 0, 0,
+                        _containerW, _containerH, hWndMain, nullptr, hInstance, this);
 
     // Create canvas
     _canvas = std::make_unique<Canvas>(_hCanvasScrollView, hInstance, appState);
@@ -134,29 +135,92 @@ void CanvasScrollView::RecalculateCanvasCentering()
 
     HWND hCanvas = _canvas->GetHWndCanvas();
 
-    // Обновляем скролл-инфо
-    UpdateScrollInfo();
+    // Запоминаем старую область канваса в координатах ScrollView
+    RECT oldRect;
+    GetWindowRect(hCanvas, &oldRect);
+    ScreenToClient(_hCanvasScrollView, (LPPOINT)&oldRect);
+    ScreenToClient(_hCanvasScrollView, ((LPPOINT)&oldRect) + 1);
 
-    // Форсируем применение изменений
+    UpdateScrollInfo();
     UpdateWindow(_hCanvasScrollView);
 
-    // Берём реальную доступную область
-    RECT clientRect;
+    // Получаем новые размеры
+    RECT clientRect, canvasRect;
     GetClientRect(_hCanvasScrollView, &clientRect);
+    GetClientRect(hCanvas, &canvasRect);
+
     int availableW = clientRect.right;
     int availableH = clientRect.bottom;
-
-    // Размер канваса
-    RECT canvasRect;
-    GetClientRect(hCanvas, &canvasRect);
     int canvasW = canvasRect.right;
     int canvasH = canvasRect.bottom;
 
-    // Центрируем
+    // Вычисляем новую позицию
     _canvasPosX = (canvasW < availableW) ? (availableW - canvasW) / 2 : 0;
     _canvasPosY = (canvasH < availableH) ? (availableH - canvasH) / 2 : 0;
 
-    SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+    // Применяем размер и позицию
+    SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, canvasW, canvasH, SWP_NOZORDER);
+
+    // Если канвас уменьшился — принудительно обновляем ТОЛЬКО освободившуюся область
+    if (canvasW < oldRect.right - oldRect.left || canvasH < oldRect.bottom - oldRect.top)
+    {
+        // RDW_NOCHILDREN гарантирует, что перерисуется ТОЛЬКО фон родителя,
+        // а канвас не будет рисоваться дважды (это убирает мерцание)
+        RedrawWindow(_hCanvasScrollView, &oldRect, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_NOCHILDREN | RDW_UPDATENOW);
+    }
+}
+
+void CanvasScrollView::ScrollVertical(int delta)
+{
+    if (!_canvas || !_hCanvasScrollView)
+        return;
+
+    HWND hCanvas = _canvas->GetHWndCanvas();
+
+    // Получаем размеры
+    RECT clientRect, canvasRect;
+    GetClientRect(_hCanvasScrollView, &clientRect);
+    GetClientRect(hCanvas, &canvasRect);
+
+    int availableH = clientRect.bottom;
+    int canvasH = canvasRect.bottom;
+    int step = (abs(delta) / WHEEL_DELTA) * 40;
+
+    // Запоминаем старую позицию
+    int oldPosY = _canvasPosY;
+
+    // Вычисляем новый скролл
+    if (delta > 0)
+        _scrollY -= step;
+    else
+        _scrollY += step;
+
+    // Ограничиваем
+    int maxScroll = (canvasH > availableH) ? (canvasH - availableH) : 0;
+    if (_scrollY < 0)
+        _scrollY = 0;
+    if (_scrollY > maxScroll)
+        _scrollY = maxScroll;
+
+    // Вычисляем позицию
+    int initialY = (canvasH < availableH) ? (availableH - canvasH) / 2 : 0;
+    _canvasPosY = initialY - _scrollY;
+
+    // Считаем сдвиг
+    int deltaY = _canvasPosY - oldPosY;
+
+    // Двигаем окно + SWP_NOCOPYBITS (убирает мерцание краёв)
+    SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOCOPYBITS);
+
+    // Корректируем клиентские координаты курсора
+    // Если канвас уехал вниз (deltaY > 0), клиентский Y уменьшается
+    if (_canvas && _canvas->_showCustomCursor)
+    {
+        _canvas->_mousePosScreen.y -= deltaY; // Нужно открыть доступ к полям
+        _canvas->InvalidateCursorArea();      // Перерисовка курсора
+    }
+
+    UpdateScrollInfo();
 }
 
 Canvas *CanvasScrollView::GetCanvas()
@@ -315,14 +379,45 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
         return 0;
     }
 
+    case WM_MOUSEWHEEL: {
+        int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+
+        // Проверяем, зажат ли Ctrl
+        bool isCtrl = (wParam & MK_CONTROL);
+
+        if (isCtrl)
+        {
+            // === ZOOM (Ctrl + Wheel) ===
+            bool zoomed = false;
+            if (delta > 0)
+                zoomed = pScrollView->_canvas->ZoomIn();
+            else
+                zoomed = pScrollView->_canvas->ZoomOut();
+
+            if (zoomed)
+            {
+                // Если зум сработал, пересчитываем центрирование
+                pScrollView->RecalculateCanvasCentering();
+            }
+        }
+        else
+        {
+            // === SCROLL (Просто Wheel) ===
+            // Вызываем локальный метод для вертикального скролла
+            pScrollView->ScrollVertical(delta);
+        }
+        return 0; // Событие обработано
+    }
+
     case WM_ERASEBKGND:
+
         HDC hdc = (HDC)wParam;
         RECT rc;
         GetClientRect(hWnd, &rc);
+        // Используем системную кисть (не создаёт мерцания)
+        FillRect(hdc, &rc, GetSysColorBrush(COLOR_3DFACE + 1));
+        return TRUE;
 
-        HBRUSH hBrush = CreateSolidBrush(RGB(200, 200, 200));
-        FillRect(hdc, &rc, hBrush);
-        DeleteObject(hBrush);
         return TRUE;
     }
 
