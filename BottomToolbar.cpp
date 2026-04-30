@@ -143,16 +143,8 @@ bool BottomToolbar::OnHScroll(int scrollCode, HWND hSlider)
         {
             if (scrollCode == TB_ENDTRACK || scrollCode == TB_THUMBPOSITION)
             {
-                int pos = static_cast<int>(SendMessageW(hSlider, TBM_GETPOS, 0, 0));
-                _appState.onionSkinOpacity = pos / 100.0f;
 
-                _framePanel->UpdateOnionLabel();
-
-                if (_appState.canvas)
-                {
-                    InvalidateRect(_appState.canvas->GetHWndCanvas(), nullptr, TRUE);
-                }
-                return true;
+                return _framePanel->OnSliderOpacity();
             }
         }
     }

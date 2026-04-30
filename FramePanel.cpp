@@ -155,8 +155,8 @@ void FramePanel::CreateOnionControls()
         CreateWindowExW(0, L"STATIC", L"35%", WS_CHILD | WS_VISIBLE | SS_CENTER | SS_CENTERIMAGE, 0, 0, 0, 0, _hWndBottomTolbar, nullptr, _hInstance, nullptr);
 
     // Slider (TrackBar)
-    _hSliderOpacity = CreateWindowExW(0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | TBS_HORZ | TBS_NOTICKS | TBS_TOOLTIPS, 0, 0, 0, 0,
-                                      _hWndBottomTolbar, (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
+    _hSliderOpacity = CreateWindowExW(0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | TBS_HORZ | TBS_NOTICKS | TBS_TOOLTIPS, 0, 0, 0, 0, _hWndBottomTolbar,
+                                      (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
 
     // Настройка диапазона (0 - 100)
     SendMessageW(_hSliderOpacity, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
@@ -207,6 +207,29 @@ bool FramePanel::OnOnionChecked()
     {
         InvalidateRect(_appState.canvas->GetHWndCanvas(), nullptr, TRUE);
     }
+
+    _appState.isDirty = true;
+
+    return true;
+}
+
+/// <summary>
+/// Set slider value
+/// </summary>
+/// <returns></returns>
+bool FramePanel::OnSliderOpacity()
+{
+    int pos = static_cast<int>(SendMessageW(_hSliderOpacity, TBM_GETPOS, 0, 0));
+    _appState.onionSkinOpacity = pos / 100.0f;
+
+    UpdateOnionLabel();
+
+    if (_appState.canvas)
+    {
+        InvalidateRect(_appState.canvas->GetHWndCanvas(), nullptr, TRUE);
+    }
+
+    _appState.isDirty = true;
 
     return true;
 }
@@ -270,6 +293,8 @@ bool FramePanel::OnButtonNew()
             const Frame &current = FrameService::GetCurrentFrame(_appState);
             _appState.canvas->LoadFrame(current);
         }
+
+        _appState.isDirty = true;
 
         return true;
     }
@@ -337,6 +362,8 @@ bool FramePanel::OnButtonClone()
             _appState.canvas->LoadFrame(current);
         }
 
+        _appState.isDirty = true;
+
         return true;
     }
 
@@ -358,6 +385,8 @@ bool FramePanel::OnButtonDelete()
             const Frame &current = _appState.frames[_appState.currentFrameIndex];
             _appState.canvas->LoadFrame(current);
         }
+
+        _appState.isDirty = true;
 
         return true;
     }

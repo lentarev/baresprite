@@ -27,6 +27,7 @@ class FramePanel
 
     // Onion
     bool OnOnionChecked();
+    bool OnSliderOpacity();
 
   private:
     HWND _hWndBottomTolbar;
