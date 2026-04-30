@@ -12,13 +12,10 @@ class ChessBackground;
 class FrameRenderer;
 class CursorRenderer;
 class OnionFrameRenderer;
-class CanvasScrollView;
 
 class Canvas : public ChildWindow
 {
   public:
-    friend class CanvasScrollView;
-
     Canvas(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState);
 
     ~Canvas() override;
@@ -45,11 +42,15 @@ class Canvas : public ChildWindow
 
     void InvalidateCursorArea(int oldSize) const;
 
-    void InvalidateCursorArea() const;  
+    void InvalidateCursorArea() const;
 
     void LoadFrame(const Frame &frame) const;
 
     void ShiftCursorPos(int dx, int dy);
+
+    bool GetShowCustomCursor() const;
+
+    POINT GetMousePosScreen() const;
 
   private:
     HWND _hWndParent;

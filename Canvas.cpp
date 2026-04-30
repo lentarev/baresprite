@@ -297,6 +297,16 @@ void Canvas::ShiftCursorPos(int dx, int dy)
     InvalidateCursorArea();
 }
 
+bool Canvas::GetShowCustomCursor() const
+{
+    return _showCustomCursor;
+}
+
+POINT Canvas::GetMousePosScreen() const
+{
+    return _mousePosScreen;
+}
+
 /// <summary>
 /// Window function
 /// </summary>

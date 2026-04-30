@@ -213,11 +213,13 @@ void CanvasScrollView::ScrollVertical(int delta)
     SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOCOPYBITS);
 
     // Корректируем клиентские координаты курсора
-    // Если канвас уехал вниз (deltaY > 0), клиентский Y уменьшается
-    if (_canvas && _canvas->_showCustomCursor)
+    if (_canvas && _canvas->GetShowCustomCursor())
     {
-        _canvas->_mousePosScreen.y -= deltaY; // Нужно открыть доступ к полям
-        _canvas->InvalidateCursorArea();      // Перерисовка курсора
+
+        POINT mousePos = _canvas->GetMousePosScreen();
+        mousePos.y -= deltaY;
+
+        _canvas->InvalidateCursorArea(); // Перерисовка курсора
     }
 
     UpdateScrollInfo();

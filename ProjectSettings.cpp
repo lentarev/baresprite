@@ -118,6 +118,11 @@ bool ProjectSettings::Load()
                 if (key == L"SelectedColorIndex")
                 {
                     _appState.palette.index = std::stoi(value);
+
+                    if (_appState.palette.index >= 0 && _appState.palette.index < static_cast<int>(_appState.palette.colors.size()))
+                    {
+                        _appState.palette.color = _appState.palette.colors[_appState.palette.index];
+                    }
                 }
             }
             // === СЕКЦИЯ [ONION_SKIN] ===
