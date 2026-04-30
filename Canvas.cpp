@@ -363,12 +363,6 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         return 0;
     }
 
-    // MOUSE WHEEL
-    case WM_MOUSEWHEEL: {
-
-        return 0;
-    }
-
     case WM_SETCURSOR: {
         // Если курсор над клиентской областью — скрываем системный
         if (LOWORD(lParam) == HTCLIENT)
