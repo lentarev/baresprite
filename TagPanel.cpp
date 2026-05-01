@@ -66,7 +66,7 @@ void TagPanel::CreateControls()
 
     // Button - Manage tags
     _hButton = CreateWindowExW(0, L"BUTTON", L"Manage tags", WS_CHILD | WS_VISIBLE | BS_FLAT | BS_PUSHBUTTON, 0, 0, _BTN_SIZE_W, _BTN_SIZE_H, _hWndBottomTolbar,
-                               nullptr, _hInstance, nullptr);
+                               (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
 }
 
 void TagPanel::ResizeControls(int clientW, int clientH) const
@@ -106,7 +106,7 @@ void TagPanel::PopulateComboBoxes()
         SendMessageW(_hComboTag, CB_ADDSTRING, 0, (LPARAM)tag.c_str());
     }
 
-    // === FILTER: <All> (индекс 0) + динамические теги из кадров ===
+    // === FILTER: All (индекс 0) + динамические теги из кадров ===
     SendMessageW(_hComboFilter, CB_ADDSTRING, 0, (LPARAM)L"All");
 
     auto dynamicTags = GetActiveFilterTags();
@@ -126,7 +126,7 @@ void TagPanel::UpdateFilterSelection()
 
     if (_appState.currentFilterTag.empty())
     {
-        targetText = L"<All>";
+        targetText = L"All";
     }
 
     else if (_appState.currentFilterTag == L"None")
@@ -149,7 +149,7 @@ void TagPanel::UpdateFilterSelection()
 
     else
     {
-        SendMessageW(_hComboFilter, CB_SETCURSEL, 0, 0); // Fallback на <All>
+        SendMessageW(_hComboFilter, CB_SETCURSEL, 0, 0); // Fallback на All
     }
 }
 
@@ -192,7 +192,7 @@ bool TagPanel::OnComboBoxChange(HWND hWndCtrl, int selIndex)
         std::wstring selected(buf);
 
         // Маппим текст в состояние фильтра
-        if (selected == L"<All>")
+        if (selected == L"All")
         {
             _appState.currentFilterTag = L"";
         }
@@ -292,7 +292,7 @@ bool TagPanel::OnChangeFilter()
 
         if (filter.empty())
         {
-            currentMatches = true; // <All> = всё подходит
+            currentMatches = true; // All = всё подходит
         }
 
         else if (filter == L"None")

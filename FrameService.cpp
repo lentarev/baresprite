@@ -254,10 +254,9 @@ const Frame &FrameService::GetCurrentFrame(const AppState &state)
 
 bool FrameService::MatchesFilter(const Frame &frame, const std::wstring &filterTag)
 {
-    if (filterTag.empty())
-    {
-        return true; // <All> = всё подходит
-    }
+    // All или пустая строка = показывать всё (защита от обоих вариантов)
+    if (filterTag.empty() || filterTag == L"All")
+        return true;
 
     if (filterTag == L"None")
     {

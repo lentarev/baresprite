@@ -3,6 +3,7 @@
 #include "FramePanel.h"
 #include "TagPanel.h"
 #include <commctrl.h>
+#include <iostream>
 
 namespace baresprite
 {
@@ -146,14 +147,14 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
         }
     }
 
-    // Filter, Tagging system
-    if (notifyCode == CBN_SELCHANGE)
+    // Tag panel
+    if (commandId >= 3055 && commandId < 3058)
     {
+        const int index = commandId - 3055;
 
-        if (commandId >= 3055 && commandId < 3057)
+        // Filter, Tagging system
+        if (notifyCode == CBN_SELCHANGE)
         {
-            const int index = commandId - 3055;
-
             // Filter list (combobox)
             if (index == 0)
             {
@@ -180,11 +181,22 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
                     {
                         _framePanel->UpdateFrameLabel();
                     }
-                        
 
                     // Закрепляем выбор в комбобоксе (PopulateComboBoxes уже сбросил фокус)
                     _tagPanel->UpdateTagSelection();
                 }
+
+                return true;
+            }
+        }
+
+        // Manage tags (button)
+        if (notifyCode == BN_CLICKED)
+        {
+            std::cout << "index: " << index << std::endl;
+
+            if (index == 2)
+            {
 
                 return true;
             }
