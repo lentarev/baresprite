@@ -1,6 +1,7 @@
 #pragma once
 #include "AppState.h"
 #include <Windows.h>
+#include <string>
 
 namespace baresprite
 {
@@ -13,13 +14,15 @@ class TagPanel
 
     void SetBounds(const RECT &rc);
 
-    void PopulateComboBoxes();                          // Заполнить тегами
+    void PopulateComboBoxes(); // Заполнить тегами
     void UpdateFilterSelection();
     void UpdateTagSelection();                          // Обновить выбор при смене кадра
     bool OnComboBoxChange(HWND hWndCtrl, int selIndex); // Обработка выбора
 
     bool OnChangeFilter();
     bool OnChangeTag();
+
+    std::vector<std::wstring> GetActiveFilterTags() const;
 
   private:
     HWND _hWndBottomTolbar;
@@ -59,6 +62,7 @@ class TagPanel
     // METHODS
     void CreateControls();
     void ResizeControls(int clientW, int clientH) const;
+    int FindFirstMatchingFrame() const;
 };
 
 } // namespace baresprite

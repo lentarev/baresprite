@@ -1,4 +1,7 @@
 #include "TagPanel.h"
+#include "Canvas.h"
+#include <set>
+#include "FrameService.h"
 
 namespace baresprite
 {
@@ -94,43 +97,59 @@ void TagPanel::ResizeControls(int clientW, int clientH) const
 
 void TagPanel::PopulateComboBoxes()
 {
-    // Очищаем
     SendMessageW(_hComboFilter, CB_RESETCONTENT, 0, 0);
     SendMessageW(_hComboTag, CB_RESETCONTENT, 0, 0);
 
-    // 1. Filter: добавляем "<All>" первым пунктом
-    SendMessageW(_hComboFilter, CB_ADDSTRING, 0, (LPARAM)L"All");
-
-    // 2. Добавляем теги ТОЛЬКО из AppState
+    // === TAG: всегда полный список доступных тегов (для назначения) ===
     for (const auto &tag : _appState.availableTags)
     {
-
-        SendMessageW(_hComboFilter, CB_ADDSTRING, 0, (LPARAM)tag.c_str());
         SendMessageW(_hComboTag, CB_ADDSTRING, 0, (LPARAM)tag.c_str());
     }
 
-    // 3. Восстанавливаем выбранные значения из AppState
+    // === FILTER: <All> (индекс 0) + динамические теги из кадров ===
+    SendMessageW(_hComboFilter, CB_ADDSTRING, 0, (LPARAM)L"All");
+
+    auto dynamicTags = GetActiveFilterTags();
+
+    for (const auto &tag : dynamicTags)
+    {
+        SendMessageW(_hComboFilter, CB_ADDSTRING, 0, (LPARAM)tag.c_str());
+    }
+
     UpdateFilterSelection();
     UpdateTagSelection();
 }
 
 void TagPanel::UpdateFilterSelection()
 {
+    std::wstring targetText;
+
     if (_appState.currentFilterTag.empty())
     {
-        SendMessageW(_hComboFilter, CB_SETCURSEL, 0, 0); // <All>
+        targetText = L"<All>";
     }
+
+    else if (_appState.currentFilterTag == L"None")
+    {
+        targetText = L"None";
+    }
+
     else
     {
-        // Ищем индекс тега в списке
-        for (size_t i = 0; i < _appState.availableTags.size(); ++i)
-        {
-            if (_appState.availableTags[i] == _appState.currentFilterTag)
-            {
-                SendMessageW(_hComboFilter, CB_SETCURSEL, i + 1, 0); // +1 из-за <All>
-                break;
-            }
-        }
+        targetText = _appState.currentFilterTag;
+    }
+
+    // Ищем точное совпадение текста в комбобоксе
+    LRESULT idx = SendMessageW(_hComboFilter, CB_FINDSTRINGEXACT, -1, (LPARAM)targetText.c_str());
+
+    if (idx != CB_ERR)
+    {
+        SendMessageW(_hComboFilter, CB_SETCURSEL, idx, 0);
+    }
+
+    else
+    {
+        SendMessageW(_hComboFilter, CB_SETCURSEL, 0, 0); // Fallback на <All>
     }
 }
 
@@ -166,27 +185,80 @@ bool TagPanel::OnComboBoxChange(HWND hWndCtrl, int selIndex)
 
     if (hWndCtrl == _hComboFilter)
     {
-        // Меняем фильтр в AppState
-        if (selIndex == 0)
+        // ЧИТАЕМ ТЕКСТ, а не полагаемся на индексы
+        wchar_t buf[256] = {};
+        SendMessageW(_hComboFilter, CB_GETLBTEXT, selIndex, (LPARAM)buf);
+
+        std::wstring selected(buf);
+
+        // Маппим текст в состояние фильтра
+        if (selected == L"<All>")
         {
-            _appState.currentFilterTag = L""; // <All>
+            _appState.currentFilterTag = L"";
         }
-        else if (selIndex - 1 < static_cast<int>(_appState.availableTags.size()))
+
+        else if (selected == L"None")
         {
-            const std::wstring &selected = _appState.availableTags[selIndex - 1];
-            _appState.currentFilterTag = (selected == L"None") ? L"" : selected;
+            _appState.currentFilterTag = L"None";
         }
+
+        else
+        {
+            _appState.currentFilterTag = selected;
+        }
+
         _appState.isDirty = true;
+
+        // === АВТО-ПЕРЕХОД: если текущий кадр не попадает в фильтр ===
+        if (!_appState.frames.empty())
+        {
+            const std::wstring &currentTag = _appState.frames[_appState.currentFrameIndex].tag;
+            bool currentMatches = false;
+
+            if (_appState.currentFilterTag.empty())
+            {
+                currentMatches = true;
+            }
+
+            else if (_appState.currentFilterTag == L"None")
+            {
+                currentMatches = currentTag.empty();
+            }
+
+            else
+            {
+                currentMatches = (currentTag == _appState.currentFilterTag);
+            }
+
+            if (!currentMatches)
+            {
+                int firstMatch = FindFirstMatchingFrame();
+                if (firstMatch >= 0)
+                {
+                    _appState.currentFrameIndex = firstMatch;
+
+                    if (_appState.canvas)
+                    {
+                        _appState.canvas->LoadFrame(_appState.frames[firstMatch]);
+                    }
+
+                    return true;
+                }
+            }
+        }
+
         return true;
     }
     else if (hWndCtrl == _hComboTag)
     {
-        // Меняем тег текущего кадра в AppState
+        // Для тега кадра — используем availableTags (индексы стабильны)
         if (selIndex < static_cast<int>(_appState.availableTags.size()))
         {
             _appState.frames[_appState.currentFrameIndex].tag = _appState.availableTags[selIndex];
         }
+
         _appState.isDirty = true;
+
         return true;
     }
 
@@ -198,26 +270,195 @@ bool TagPanel::OnChangeFilter()
 
     int selIndex = (int)SendMessageW(_hComboFilter, CB_GETCURSEL, 0, 0);
 
-    if (OnComboBoxChange(_hComboFilter, selIndex))
+    if (selIndex < 0)
     {
-
-        return true;
+        return false;
     }
 
-    return false;
+    // 1. Применяем фильтр через базовый метод
+    if (!OnComboBoxChange(_hComboFilter, selIndex))
+    {
+        return false;
+    }
+
+    // 2. Авто-переход: если текущий кадр не попадает в новый фильтр
+    if (!_appState.frames.empty())
+    {
+        const std::wstring &currentTag = _appState.frames[_appState.currentFrameIndex].tag;
+        const std::wstring &filter = _appState.currentFilterTag;
+
+        // Проверяем, соответствует ли текущий кадр фильтру
+        bool currentMatches = false;
+
+        if (filter.empty())
+        {
+            currentMatches = true; // <All> = всё подходит
+        }
+
+        else if (filter == L"None")
+        {
+            currentMatches = currentTag.empty();
+        }
+
+        else
+        {
+            currentMatches = (currentTag == filter);
+        }
+
+        // Если не соответствует — ищем первый подходящий кадр
+        if (!currentMatches)
+        {
+            int firstMatch = FindFirstMatchingFrame();
+            if (firstMatch >= 0 && firstMatch != _appState.currentFrameIndex)
+            {
+                // Меняем текущий кадр
+                _appState.currentFrameIndex = firstMatch;
+
+                // Обновляем канвас
+                if (_appState.canvas)
+                {
+                    _appState.canvas->LoadFrame(_appState.frames[firstMatch]);
+                }
+
+                // Возвращаем true, чтобы сообщить об изменении кадра
+                return true;
+            }
+        }
+    }
+
+    return true;
 }
 
 bool TagPanel::OnChangeTag()
 {
     int selIndex = (int)SendMessageW(_hComboTag, CB_GETCURSEL, 0, 0);
-
-    if (OnComboBoxChange(_hComboTag, selIndex))
+    if (selIndex < 0)
     {
+        return false;
+    }
+        
 
-        return true;
+    // Применяем новый тег
+    if (!OnComboBoxChange(_hComboTag, selIndex))
+    {
+        return false;
+    }
+        
+
+    // Если фильтр активен и текущий кадр больше не соответствует ему
+    if (!_appState.currentFilterTag.empty() && !_appState.frames.empty())
+    {
+        const Frame &currentFrame = _appState.frames[_appState.currentFrameIndex];
+        if (!FrameService::MatchesFilter(currentFrame, _appState.currentFilterTag))
+        {
+            // Поиск БЛИЖАЙШЕГО подходящего кадра (в обе стороны)
+            int nearest = -1;
+            int current = _appState.currentFrameIndex;
+            int size = static_cast<int>(_appState.frames.size());
+            const std::wstring &filter = _appState.currentFilterTag;
+
+            // Расходящийся радиус: 1, 2, 3...
+            for (int radius = 1; radius < size; ++radius)
+            {
+                // Сначала проверяем назад
+                int prev = current - radius;
+                if (prev >= 0 && FrameService::MatchesFilter(_appState.frames[prev], filter))
+                {
+                    nearest = prev;
+                    break;
+                }
+                // Потом вперёд
+                int next = current + radius;
+                if (next < size && FrameService::MatchesFilter(_appState.frames[next], filter))
+                {
+                    nearest = next;
+                    break;
+                }
+            }
+
+            // Если нашли подходящий кадр — переключаемся на него
+            if (nearest >= 0)
+            {
+                _appState.currentFrameIndex = nearest;
+                if (_appState.canvas)
+                {
+                    _appState.canvas->LoadFrame(_appState.frames[nearest]);
+                }
+            }
+            // Если nearest == -1 → подходящих кадров больше нет, остаёмся на текущем
+        }
     }
 
-    return false;
+    // Обновляем списки (распределение тегов изменилось)
+    PopulateComboBoxes();
+
+    return true;
+}
+
+/// <summary>
+/// Finds the index of the first frame matching the filter
+/// Returns -1 if there are no suitable frames.
+/// </summary>
+/// <returns></returns>
+int TagPanel::FindFirstMatchingFrame() const
+{
+
+    const std::wstring &filter = _appState.currentFilterTag;
+
+    // Пустой фильтр = все кадры подходят, возвращаем первый (0)
+    if (filter.empty())
+        return 0;
+
+    for (size_t i = 0; i < _appState.frames.size(); ++i)
+    {
+        const std::wstring &frameTag = _appState.frames[i].tag;
+
+        if (filter == L"None")
+        {
+            // Фильтр "None" = ищем кадры без тега
+            if (frameTag.empty())
+                return static_cast<int>(i);
+        }
+        else
+        {
+            // Обычный тег = точное совпадение
+            if (frameTag == filter)
+                return static_cast<int>(i);
+        }
+    }
+    return -1; // Не найдено
+}
+
+std::vector<std::wstring> TagPanel::GetActiveFilterTags() const
+{
+    std::set<std::wstring> uniqueTags; // set автоматически сортирует и убирает дубли
+    bool hasNone = false;
+
+    for (const auto &frame : _appState.frames)
+    {
+        if (frame.tag.empty())
+        {
+            hasNone = true;
+        }
+
+        else
+        {
+            uniqueTags.insert(frame.tag);
+        }
+    }
+
+    std::vector<std::wstring> result;
+    if (hasNone)
+    {
+        result.push_back(L"None"); // "None" всегда идёт первым среди динамических
+    }
+
+    for (const auto &tag : uniqueTags)
+    {
+        result.push_back(tag);
+    }
+
+    return result;
 }
 
 } // namespace baresprite

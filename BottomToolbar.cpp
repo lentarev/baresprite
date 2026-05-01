@@ -130,8 +130,6 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
                     _tagPanel->UpdateTagSelection();
                     return true;
                 }
-
-                
             }
         }
     }
@@ -148,7 +146,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
         }
     }
 
-    // Tagging system
+    // Filter, Tagging system
     if (notifyCode == CBN_SELCHANGE)
     {
 
@@ -159,13 +157,36 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             // Filter list (combobox)
             if (index == 0)
             {
-                return _tagPanel->OnChangeFilter();
+                if (_tagPanel->OnChangeFilter())
+                {
+
+                    if (_framePanel)
+                    {
+                        _framePanel->UpdateFrameLabel(); // Update "Frame 3/10"
+                    }
+
+                    _tagPanel->UpdateTagSelection();
+                }
+
+                return true;
             }
 
             // Tag list (combobox)
             if (index == 1)
             {
-                return _tagPanel->OnChangeTag();
+                if (_tagPanel->OnChangeTag())
+                {
+                    if (_framePanel)
+                    {
+                        _framePanel->UpdateFrameLabel();
+                    }
+                        
+
+                    // Закрепляем выбор в комбобоксе (PopulateComboBoxes уже сбросил фокус)
+                    _tagPanel->UpdateTagSelection();
+                }
+
+                return true;
             }
         }
     }

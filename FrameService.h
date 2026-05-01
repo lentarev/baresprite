@@ -21,6 +21,8 @@ class FrameService
 
     static Frame &GetCurrentFrame(AppState &state);
     static const Frame &GetCurrentFrame(const AppState &state);
+
+    static bool MatchesFilter(const Frame &frame, const std::wstring &filterTag);
 };
 
 } // namespace baresprite
