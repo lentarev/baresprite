@@ -88,6 +88,10 @@ bool ProjectSettings::Load()
                 {
                     _appState.checkerSize = std::stoi(value);
                 }
+                else if (key == L"filterTag")
+                {
+                    _appState.currentFilterTag = value;
+                }
             }
             // === СЕКЦИЯ [PALETTE] ===
             else if (currentSection == L"PALETTE")
@@ -155,6 +159,7 @@ bool ProjectSettings::Load()
                     }
                 }
             }
+
             // === СЕКЦИЯ [FRAMES] ===
             else if (currentSection == L"FRAMES")
             {
@@ -274,6 +279,7 @@ void ProjectSettings::Save()
     file << L"name=" << _appState.name << L"\n";
     file << L"imageSize=" << _appState.imageSize << L"\n";
     file << L"checkerSize=" << _appState.checkerSize << L"\n";
+    file << L"filterTag=" << _appState.currentFilterTag << L"\n";
 
     if (!_appState.palette.colors.empty())
     {

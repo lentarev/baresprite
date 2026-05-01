@@ -29,9 +29,13 @@ struct AppState
 
     // Onion Skinning settings
     bool onionSkinEnabled = true;
-    int onionSkinPrevFrames = 1;    
-    int onionSkinNextFrames = 0;    
+    int onionSkinPrevFrames = 1;
+    int onionSkinNextFrames = 0;
     float onionSkinOpacity = 0.35f;
+
+    // Tagging system
+    std::vector<std::wstring> availableTags = {L"None", L"Idle", L"Walk", L"Run", L"Jump", L"Die", L"Attack"};
+    std::wstring currentFilterTag = L"";
 };
 
 } // namespace baresprite

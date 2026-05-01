@@ -3,7 +3,6 @@
 #include "FramePanel.h"
 #include "TagPanel.h"
 #include <commctrl.h>
-#include <iostream>
 
 namespace baresprite
 {
@@ -88,27 +87,51 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             // Prev <
             if (index == 0)
             {
-                return _framePanel->OnButtonPrev();
+
+                if (_framePanel->OnButtonPrev())
+                {
+                    _tagPanel->UpdateTagSelection();
+                    return true;
+                }
             }
             // Next >
             else if (index == 1)
             {
-                return _framePanel->OnButtonNext();
+                if (_framePanel->OnButtonNext())
+                {
+                    _tagPanel->UpdateTagSelection();
+                    return true;
+                }
             }
             // New
             else if (index == 2)
             {
-                return _framePanel->OnButtonNew();
+                if (_framePanel->OnButtonNew())
+                {
+                    _tagPanel->UpdateTagSelection();
+                    return true;
+                }
             }
             // Clone
             else if (index == 3)
             {
-                return _framePanel->OnButtonClone();
+
+                if (_framePanel->OnButtonClone())
+                {
+                    _tagPanel->UpdateTagSelection();
+                    return true;
+                }
             }
             // Delete
             else if (index == 4)
             {
-                return _framePanel->OnButtonDelete();
+                if (_framePanel->OnButtonDelete())
+                {
+                    _tagPanel->UpdateTagSelection();
+                    return true;
+                }
+
+                
             }
         }
     }
@@ -122,6 +145,28 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
         if (index == 0)
         {
             return _framePanel->OnOnionChecked();
+        }
+    }
+
+    // Tagging system
+    if (notifyCode == CBN_SELCHANGE)
+    {
+
+        if (commandId >= 3055 && commandId < 3057)
+        {
+            const int index = commandId - 3055;
+
+            // Filter list (combobox)
+            if (index == 0)
+            {
+                return _tagPanel->OnChangeFilter();
+            }
+
+            // Tag list (combobox)
+            if (index == 1)
+            {
+                return _tagPanel->OnChangeTag();
+            }
         }
     }
 
