@@ -156,6 +156,9 @@
     <ClInclude Include="OnionFrameRenderer.h">
       <Filter>Header Files\Canvas</Filter>
     </ClInclude>
+    <ClInclude Include="manage_tags_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -220,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="OnionFrameRenderer.cpp">
       <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="manage_tags_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

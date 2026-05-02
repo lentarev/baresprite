@@ -34,7 +34,7 @@ struct AppState
     float onionSkinOpacity = 0.35f;
 
     // Tagging system
-    std::vector<std::wstring> availableTags = {L"None", L"Idle", L"Walk", L"Run", L"Jump", L"Die", L"Attack"};
+    std::vector<std::wstring> availableTags = {};
     std::wstring currentFilterTag = L"";
 };
 

@@ -3,7 +3,6 @@
 #include "AppState.h"
 #include "resource.h"
 
-#include <Windows.h>
 #include <shlobj.h>
 #include <shlwapi.h>
 #include <windowsx.h>

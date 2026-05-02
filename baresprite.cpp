@@ -116,7 +116,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     while (!launchEditor)
     {
-        // 1. Show start screen dialog
+        // Show start screen dialog
         INT_PTR startResult = DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG_START_SCREEN), nullptr, StartScreenDialogProc);
 
         // If you closed the start screen (cross / Esc / Cancel), exit the application
@@ -147,6 +147,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
                     // Initialization
                     gAppState->frames.emplace_back(gAppState->imageSize, gAppState->imageSize);
+                    gAppState->availableTags = {L"None", L"Idle", L"Walk", L"Run", L"Jump", L"Die", L"Attack"};
 
                     launchEditor = true;
 

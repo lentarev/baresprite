@@ -2,6 +2,8 @@
 #include "Canvas.h"
 #include "FramePanel.h"
 #include "TagPanel.h"
+#include "manage_tags_dialog_proc.h"
+#include "resource.h"
 #include <commctrl.h>
 #include <iostream>
 
@@ -197,6 +199,16 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 
             if (index == 2)
             {
+                // Show manage tags dialog
+                INT_PTR manageTagsResult = DialogBoxParam(_hInstance, MAKEINTRESOURCE(IDD_DIALOG_MANAGE_TAGS), _hWnd, ManageTagsDialogProc,
+                                                     reinterpret_cast<LPARAM>(&_appState)
+                );
+
+
+                if (_tagPanel)
+                {
+                    _tagPanel->PopulateComboBoxes();
+                }
 
                 return true;
             }

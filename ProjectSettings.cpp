@@ -160,6 +160,15 @@ bool ProjectSettings::Load()
                 }
             }
 
+            // === СЕКЦИЯ [TAGS] ===
+            else if (currentSection == L"TAGS")
+            {
+                if (key.find(L"Tag") == 0) // Tag0, Tag1, ...
+                {
+                    _appState.availableTags.push_back(value);
+                }
+            }
+
             // === СЕКЦИЯ [FRAMES] ===
             else if (currentSection == L"FRAMES")
             {
@@ -317,6 +326,20 @@ void ProjectSettings::Save()
     file << L"onionSkinPrevFrames=" << _appState.onionSkinPrevFrames << L"\n";
     file << L"onionSkinNextFrames=" << _appState.onionSkinNextFrames << L"\n";
     file << L"onionSkinOpacity=" << static_cast<int>(_appState.onionSkinOpacity * 100) << L"\n";
+
+    // === СЕКЦИЯ [TAGS] ===
+    if (!_appState.availableTags.empty())
+    {
+        file << L"\n[TAGS]\n";
+        file << L"Count=" << _appState.availableTags.size() << L"\n"; // Опционально, для надёжности
+
+        for (size_t i = 0; i < _appState.availableTags.size(); ++i)
+        {
+            wchar_t key[32];
+            swprintf_s(key, L"Tag%zu", i); // Tag0, Tag1, Tag2...
+            file << key << L"=" << _appState.availableTags[i] << L"\n";
+        }
+    }
 
     for (size_t i = 0; i < _appState.frames.size(); ++i)
     {

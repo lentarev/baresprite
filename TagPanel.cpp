@@ -1,7 +1,7 @@
 #include "TagPanel.h"
 #include "Canvas.h"
-#include <set>
 #include "FrameService.h"
+#include <set>
 
 namespace baresprite
 {
@@ -336,14 +336,12 @@ bool TagPanel::OnChangeTag()
     {
         return false;
     }
-        
 
     // Применяем новый тег
     if (!OnComboBoxChange(_hComboTag, selIndex))
     {
         return false;
     }
-        
 
     // Если фильтр активен и текущий кадр больше не соответствует ему
     if (!_appState.currentFilterTag.empty() && !_appState.frames.empty())
