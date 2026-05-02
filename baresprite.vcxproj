@@ -188,6 +188,7 @@
     <ClInclude Include="CanvasScrollView.h" />
     <ClInclude Include="ChessBackground.h" />
     <ClInclude Include="ChildWindow.h" />
+    <ClInclude Include="ClipboardData.h" />
     <ClInclude Include="CursorRenderer.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="FramePanel.h" />
@@ -206,6 +207,8 @@
     <ClInclude Include="ProjectSettings.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RightToolbar.h" />
+    <ClInclude Include="SelectionRenderer.h" />
+    <ClInclude Include="SelectionState.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="start_screen_dialog_proc.h" />
     <ClInclude Include="TagPanel.h" />
@@ -233,6 +236,7 @@
     <ClCompile Include="Palette.cpp" />
     <ClCompile Include="ProjectSettings.cpp" />
     <ClCompile Include="RightToolbar.cpp" />
+    <ClCompile Include="SelectionRenderer.cpp" />
     <ClCompile Include="start_screen_dialog_proc.cpp" />
     <ClCompile Include="TagPanel.cpp" />
     <ClCompile Include="Tools.cpp" />

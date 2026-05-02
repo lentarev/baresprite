@@ -4,6 +4,7 @@
 #include "Frame.h"
 #include "FrameRenderer.h"
 #include "OnionFrameRenderer.h"
+#include "SelectionRenderer.h"
 #include <iostream>
 #include <windowsx.h>
 
@@ -43,6 +44,7 @@ Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState) :
     _frameRenderer = std::make_unique<FrameRenderer>();
     _cursorRenderer = std::make_unique<CursorRenderer>();
     _onionFrameRenderer = std::make_unique<OnionFrameRenderer>();
+    _selectionRenderer = std::make_unique<SelectionRenderer>();
 }
 
 Canvas::~Canvas()
@@ -307,6 +309,16 @@ POINT Canvas::GetMousePosScreen() const
     return _mousePosScreen;
 }
 
+void Canvas::OnToolChanged(ToolType newTool)
+{
+    // Если переключились с Select на другой инструмент → сбрасываем выделение
+    if (newTool != ToolType::Select && _appState.selection.isActive)
+    {
+        _appState.selection.Clear();
+        InvalidateRect(_hCanvas, nullptr, FALSE);
+    }
+}
+
 /// <summary>
 /// Window function
 /// </summary>
@@ -343,6 +355,28 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
 
+        // Processing for the Select tool
+        if (pCanvas->_appState.currentTool == ToolType::Select)
+        {
+            SetFocus(pCanvas->_hCanvas);
+
+            // Конвертация: экран → логические координаты кадра
+            int logX = x / pCanvas->_checkerSize;
+            int logY = y / pCanvas->_checkerSize;
+
+            // Начинаем новое выделение
+            pCanvas->_appState.selection.x = logX;
+            pCanvas->_appState.selection.y = logY;
+            pCanvas->_appState.selection.w = 0;
+            pCanvas->_appState.selection.h = 0;
+            pCanvas->_appState.selection.isDragging = true;
+            pCanvas->_appState.selection.isActive = true;
+
+            // Перерисовываем для показа "призрачного" прямоугольника
+            InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
+            return 0;
+        }
+
         pCanvas->HandleDraw(wParam, lParam);
 
         return 0;
@@ -359,6 +393,18 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
         // Для HandleDraw
         pCanvas->_mousePos = {logX, logY};
+
+        // Драг выделения для Select
+        if (pCanvas->_appState.currentTool == ToolType::Select && pCanvas->_appState.selection.isDragging)
+        {
+            // Вычисляем размеры
+            pCanvas->_appState.selection.w = logX - pCanvas->_appState.selection.x;
+            pCanvas->_appState.selection.h = logY - pCanvas->_appState.selection.y;
+
+            // Перерисовываем только область выделения (оптимизация)
+            InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
+            return 0;
+        }
 
         if (wParam & MK_LBUTTON)
         { // Рисуем только если зажата ЛКМ
@@ -397,6 +443,19 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
 
+        // Завершение выделения для Select
+        if (pCanvas->_appState.currentTool == ToolType::Select && pCanvas->_appState.selection.isDragging)
+        {
+            pCanvas->_appState.selection.isDragging = false;
+
+            // Нормализуем прямоугольник (на случай драга влево/вверх)
+            pCanvas->_appState.selection.Normalize();
+
+            // Перерисовываем для финального отображения
+            InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
+            return 0;
+        }
+
         return 0;
     }
 
@@ -404,9 +463,20 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         // Если курсор над клиентской областью — скрываем системный
         if (LOWORD(lParam) == HTCLIENT)
         {
-            SetCursor(nullptr); // Скрыть стандартную стрелку/крест
 
-            pCanvas->SetCustomCursor(true);
+            if (pCanvas->_appState.currentTool == ToolType::Select)
+            {
+                // Для Select: показываем системный крестик
+                SetCursor(LoadCursor(nullptr, IDC_CROSS));
+
+                pCanvas->SetCustomCursor(false); // Скрываем кастомный квадрат
+            }
+            else
+            {
+                SetCursor(nullptr); // Скрыть стандартную стрелку/крест
+
+                pCanvas->SetCustomCursor(true);
+            }
 
             return TRUE;
         }
@@ -486,6 +556,12 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             pCanvas->_cursorRenderer->Render(cursorSize, cursorX, cursorY, hdcMem);
         }
 
+        //  Рисуем рамку выделения (поверх кадра, под курсором)
+        if (pCanvas->_appState.selection.isActive && pCanvas->_appState.currentTool == ToolType::Select)
+        {
+            pCanvas->_selectionRenderer->Render(hdcMem, pCanvas->_appState.selection, pCanvas->_checkerSize);
+        }
+
         // 5. Копируем на экран
         BitBlt(hdc, 0, 0, width, height, hdcMem, 0, 0, SRCCOPY);
 
@@ -497,6 +573,20 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         EndPaint(hWnd, &ps);
         return 0;
     }
+
+    case WM_KEYDOWN: {
+        if (wParam == VK_ESCAPE && pCanvas->_appState.selection.isActive)
+        {
+            // Сбрасываем выделение
+            pCanvas->_appState.selection.Clear();
+
+            // Перерисовываем область, где была рамка
+            InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
+            return 0;
+        }
+    }
+
+    break;
 
     case WM_ERASEBKGND:
         // Preventing flickering

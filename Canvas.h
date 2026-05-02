@@ -12,6 +12,7 @@ class ChessBackground;
 class FrameRenderer;
 class CursorRenderer;
 class OnionFrameRenderer;
+class SelectionRenderer;
 
 class Canvas : public ChildWindow
 {
@@ -52,6 +53,8 @@ class Canvas : public ChildWindow
 
     POINT GetMousePosScreen() const;
 
+    void OnToolChanged(ToolType newTool);
+
   private:
     HWND _hWndParent;
     HINSTANCE _hInstanceParent;
@@ -87,6 +90,7 @@ class Canvas : public ChildWindow
     std::unique_ptr<FrameRenderer> _frameRenderer;
     std::unique_ptr<CursorRenderer> _cursorRenderer;
     std::unique_ptr<OnionFrameRenderer> _onionFrameRenderer;
+    std::unique_ptr<SelectionRenderer> _selectionRenderer;
 
     // Configuration
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;

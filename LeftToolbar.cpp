@@ -2,6 +2,7 @@
 #include "Palette.h"
 #include "Tools.h"
 #include <iostream>
+#include "Canvas.h"
 
 namespace baresprite
 {
@@ -110,6 +111,7 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
             {
 
                 _tools->SetActive(index);
+                _appState.canvas->OnToolChanged(static_cast<ToolType>(index));
             }
         }
     }
@@ -120,6 +122,7 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
 void LeftToolbar::SelectTool(int index)
 {
     _tools->SetActive(index);
+    _appState.canvas->OnToolChanged(static_cast<ToolType>(index));
 }
 
 LRESULT CALLBACK LeftToolbar::_LeftToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

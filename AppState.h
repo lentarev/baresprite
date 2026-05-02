@@ -5,6 +5,8 @@
 #include "ToolType.h"
 #include <Windows.h>
 #include <string>
+#include "SelectionState.h"
+#include "ClipboardData.h"
 
 namespace baresprite
 {
@@ -36,6 +38,10 @@ struct AppState
     // Tagging system
     std::vector<std::wstring> availableTags = {};
     std::wstring currentFilterTag = L"";
+
+    // Selection
+    SelectionState selection;
+    ClipboardData clipboard;
 };
 
 } // namespace baresprite
