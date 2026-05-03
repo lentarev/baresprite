@@ -316,7 +316,7 @@ POINT Canvas::GetMousePosScreen() const
 void Canvas::OnToolChanged(ToolType newTool)
 {
     // Если переключились с Select на другой инструмент → сбрасываем выделение
-    if (newTool != ToolType::Select && newTool != ToolType::Fill && _appState.selection.isActive)
+    if (newTool != ToolType::Select && newTool != ToolType::Fill && newTool != ToolType::Move && _appState.selection.isActive)
     {
         _appState.selection.Clear();
         InvalidateRect(_hCanvas, nullptr, FALSE);
@@ -386,7 +386,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
 
-        pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
+        // pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
 
         // Processing for the Select tool
         if (pCanvas->_appState.currentTool == ToolType::Select)
@@ -439,8 +439,74 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             return 0;
         }
 
+        else if (pCanvas->_appState.currentTool == ToolType::Move)
+        {
+
+            int logX = x / pCanvas->_checkerSize;
+            int logY = y / pCanvas->_checkerSize;
+            const auto &sel = pCanvas->_appState.selection;
+
+            // Начинаем драг только если клик внутри активного выделения
+            if (sel.isActive && logX >= sel.x && logX < sel.x + sel.w && logY >= sel.y && logY < sel.y + sel.h)
+            {
+                // Сохраняем состояние для Undo (один раз в начале действия)
+                pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
+
+                // Инициализируем состояние драга
+                pCanvas->_appState.moveDrag.isDragging = true;
+                pCanvas->_appState.moveDrag.startLogX = logX;
+                pCanvas->_appState.moveDrag.startLogY = logY;
+                pCanvas->_appState.moveDrag.prevDx = 0;
+                pCanvas->_appState.moveDrag.currDx = 0;
+                pCanvas->_appState.moveDrag.prevDy = 0;
+                pCanvas->_appState.moveDrag.currDy = 0;
+                pCanvas->_appState.moveDrag.origSelX = sel.x;
+                pCanvas->_appState.moveDrag.origSelY = sel.y;
+                pCanvas->_appState.moveDrag.w = sel.w;
+                pCanvas->_appState.moveDrag.h = sel.h;
+
+                // Копируем пиксели выделения в буфер
+                Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
+
+                pCanvas->_appState.moveDrag.pixelBuffer.resize(sel.w * sel.h);
+
+                for (int dy = 0; dy < sel.h; ++dy)
+                {
+                    for (int dx = 0; dx < sel.w; ++dx)
+                    {
+                        int fx = sel.x + dx;
+                        int fy = sel.y + dy;
+                        // Безопасное чтение с учётом границ кадра
+                        pCanvas->_appState.moveDrag.pixelBuffer[dy * sel.w + dx] = frame.GetPixel(fx, fy);
+                    }
+                }
+
+                // Очищаем исходную область в кадре (прозрачность)
+                for (int dy = 0; dy < sel.h; ++dy)
+                {
+                    for (int dx = 0; dx < sel.w; ++dx)
+                    {
+                        frame.SetPixel(sel.x + dx, sel.y + dy, 0);
+                    }
+                }
+
+                // 5. Рисуем блок на текущей позиции (сдвиг 0)
+                for (int dy = 0; dy < sel.h; ++dy)
+                {
+                    for (int dx = 0; dx < sel.w; ++dx)
+                    {
+                        frame.SetPixel(sel.x + dx, sel.y + dy, pCanvas->_appState.moveDrag.pixelBuffer[dy * sel.w + dx]);
+                    }
+                }
+
+                InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
+            }
+            return 0;
+        }
+
         else if (pCanvas->_appState.currentTool == ToolType::Brush || pCanvas->_appState.currentTool == ToolType::Eraser)
         {
+            pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
             pCanvas->HandleDraw(wParam, lParam);
         }
 
@@ -471,7 +537,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             return 0;
         }
 
-        if (wParam & MK_LBUTTON)
+        if ((wParam & MK_LBUTTON) && (pCanvas->_appState.currentTool == ToolType::Brush || pCanvas->_appState.currentTool == ToolType::Eraser))
         { // Рисуем только если зажата ЛКМ
             pCanvas->HandleDraw(wParam, lParam);
         }
@@ -482,22 +548,119 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             int cursorSize = pCanvas->_brushSize * pCanvas->_checkerSize;
             int padding = 2; // Запас для 1px рамки и избежания артефактов на краях
 
-            // 1. Область СТАРОГО курсора (до обновления позиции)
+            // Область старого курсора (до обновления позиции)
             RECT oldRect = {pCanvas->_mousePosScreen.x - cursorSize / 2 - padding, pCanvas->_mousePosScreen.y - cursorSize / 2 - padding,
                             pCanvas->_mousePosScreen.x + cursorSize / 2 + padding, pCanvas->_mousePosScreen.y + cursorSize / 2 + padding};
 
-            // 2. Обновляем позицию
+            // Обновляем позицию
             pCanvas->_mousePosScreen = {x, y};
 
-            // 3. Область НОВОГО курсора
+            // Область нового курсора
             RECT newRect = {x - cursorSize / 2 - padding, y - cursorSize / 2 - padding, x + cursorSize / 2 + padding, y + cursorSize / 2 + padding};
 
-            // 4. Объединяем области: Windows перерисует только этот прямоугольник
+            // Объединяем области: Windows перерисует только этот прямоугольник
             RECT dirtyRect;
             UnionRect(&dirtyRect, &oldRect, &newRect);
 
             // FALSE = не стирать фон (у нас двойная буферизация, фон рисуется в WM_PAINT)
             InvalidateRect(pCanvas->_hCanvas, &dirtyRect, FALSE);
+        }
+
+        // Логика перетаскивания для Move
+        if (pCanvas->_appState.currentTool == ToolType::Move && pCanvas->_appState.moveDrag.isDragging)
+        {
+            int logX = x / pCanvas->_checkerSize;
+            int logY = y / pCanvas->_checkerSize;
+
+            // Вычисляем смещение от точки нажатия
+            int dx = logX - pCanvas->_appState.moveDrag.startLogX;
+            int dy = logY - pCanvas->_appState.moveDrag.startLogY;
+
+            // Потенциальная новая позиция
+            int newX = pCanvas->_appState.moveDrag.origSelX + dx;
+            int newY = pCanvas->_appState.moveDrag.origSelY + dy;
+
+            Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
+            int w = pCanvas->_appState.moveDrag.w;
+            int h = pCanvas->_appState.moveDrag.h;
+
+            // Ограничение границ холста
+            if (newX < 0)
+            {
+                newX = 0;
+            }
+
+            if (newY < 0)
+            {
+                newY = 0;
+            }
+
+            if (newX + w > frame.width)
+            {
+                newX = frame.width - w;
+            }
+
+            if (newY + h > frame.height)
+            {
+                newY = frame.height - h;
+            }
+
+            // Защита на случай, если выделение больше самого кадра
+            if (newX < 0)
+            {
+                newX = 0;
+            }
+
+            if (newY < 0)
+            {
+                newY = 0;
+            }
+
+            // Если позиция не изменилась (мышь ушла за край), ничего не делаем
+            if (newX == pCanvas->_appState.selection.x && newY == pCanvas->_appState.selection.y)
+            {
+                return 0;
+            }
+
+            // 1. Очищаем старую позицию
+            int oldX = pCanvas->_appState.selection.x;
+            int oldY = pCanvas->_appState.selection.y;
+
+            for (int cy = 0; cy < h; ++cy)
+            {
+                for (int cx = 0; cx < w; ++cx)
+                {
+                    int px = oldX + cx;
+                    int py = oldY + cy;
+                    if (px >= 0 && px < frame.width && py >= 0 && py < frame.height)
+                    {
+                        frame.SetPixel(px, py, 0);
+                    }
+                }
+            }
+
+            // 2. Рисуем на новой позиции
+            for (int cy = 0; cy < h; ++cy)
+            {
+                for (int cx = 0; cx < w; ++cx)
+                {
+                    int px = newX + cx;
+                    int py = newY + cy;
+
+                    if (px >= 0 && px < frame.width && py >= 0 && py < frame.height)
+                    {
+                        frame.SetPixel(px, py, pCanvas->_appState.moveDrag.pixelBuffer[cy * w + cx]);
+                    }
+                }
+            }
+
+            // 3. Обновляем координаты выделения
+            pCanvas->_appState.selection.x = newX;
+            pCanvas->_appState.selection.y = newY;
+
+            InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
+
+            return 0;
         }
 
         return 0;
@@ -521,6 +684,17 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             return 0;
         }
 
+        // Завершение перетаскивания - Move
+        if (pCanvas->_appState.currentTool == ToolType::Move && pCanvas->_appState.moveDrag.isDragging)
+        {
+            pCanvas->_appState.moveDrag.isDragging = false;
+            pCanvas->_appState.moveDrag.pixelBuffer.clear();
+            pCanvas->_appState.moveDrag.pixelBuffer.shrink_to_fit();
+
+            InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
+            return 0;
+        }
+
         return 0;
     }
 
@@ -529,10 +703,13 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         if (LOWORD(lParam) == HTCLIENT)
         {
 
-            if (pCanvas->_appState.currentTool == ToolType::Select || pCanvas->_appState.currentTool == ToolType::Fill)
+            if (pCanvas->_appState.currentTool == ToolType::Select || pCanvas->_appState.currentTool == ToolType::Fill ||
+                pCanvas->_appState.currentTool == ToolType::Move)
             {
-                // Для Select: показываем системный крестик
-                SetCursor(LoadCursor(nullptr, IDC_CROSS));
+
+                // Выбор нужного курсора
+                HCURSOR hCur = (pCanvas->_appState.currentTool == ToolType::Move) ? LoadCursor(nullptr, IDC_SIZEALL) : LoadCursor(nullptr, IDC_CROSS);
+                SetCursor(hCur);
 
                 pCanvas->SetCustomCursor(false); // Скрываем кастомный квадрат
             }

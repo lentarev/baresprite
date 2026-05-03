@@ -8,6 +8,8 @@
 #include "SelectionState.h"
 #include "ClipboardData.h"
 #include "HistoryState.h"
+#include "MoveDragState.h"
+
 
 namespace baresprite
 {
@@ -46,6 +48,9 @@ struct AppState
 
     // Undo/Redo
     HistoryState history;
+
+    // Move
+    MoveDragState moveDrag;
 };
 
 } // namespace baresprite

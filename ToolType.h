@@ -9,6 +9,7 @@ enum class ToolType
     Eraser,
     Select,
     Fill,
+    Move,
 
     Count
 };
@@ -28,6 +29,9 @@ inline const wchar_t *GetToolLabel(ToolType tool)
 
     case ToolType::Fill:
         return L"Fill";
+
+    case ToolType::Move:
+        return L"Move";
 
     default:
         return L"Unknown";

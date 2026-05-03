@@ -180,6 +180,9 @@
     <ClInclude Include="FillService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="MoveDragState.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
