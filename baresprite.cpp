@@ -329,31 +329,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
 
-    case WM_KEYDOWN: {
-
-        int toolIndex = -1;
-
-        switch (wParam)
-        {
-
-        case 'S':
-            toolIndex = 2;
-
-            break; // Select
-        case 'F':
-            toolIndex = 3;
-
-            break; // Fill
-        }
-
-        if (toolIndex != -1 && gLeftToolbar)
-        {
-            gLeftToolbar->SelectTool(toolIndex);
-            return 0; // Сообщение обработано
-        }
-    }
-    break;
-
     case WM_COMMAND: {
         int wmId = LOWORD(wParam);
         int wmEvent = HIWORD(wParam); // notification code (BN_CLICKED or BN_DBLCLK)
@@ -387,7 +362,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             return 0;
         }
-
 
         if (wmId == ID_PREV_FRAME)
         {
@@ -426,7 +400,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0;
         }
 
-        if (wmId == ID_ZOOM_IN)
+        if (wmId == ID_ZOOM_IN || wmId == ID_VIEW_ZOOMIN)
         {
             RECT rc;
             GetClientRect(hWnd, &rc);
@@ -442,7 +416,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0;
         }
 
-        if (wmId == ID_ZOOM_OUT)
+        if (wmId == ID_ZOOM_OUT || wmId == ID_VIEW_ZOOMOUT)
         {
             RECT rc;
             GetClientRect(hWnd, &rc);
@@ -475,6 +449,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (gLeftToolbar)
             {
                 gLeftToolbar->SelectTool(1);
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_TOOL_SELECT)
+        {
+
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->SelectTool(2);
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_TOOL_FILL)
+        {
+
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->SelectTool(3);
             }
 
             return 0;
