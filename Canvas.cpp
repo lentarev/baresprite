@@ -2,6 +2,7 @@
 #include "ChessBackground.h"
 #include "ClipboardService.h"
 #include "CursorRenderer.h"
+#include "FillService.h"
 #include "Frame.h"
 #include "FrameRenderer.h"
 #include "OnionFrameRenderer.h"
@@ -315,7 +316,7 @@ POINT Canvas::GetMousePosScreen() const
 void Canvas::OnToolChanged(ToolType newTool)
 {
     // Если переключились с Select на другой инструмент → сбрасываем выделение
-    if (newTool != ToolType::Select && _appState.selection.isActive)
+    if (newTool != ToolType::Select && newTool != ToolType::Fill && _appState.selection.isActive)
     {
         _appState.selection.Clear();
         InvalidateRect(_hCanvas, nullptr, FALSE);
@@ -409,7 +410,39 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             return 0;
         }
 
-        pCanvas->HandleDraw(wParam, lParam);
+        else if (pCanvas->_appState.currentTool == ToolType::Fill)
+        {
+            // 1. Конвертация: экран → логические координаты
+            int logX = x / pCanvas->_checkerSize;
+            int logY = y / pCanvas->_checkerSize;
+
+            if (logX >= 0 && logY >= 0 && !pCanvas->_appState.frames.empty())
+            {
+                Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
+
+                // Save state for UNDO
+                pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
+
+                // Получаем цвет из палитры (преобразуем COLORREF → 0xAARRGGBB)
+                COLORREF palColor = pCanvas->_appState.palette.color;
+                uint32_t fillColor = 0xFF000000 | (static_cast<uint32_t>(GetRValue(palColor)) << 16) | (static_cast<uint32_t>(GetGValue(palColor)) << 8) |
+                                     static_cast<uint32_t>(GetBValue(palColor));
+
+                // Запускаем заливку (с учётом выделения)
+                FillService::PerformFill(frame, pCanvas->_appState.selection, logX, logY, fillColor);
+
+                // Помечаем проект как изменённый и перерисовываем
+                pCanvas->_appState.isDirty = true;
+
+                InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
+            }
+            return 0;
+        }
+
+        else if (pCanvas->_appState.currentTool == ToolType::Brush || pCanvas->_appState.currentTool == ToolType::Eraser)
+        {
+            pCanvas->HandleDraw(wParam, lParam);
+        }
 
         return 0;
     }
@@ -496,7 +529,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         if (LOWORD(lParam) == HTCLIENT)
         {
 
-            if (pCanvas->_appState.currentTool == ToolType::Select)
+            if (pCanvas->_appState.currentTool == ToolType::Select || pCanvas->_appState.currentTool == ToolType::Fill)
             {
                 // Для Select: показываем системный крестик
                 SetCursor(LoadCursor(nullptr, IDC_CROSS));
@@ -589,7 +622,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         }
 
         //  Рисуем рамку выделения (поверх кадра, под курсором)
-        if (pCanvas->_appState.selection.isActive && pCanvas->_appState.currentTool == ToolType::Select)
+        if (pCanvas->_appState.selection.isActive && (pCanvas->_appState.currentTool == ToolType::Select || pCanvas->_appState.currentTool == ToolType::Fill))
         {
             pCanvas->_selectionRenderer->Render(hdcMem, pCanvas->_appState.selection, pCanvas->_checkerSize);
         }

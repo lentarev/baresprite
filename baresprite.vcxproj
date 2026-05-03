@@ -191,6 +191,7 @@
     <ClInclude Include="ClipboardData.h" />
     <ClInclude Include="ClipboardService.h" />
     <ClInclude Include="CursorRenderer.h" />
+    <ClInclude Include="FillService.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="FramePanel.h" />
     <ClInclude Include="FrameRenderer.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="ChessBackground.cpp" />
     <ClCompile Include="ClipboardService.cpp" />
     <ClCompile Include="CursorRenderer.cpp" />
+    <ClCompile Include="FillService.cpp" />
     <ClCompile Include="FramePanel.cpp" />
     <ClCompile Include="FrameRenderer.cpp" />
     <ClCompile Include="BottomToolbar.cpp" />

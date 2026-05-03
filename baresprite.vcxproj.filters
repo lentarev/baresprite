@@ -177,6 +177,9 @@
     <ClInclude Include="HistoryState.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
+    <ClInclude Include="FillService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -252,6 +255,9 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="HistoryService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="FillService.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>
