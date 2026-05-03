@@ -21,6 +21,7 @@
 #define IDC_BUTTON_LOAD_PROJECT         1003
 #define IDC_EDIT_BROWSE_LOAD_PROJECT    1004
 #define IDC_BUTTON_BROWSE_LOAD_PROJECT  1005
+#define IDC_MANAGE_TAGS_BTN_LIST        1007
 #define IDC_MANAGE_TAGS_LIST            1007
 #define IDC_MANAGE_TAGS_BTN_ADD         1008
 #define IDC_MANAGE_TAGS_EDIT            1009
@@ -37,6 +38,13 @@
 #define ID_FILE_NEWPROJECT              32789
 #define ID_FILE_LOADPROJECT             32790
 #define ID_FILE_SAVEPROJECT             32791
+#define ID_EDIT_CUT                     32792
+#define ID_EDIT_COPY                    32793
+#define ID_EDIT_PASTE                   32794
+#define ID_EDIT_UNDO                    32795
+#define ID_EDIT_REDO                    32796
+#define ID_VIEW_ZOOMIN                  32797
+#define ID_VIEW_ZOOMOUT                 32798
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -45,7 +53,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32792
+#define _APS_NEXT_COMMAND_VALUE         32799
 #define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

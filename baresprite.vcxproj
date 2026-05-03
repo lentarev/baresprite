@@ -189,6 +189,7 @@
     <ClInclude Include="ChessBackground.h" />
     <ClInclude Include="ChildWindow.h" />
     <ClInclude Include="ClipboardData.h" />
+    <ClInclude Include="ClipboardService.h" />
     <ClInclude Include="CursorRenderer.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="FramePanel.h" />
@@ -223,6 +224,7 @@
     <ClCompile Include="ask_save_dialog.cpp" />
     <ClCompile Include="CanvasScrollView.cpp" />
     <ClCompile Include="ChessBackground.cpp" />
+    <ClCompile Include="ClipboardService.cpp" />
     <ClCompile Include="CursorRenderer.cpp" />
     <ClCompile Include="FramePanel.cpp" />
     <ClCompile Include="FrameRenderer.cpp" />

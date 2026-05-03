@@ -1,5 +1,6 @@
 #include "Canvas.h"
 #include "ChessBackground.h"
+#include "ClipboardService.h"
 #include "CursorRenderer.h"
 #include "Frame.h"
 #include "FrameRenderer.h"
@@ -319,6 +320,29 @@ void Canvas::OnToolChanged(ToolType newTool)
     }
 }
 
+void Canvas::OnCut()
+{
+    ClipboardService::CopySelectionToClipboard(_appState, true);
+}
+
+void Canvas::OnCopy()
+{
+    ClipboardService::CopySelectionToClipboard(_appState, false);
+}
+
+void Canvas::OnPaste()
+{
+    ClipboardService::PasteFromClipboard(_appState);
+}
+
+void Canvas::OnUndo()
+{
+}
+
+void Canvas::OnRedo()
+{
+}
+
 /// <summary>
 /// Window function
 /// </summary>
@@ -575,10 +599,36 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
     }
 
     case WM_KEYDOWN: {
+
+        // Проверяем зажат ли Ctrl
+        if (GetKeyState(VK_CONTROL) & 0x8000)
+        {
+            switch (wParam)
+            {
+            case 'C':
+
+                ClipboardService::CopySelectionToClipboard(pCanvas->_appState, false);
+
+                return 0;
+
+            case 'X':
+
+                ClipboardService::CopySelectionToClipboard(pCanvas->_appState, true);
+                return 0;
+
+            case 'V':
+
+                ClipboardService::PasteFromClipboard(pCanvas->_appState);
+
+                return 0;
+            }
+        }
+
         if (wParam == VK_ESCAPE && pCanvas->_appState.selection.isActive)
         {
             // Сбрасываем выделение
             pCanvas->_appState.selection.Clear();
+            pCanvas->_appState.clipboard.Clear(); // Freeing up allocated RAM
 
             // Перерисовываем область, где была рамка
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);

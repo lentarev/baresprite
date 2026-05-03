@@ -22,38 +22,29 @@ class Canvas : public ChildWindow
     ~Canvas() override;
 
     void OnSize(int clientW, int clientH) override;
-
     bool OnCommand(int commandId, int notifyCode) override;
-
     bool ZoomIn();
-
     bool ZoomOut();
-
     int GetZoom() const;
-
     void ApplyZoom();
-
     HWND GetHWndCanvas() const;
-
     void SetCustomCursor(bool isCustom);
-
     void IncreaseBrushSize();
-
     void DecreaseBrushSize();
-
     void InvalidateCursorArea(int oldSize) const;
-
     void InvalidateCursorArea() const;
-
     void LoadFrame(const Frame &frame) const;
-
     void ShiftCursorPos(int dx, int dy);
-
     bool GetShowCustomCursor() const;
-
     POINT GetMousePosScreen() const;
-
     void OnToolChanged(ToolType newTool);
+
+    void OnCut();
+    void OnCopy();
+    void OnPaste();
+    void OnUndo();
+    void OnRedo();
+
 
   private:
     HWND _hWndParent;

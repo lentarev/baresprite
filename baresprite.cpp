@@ -358,6 +358,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         int wmId = LOWORD(wParam);
         int wmEvent = HIWORD(wParam); // notification code (BN_CLICKED or BN_DBLCLK)
 
+        // CUT
+        if (wmId == ID_EDIT_CUT)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnCut();
+            }
+            return 0;
+        }
+
+        // COPY
+        if (wmId == ID_EDIT_COPY)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnCopy();
+            }
+            return 0;
+        }
+
+        // PASTE
+        if (wmId == ID_EDIT_PASTE)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnPaste();
+            }
+            return 0;
+        }
+
+
         if (wmId == ID_PREV_FRAME)
         {
             if (gBottomToolbar)

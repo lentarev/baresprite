@@ -16,6 +16,7 @@ struct ClipboardData
     void Clear()
     {
         pixels.clear();
+        pixels.shrink_to_fit(); // Freeing up allocated RAM
         width = height = 0;
         hasData = false;
     }

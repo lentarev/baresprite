@@ -168,6 +168,9 @@
     <ClInclude Include="ClipboardData.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
+    <ClInclude Include="ClipboardService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -238,6 +241,9 @@
     </ClCompile>
     <ClCompile Include="SelectionRenderer.cpp">
       <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="ClipboardService.cpp">
+      <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
