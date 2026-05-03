@@ -6,6 +6,7 @@
 #include "Frame.h"
 #include "FrameRenderer.h"
 #include "OnionFrameRenderer.h"
+#include "RotateService.h"
 #include "SelectionRenderer.h"
 #include <iostream>
 #include <windowsx.h>
@@ -316,7 +317,8 @@ POINT Canvas::GetMousePosScreen() const
 void Canvas::OnToolChanged(ToolType newTool)
 {
     // Если переключились с Select на другой инструмент → сбрасываем выделение
-    if (newTool != ToolType::Select && newTool != ToolType::Fill && newTool != ToolType::Move && _appState.selection.isActive)
+    if (newTool != ToolType::Select && newTool != ToolType::Fill && newTool != ToolType::Move && newTool != ToolType::RotateR && newTool != ToolType::RotateL &&
+        _appState.selection.isActive)
     {
         _appState.selection.Clear();
         InvalidateRect(_hCanvas, nullptr, FALSE);
@@ -348,6 +350,26 @@ void Canvas::OnRedo()
 {
     _appState.history.Redo(_appState.frames);
     InvalidateRect(_hCanvas, nullptr, FALSE);
+}
+
+void Canvas::OnRotateR()
+{
+
+    if (_appState.selection.isActive)
+    {
+
+        RotateService::RotateSelection90R(_appState, _hCanvas);
+    }
+}
+
+void Canvas::OnRotateL()
+{
+
+    if (_appState.selection.isActive)
+    {
+
+        RotateService::RotateSelection90L(_appState, _hCanvas);
+    }
 }
 
 /// <summary>
@@ -385,8 +407,6 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
     case WM_LBUTTONDOWN: {
         int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
-
-        // pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
 
         // Processing for the Select tool
         if (pCanvas->_appState.currentTool == ToolType::Select)
@@ -703,20 +723,35 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         if (LOWORD(lParam) == HTCLIENT)
         {
 
-            if (pCanvas->_appState.currentTool == ToolType::Select || pCanvas->_appState.currentTool == ToolType::Fill ||
-                pCanvas->_appState.currentTool == ToolType::Move)
+            // Список инструментов, использующих системные курсоры
+            bool useSystemCursor = (pCanvas->_appState.currentTool == ToolType::Select || pCanvas->_appState.currentTool == ToolType::Fill ||
+                                    pCanvas->_appState.currentTool == ToolType::Move || pCanvas->_appState.currentTool == ToolType::RotateR ||
+                                    pCanvas->_appState.currentTool == ToolType::RotateL);
+
+            if (useSystemCursor)
             {
+                HCURSOR hCur;
+                if (pCanvas->_appState.currentTool == ToolType::Move)
+                {
+                    hCur = LoadCursor(nullptr, IDC_SIZEALL);
+                }
 
-                // Выбор нужного курсора
-                HCURSOR hCur = (pCanvas->_appState.currentTool == ToolType::Move) ? LoadCursor(nullptr, IDC_SIZEALL) : LoadCursor(nullptr, IDC_CROSS);
+                else if (pCanvas->_appState.currentTool == ToolType::RotateR || pCanvas->_appState.currentTool == ToolType::RotateL)
+                {
+                    hCur = LoadCursor(nullptr, IDC_ARROW); // 🔥 Курсор для Rotate
+                }
+
+                else
+                {
+                    hCur = LoadCursor(nullptr, IDC_CROSS);
+                }
+
                 SetCursor(hCur);
-
-                pCanvas->SetCustomCursor(false); // Скрываем кастомный квадрат
+                pCanvas->SetCustomCursor(false);
             }
             else
             {
-                SetCursor(nullptr); // Скрыть стандартную стрелку/крест
-
+                SetCursor(nullptr);
                 pCanvas->SetCustomCursor(true);
             }
 

@@ -12,12 +12,15 @@ struct SelectionState
     int x = 0, y = 0; // Левый верхний угол
     int w = 0, h = 0; // Ширина и высота (могут быть отрицательными при драге)
 
+    float rotationAngle = 0.0f;
+
     // Сброс выделения
     void Clear()
     {
         isActive = false;
         isDragging = false;
         x = y = w = h = 0;
+        rotationAngle = 0.0f;
     }
 
     // Нормализация: гарантирует положительные w/h и корректные x/y

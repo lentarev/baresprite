@@ -183,6 +183,9 @@
     <ClInclude Include="MoveDragState.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
+    <ClInclude Include="RotateService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -261,6 +264,9 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="FillService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="RotateService.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

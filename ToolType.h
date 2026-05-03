@@ -10,6 +10,9 @@ enum class ToolType
     Select,
     Fill,
     Move,
+    Mirror,
+    RotateL,
+    RotateR,
 
     Count
 };
@@ -32,6 +35,15 @@ inline const wchar_t *GetToolLabel(ToolType tool)
 
     case ToolType::Move:
         return L"Move";
+
+    case ToolType::Mirror:
+        return L"Mirror";
+
+    case ToolType::RotateL:
+        return L"<- 90";
+
+    case ToolType::RotateR:
+        return L"90 ->";
 
     default:
         return L"Unknown";

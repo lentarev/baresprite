@@ -295,6 +295,7 @@ bool FramePanel::OnButtonNew()
             _appState.canvas->LoadFrame(current);
         }
 
+        _appState.selection.Clear();
         _appState.isDirty = true;
 
         return true;
@@ -319,6 +320,8 @@ bool FramePanel::OnButtonPrev()
             _appState.canvas->LoadFrame(current);
         }
 
+        _appState.selection.Clear();
+
         return true;
     }
 
@@ -340,6 +343,8 @@ bool FramePanel::OnButtonNext()
             const Frame &current = FrameService::GetCurrentFrame(_appState);
             _appState.canvas->LoadFrame(current);
         }
+
+        _appState.selection.Clear();
 
         return true;
     }
@@ -363,6 +368,7 @@ bool FramePanel::OnButtonClone()
             _appState.canvas->LoadFrame(current);
         }
 
+        _appState.selection.Clear();
         _appState.isDirty = true;
 
         return true;
@@ -387,6 +393,7 @@ bool FramePanel::OnButtonDelete()
             _appState.canvas->LoadFrame(current);
         }
 
+        _appState.selection.Clear();
         _appState.isDirty = true;
 
         return true;

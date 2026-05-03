@@ -45,6 +45,9 @@ class Canvas : public ChildWindow
     void OnUndo();
     void OnRedo();
 
+    void OnRotateR();
+    void OnRotateL();
+
 
   private:
     HWND _hWndParent;

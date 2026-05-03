@@ -1,8 +1,8 @@
 #include "LeftToolbar.h"
+#include "Canvas.h"
 #include "Palette.h"
 #include "Tools.h"
 #include <iostream>
-#include "Canvas.h"
 
 namespace baresprite
 {
@@ -112,6 +112,19 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
 
                 _tools->SetActive(index);
                 _appState.canvas->OnToolChanged(static_cast<ToolType>(index));
+
+                // Rotate to right
+                if (ToolType::RotateR == static_cast<ToolType>(index))
+                {
+                    _appState.canvas->OnRotateR();
+                }
+
+
+                // Rotate to left
+                if (ToolType::RotateL == static_cast<ToolType>(index))
+                {
+                    _appState.canvas->OnRotateL();
+                }
             }
         }
     }
@@ -119,6 +132,7 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
     return false;
 }
 
+// Handler for Hotkeys from Main Wnd
 void LeftToolbar::SelectTool(int index)
 {
     _tools->SetActive(index);
