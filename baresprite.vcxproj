@@ -197,6 +197,8 @@
     <ClInclude Include="BottomToolbar.h" />
     <ClInclude Include="FrameService.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="HistoryService.h" />
+    <ClInclude Include="HistoryState.h" />
     <ClInclude Include="LeftToolbar.h" />
     <ClInclude Include="load_project_dialog_proc.h" />
     <ClInclude Include="manage_tags_dialog_proc.h" />
@@ -230,6 +232,7 @@
     <ClCompile Include="FrameRenderer.cpp" />
     <ClCompile Include="BottomToolbar.cpp" />
     <ClCompile Include="FrameService.cpp" />
+    <ClCompile Include="HistoryService.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="load_project_dialog_proc.cpp" />
     <ClCompile Include="manage_tags_dialog_proc.cpp" />

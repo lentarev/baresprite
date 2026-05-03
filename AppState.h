@@ -7,6 +7,7 @@
 #include <string>
 #include "SelectionState.h"
 #include "ClipboardData.h"
+#include "HistoryState.h"
 
 namespace baresprite
 {
@@ -42,6 +43,9 @@ struct AppState
     // Selection
     SelectionState selection;
     ClipboardData clipboard;
+
+    // Undo/Redo
+    HistoryState history;
 };
 
 } // namespace baresprite

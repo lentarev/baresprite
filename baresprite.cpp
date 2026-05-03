@@ -363,6 +363,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0;
         }
 
+        // UNDO
+        if (wmId == ID_EDIT_UNDO || wmId == ID_UNDO)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnUndo();
+            }
+            return 0;
+        }
+
+        // REDO
+        if (wmId == ID_EDIT_REDO || wmId == ID_REDO)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnRedo();
+            }
+            return 0;
+        }
+
         if (wmId == ID_PREV_FRAME)
         {
             if (gBottomToolbar)

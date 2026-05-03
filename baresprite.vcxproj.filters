@@ -159,17 +159,23 @@
     <ClInclude Include="manage_tags_dialog_proc.h">
       <Filter>Header Files\DialogsWndProc</Filter>
     </ClInclude>
-    <ClInclude Include="SelectionRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SelectionState.h">
-      <Filter>Header Files\Canvas</Filter>
-    </ClInclude>
     <ClInclude Include="ClipboardData.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
     <ClInclude Include="ClipboardService.h">
       <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionState.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryState.h">
+      <Filter>Header Files\Structures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +249,9 @@
       <Filter>Source Files\Canvas</Filter>
     </ClCompile>
     <ClCompile Include="ClipboardService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryService.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

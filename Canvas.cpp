@@ -152,6 +152,8 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
 
     // Перерисовываем всю область кисти
     InvalidateRect(_hCanvas, &dirtyRect, FALSE);
+
+    _appState.isDirty = true;
 }
 
 bool Canvas::ZoomIn()
@@ -337,10 +339,14 @@ void Canvas::OnPaste()
 
 void Canvas::OnUndo()
 {
+    _appState.history.Undo(_appState.frames);
+    InvalidateRect(_hCanvas, nullptr, FALSE);
 }
 
 void Canvas::OnRedo()
 {
+    _appState.history.Redo(_appState.frames);
+    InvalidateRect(_hCanvas, nullptr, FALSE);
 }
 
 /// <summary>
@@ -378,6 +384,8 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
     case WM_LBUTTONDOWN: {
         int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
+
+        pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
 
         // Processing for the Select tool
         if (pCanvas->_appState.currentTool == ToolType::Select)
