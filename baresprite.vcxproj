@@ -212,6 +212,7 @@
     <ClInclude Include="AppState.h" />
     <ClInclude Include="ProjectSettings.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="restart_to_wizard.h" />
     <ClInclude Include="RightToolbar.h" />
     <ClInclude Include="RotateService.h" />
     <ClInclude Include="SelectionRenderer.h" />
@@ -246,6 +247,7 @@
     <ClCompile Include="OnionFrameRenderer.cpp" />
     <ClCompile Include="Palette.cpp" />
     <ClCompile Include="ProjectSettings.cpp" />
+    <ClCompile Include="restart_to_wizard.cpp" />
     <ClCompile Include="RightToolbar.cpp" />
     <ClCompile Include="RotateService.cpp" />
     <ClCompile Include="SelectionRenderer.cpp" />

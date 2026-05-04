@@ -64,6 +64,12 @@
     <Filter Include="Header Files\Services">
       <UniqueIdentifier>{7af86eb2-cd79-4093-b37c-847da81331da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Helpers">
+      <UniqueIdentifier>{b118e71d-f868-4cfd-b22e-82ce45ffa972}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helpers">
+      <UniqueIdentifier>{4fa116bf-0228-4619-952b-1aed2952e6bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -189,6 +195,9 @@
     <ClInclude Include="MirrorService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="restart_to_wizard.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -274,6 +283,9 @@
     </ClCompile>
     <ClCompile Include="MirrorService.cpp">
       <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="restart_to_wizard.cpp">
+      <Filter>Source Files\Helpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

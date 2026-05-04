@@ -15,6 +15,9 @@ INT_PTR CALLBACK LoadProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, L
     switch (message)
     {
     case WM_INITDIALOG: {
+        // Bring the window to the foreground
+        SetForegroundWindow(hDlg);
+
         SetWindowLongPtr(hDlg, DWLP_USER, lParam);
         AppState *appState = reinterpret_cast<AppState *>(lParam);
 

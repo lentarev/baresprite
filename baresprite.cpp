@@ -19,6 +19,7 @@
 #include "ask_save_dialog.h"
 #include "load_project_dialog_proc.h"
 #include "new_project_dialog_proc.h"
+#include "restart_to_wizard.h"
 #include "start_screen_dialog_proc.h"
 
 // Manifesto and Libraries.
@@ -111,28 +112,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         gAppState->isExistAppConfig = false;
     }
 
+    int startupMode = 0;
+
+    if (wcsstr(lpCmdLine, L"--new"))
+    {
+        startupMode = 1;
+    }
+    else if (wcsstr(lpCmdLine, L"--load"))
+    {
+        startupMode = 2;
+    }
+
     // === Startup Loop ===
     bool launchEditor = false;
 
     while (!launchEditor)
     {
-        // Show start screen dialog
-        INT_PTR startResult = DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG_START_SCREEN), nullptr, StartScreenDialogProc);
 
-        // If you closed the start screen (cross / Esc / Cancel), exit the application
-        if (startResult == IDCANCEL || startResult == 0)
+        if (startupMode == 1)
         {
-            return 0;
-        }
+            // Принудительный New Project
 
-        if (startResult == IDOK) // New Project
-        {
-            // Show new project dialog
-            INT_PTR newProjectResult =
+            INT_PTR res =
                 DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_NEW_PROJECT), nullptr, NewProjectDialogProc, reinterpret_cast<LPARAM>(gAppState.get()));
 
-            if (newProjectResult == IDOK)
+            if (res == IDOK)
             {
+
                 if (appSettings->IsProjectExist(gAppState->projectPath))
                 {
                     MessageBox(nullptr, L"The project you are trying to create already exists.", L"Error", MB_OK | MB_ICONEXCLAMATION);
@@ -154,14 +160,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                     gAppState->isProjectLoadedFromConfig = false;
                 }
             }
+            else
+            {
+                // Cancel. Cбрасываем флаг, следующая итерация покажет Start Screen
+                startupMode = 0;
+            }
         }
-        else if (startResult == IDC_BUTTON_LOAD_PROJECT)
+        else if (startupMode == 2)
         {
-            // Show Load Project dialog
-            INT_PTR loadProjectResult =
+            // Принудительный Load Project
+
+            INT_PTR res =
                 DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_LOAD_PROJECT), nullptr, LoadProjectDialogProc, reinterpret_cast<LPARAM>(gAppState.get()));
 
-            if (loadProjectResult == IDOK)
+            if (res == IDOK)
             {
                 // Check is project exists
                 if (appSettings->IsProjectExist(gAppState->projectPath))
@@ -187,6 +199,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                 {
                     MessageBox(nullptr, L"The project you are trying to load is missing configuration data.", L"Error", MB_OK | MB_ICONEXCLAMATION);
                 }
+            }
+            else
+            {
+                // Cancel. Cбрасываем флаг, следующая итерация покажет Start Screen
+                startupMode = 0;
+            }
+        }
+        else
+        {
+            // Show start screen dialog
+            INT_PTR res = DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG_START_SCREEN), nullptr, StartScreenDialogProc);
+
+            // If you closed the start screen (cross / Esc / Cancel), exit the application
+            if (res == IDCANCEL || res == 0)
+            {
+                // Закрыли крестиком
+                return 0;
+            }
+            else if (res == IDOK)
+            {
+                startupMode = 1;
+            }
+            else if (res == IDC_BUTTON_LOAD_PROJECT)
+            {
+                startupMode = 2;
             }
         }
     }
@@ -332,6 +369,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND: {
         int wmId = LOWORD(wParam);
         int wmEvent = HIWORD(wParam); // notification code (BN_CLICKED or BN_DBLCLK)
+
+        // New Project
+        if (wmId == ID_FILE_NEWPROJECT || wmId == ID_HOTKEY_NEW_PROJECT)
+        {
+            if (AskSaveDialog(hWnd, *gAppState, *gProjectSettings))
+            {
+                // Restart app
+                RestartToWizard(hWnd, L"--new");
+            }
+            return 0;
+        }
+
+        // Load Project
+        if (wmId == ID_FILE_LOADPROJECT || wmId == ID_HOTKEY_LOAD_PROJECT)
+        {
+            if (AskSaveDialog(hWnd, *gAppState, *gProjectSettings))
+            {
+                // Restart app
+                RestartToWizard(hWnd, L"--load");
+            }
+            return 0;
+        }
+
+        // Save Project
+        if (wmId == ID_FILE_SAVEPROJECT || wmId == ID_HOTKEY_SAVE_PROJECT)
+        {
+            gProjectSettings->Save();
+
+            gAppState->isDirty = false;
+
+            return 0;
+        }
 
         // CUT
         if (wmId == ID_EDIT_CUT)
