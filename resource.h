@@ -52,6 +52,7 @@
 #define ID_HOTKEY_SAVE_PROJECT          32808
 #define ID_HOTKEY_NEW_PROJECT           32810
 #define ID_HOTKEY_LOAD_PROJECT          32811
+#define ID_FILE_EXPORTFRAMETOPNG        32813
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -60,7 +61,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32813
+#define _APS_NEXT_COMMAND_VALUE         32814
 #define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

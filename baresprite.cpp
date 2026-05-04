@@ -17,6 +17,7 @@
 #include "ProjectSettings.h"
 #include "RightToolbar.h"
 #include "ask_save_dialog.h"
+#include "export_frame_dialog.h"
 #include "load_project_dialog_proc.h"
 #include "new_project_dialog_proc.h"
 #include "restart_to_wizard.h"
@@ -400,6 +401,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             gAppState->isDirty = false;
 
             return 0;
+        }
+
+        // Export Frame to PNG
+        if (wmId == ID_FILE_EXPORTFRAMETOPNG)
+        {
+
+            return ExportFrameDialog(hWnd, *gAppState);
         }
 
         // CUT
