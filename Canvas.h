@@ -48,6 +48,8 @@ class Canvas : public ChildWindow
     void OnRotateR();
     void OnRotateL();
 
+    void OnMirrorHorizontal();
+    void OnMirrorVertical();
 
   private:
     HWND _hWndParent;

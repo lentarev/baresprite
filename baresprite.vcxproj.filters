@@ -186,6 +186,9 @@
     <ClInclude Include="RotateService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="MirrorService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -267,6 +270,9 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="RotateService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="MirrorService.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

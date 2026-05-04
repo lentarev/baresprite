@@ -5,6 +5,7 @@
 #include "FillService.h"
 #include "Frame.h"
 #include "FrameRenderer.h"
+#include "MirrorService.h"
 #include "OnionFrameRenderer.h"
 #include "RotateService.h"
 #include "SelectionRenderer.h"
@@ -318,7 +319,7 @@ void Canvas::OnToolChanged(ToolType newTool)
 {
     // Если переключились с Select на другой инструмент → сбрасываем выделение
     if (newTool != ToolType::Select && newTool != ToolType::Fill && newTool != ToolType::Move && newTool != ToolType::RotateR && newTool != ToolType::RotateL &&
-        _appState.selection.isActive)
+        newTool != ToolType::MirrorV && newTool != ToolType::MirrorH && _appState.selection.isActive)
     {
         _appState.selection.Clear();
         InvalidateRect(_hCanvas, nullptr, FALSE);
@@ -369,6 +370,22 @@ void Canvas::OnRotateL()
     {
 
         RotateService::RotateSelection90L(_appState, _hCanvas);
+    }
+}
+
+void Canvas::OnMirrorHorizontal()
+{
+    if (_appState.selection.isActive)
+    {
+        MirrorService::FlipHorizontal(_appState, _hCanvas);
+    }
+}
+
+void Canvas::OnMirrorVertical()
+{
+    if (_appState.selection.isActive)
+    {
+        MirrorService::FlipVertical(_appState, _hCanvas);
     }
 }
 
@@ -736,9 +753,10 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
                     hCur = LoadCursor(nullptr, IDC_SIZEALL);
                 }
 
-                else if (pCanvas->_appState.currentTool == ToolType::RotateR || pCanvas->_appState.currentTool == ToolType::RotateL)
+                else if (pCanvas->_appState.currentTool == ToolType::RotateR || pCanvas->_appState.currentTool == ToolType::RotateL ||
+                         pCanvas->_appState.currentTool == ToolType::MirrorV || pCanvas->_appState.currentTool == ToolType::MirrorH)
                 {
-                    hCur = LoadCursor(nullptr, IDC_ARROW); // 🔥 Курсор для Rotate
+                    hCur = LoadCursor(nullptr, IDC_ARROW); // Курсор для Rotate и Mirror
                 }
 
                 else

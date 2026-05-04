@@ -125,6 +125,18 @@ bool LeftToolbar::OnCommand(int commandId, int notifyCode)
                 {
                     _appState.canvas->OnRotateL();
                 }
+
+                // Mirror V
+                if (ToolType::MirrorV == static_cast<ToolType>(index))
+                {
+                    _appState.canvas->OnMirrorVertical();
+                }
+
+                // Mirror H
+                if (ToolType::MirrorH == static_cast<ToolType>(index))
+                {
+                    _appState.canvas->OnMirrorHorizontal();
+                }
             }
         }
     }

@@ -203,6 +203,7 @@
     <ClInclude Include="LeftToolbar.h" />
     <ClInclude Include="load_project_dialog_proc.h" />
     <ClInclude Include="manage_tags_dialog_proc.h" />
+    <ClInclude Include="MirrorService.h" />
     <ClInclude Include="MoveDragState.h" />
     <ClInclude Include="new_project_dialog_proc.h" />
     <ClInclude Include="OnionFrameRenderer.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="load_project_dialog_proc.cpp" />
     <ClCompile Include="manage_tags_dialog_proc.cpp" />
+    <ClCompile Include="MirrorService.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />
     <ClCompile Include="OnionFrameRenderer.cpp" />
     <ClCompile Include="Palette.cpp" />

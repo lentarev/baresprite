@@ -81,9 +81,8 @@ void Tools::CreateButtonTools()
         int x = _startX + col * (_BTN_SIZE_W + _SPACING);
         int y = _startY + row * (_BTN_SIZE_H + _SPACING);
 
-        // tool buttons
-        HWND hBtn = CreateWindowExW(0, L"BUTTON", GetToolLabel(static_cast<ToolType>(i)), WS_CHILD | WS_VISIBLE | BS_FLAT | BS_NOTIFY | BS_DEFPUSHBUTTON, x, y,
-                                    _BTN_SIZE_W, _BTN_SIZE_H, _hWndToolbar, (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
+        HWND hBtn = CreateWindowExW(0, L"BUTTON", GetToolLabel(static_cast<ToolType>(i)), WS_CHILD | WS_VISIBLE | BS_FLAT | BS_PUSHBUTTON, x, y, _BTN_SIZE_W,
+                                    _BTN_SIZE_H, _hWndToolbar, (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
 
         _toolButtons.push_back(hBtn);
     }
