@@ -2,6 +2,7 @@
 
 #include "Frame.h"
 #include <string>
+#include <vector>
 
 namespace baresprite
 {
@@ -16,6 +17,9 @@ class ExportService
 
     // Exporting a single frame to PNG
     static bool ExportFrameToPNG(const Frame &frame, const std::wstring &filePath);
+
+    // Export sequence
+    static bool ExportSequence(const std::vector<Frame> &frames, const std::wstring &tagFilter, const std::wstring &outputFolder, std::wstring &outMessage);
 };
 
 } // namespace baresprite

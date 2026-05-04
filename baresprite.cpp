@@ -22,6 +22,7 @@
 #include "new_project_dialog_proc.h"
 #include "restart_to_wizard.h"
 #include "start_screen_dialog_proc.h"
+#include "export_sequence_dialog.h"
 
 // Manifesto and Libraries.
 #pragma comment(                                                                                                                                               \
@@ -408,6 +409,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
 
             return ExportFrameDialog(hWnd, *gAppState);
+        }
+
+        // Export Sequence
+        if (wmId == ID_FILE_EXPORTSEQUENCE)
+        {
+
+            return ExportSequenceDialog(hInst, hWnd, *gAppState);
         }
 
         // CUT

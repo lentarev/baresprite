@@ -15,6 +15,7 @@
 #define IDD_DIALOG_NEW_PROJECT          133
 #define IDD_DIALOG_LOAD_PROJECT         134
 #define IDD_DIALOG_MANAGE_TAGS          135
+#define IDD_EXPORT_SEQUENCE_DIALOG      136
 #define IDC_COMBO_NEW_PROJECT_RESOLUTION 1000
 #define IDC_EDIT_NEW_PROJECT_BROWSE     1001
 #define IDC_BUTTON_NEW_PROJECT_BROWSE   1002
@@ -27,6 +28,9 @@
 #define IDC_MANAGE_TAGS_EDIT            1009
 #define IDC_MANAGE_TAGS_BTN_RENAME      1010
 #define IDC_MANAGE_TAGS_BTN_DELETE      1011
+#define IDC_COMBO_TAG                   1012
+#define IDC_EDIT_OUTPUT_FOLDER          1013
+#define IDC_BTN_BROWSE_FOLDER           1014
 #define ID_ZOOM_IN                      32771
 #define ID_ZOOM_OUT                     32773
 #define ID_TOOL_BRUSH                   32775
@@ -53,6 +57,7 @@
 #define ID_HOTKEY_NEW_PROJECT           32810
 #define ID_HOTKEY_LOAD_PROJECT          32811
 #define ID_FILE_EXPORTFRAMETOPNG        32813
+#define ID_FILE_EXPORTSEQUENCE          32814
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -60,9 +65,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32814
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_COMMAND_VALUE         32815
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

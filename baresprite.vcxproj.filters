@@ -207,6 +207,15 @@
     <ClInclude Include="export_frame_dialog.h">
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
+    <ClInclude Include="export_sequence_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportSequenceData.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="export_sequence_dialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -300,6 +309,12 @@
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="export_frame_dialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="export_sequence_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="export_sequence_dialog.cpp">
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>

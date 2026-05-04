@@ -191,8 +191,11 @@
     <ClInclude Include="ClipboardData.h" />
     <ClInclude Include="ClipboardService.h" />
     <ClInclude Include="CursorRenderer.h" />
+    <ClInclude Include="ExportSequenceData.h" />
     <ClInclude Include="ExportService.h" />
     <ClInclude Include="export_frame_dialog.h" />
+    <ClInclude Include="export_sequence_dialog.h" />
+    <ClInclude Include="export_sequence_dialog_proc.h" />
     <ClInclude Include="FillService.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="FramePanel.h" />
@@ -238,6 +241,8 @@
     <ClCompile Include="CursorRenderer.cpp" />
     <ClCompile Include="ExportService.cpp" />
     <ClCompile Include="export_frame_dialog.cpp" />
+    <ClCompile Include="export_sequence_dialog.cpp" />
+    <ClCompile Include="export_sequence_dialog_proc.cpp" />
     <ClCompile Include="FillService.cpp" />
     <ClCompile Include="FramePanel.cpp" />
     <ClCompile Include="FrameRenderer.cpp" />
