@@ -595,6 +595,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0;
         }
 
+        // Animation (Hotkey)
+        if (wmId == ID_SPACE)
+        {
+
+            if (gBottomToolbar)
+            {
+                gBottomToolbar->GetFramePanel()->OnPlay();
+            }
+
+            return 0;
+        }
+
         // LeftToolbar
         if (gLeftToolbar && gLeftToolbar->OnCommand(wmId, wmEvent))
         {
