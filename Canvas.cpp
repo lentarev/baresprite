@@ -565,9 +565,9 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         // Драг выделения для Select
         if (pCanvas->_appState.currentTool == ToolType::Select && pCanvas->_appState.selection.isDragging)
         {
-            // Вычисляем размеры
-            pCanvas->_appState.selection.w = logX - pCanvas->_appState.selection.x;
-            pCanvas->_appState.selection.h = logY - pCanvas->_appState.selection.y;
+            // Вычисляем размеры с учётом последнего пикселя
+            pCanvas->_appState.selection.w = logX - pCanvas->_appState.selection.x + 1;
+            pCanvas->_appState.selection.h = logY - pCanvas->_appState.selection.y + 1;
 
             // Перерисовываем только область выделения (оптимизация)
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
