@@ -42,7 +42,8 @@ void RotateService::RotateSelection90R(AppState &appState, HWND hCanvas)
     }
 
     // Сохраняем в историю до изменений
-    appState.history.Commit(appState.frames);
+    appState.history.Commit(appState.frames, appState.selection.x, appState.selection.y, appState.selection.w, appState.selection.h,
+                            appState.selection.isActive);
 
     // Очищаем старую область
     for (int y = 0; y < h; ++y)
@@ -115,7 +116,8 @@ void RotateService::RotateSelection90L(AppState &appState, HWND hCanvas)
     }
 
     // Сохраняем в историю
-    appState.history.Commit(appState.frames);
+    appState.history.Commit(appState.frames, appState.selection.x, appState.selection.y, appState.selection.w, appState.selection.h,
+                            appState.selection.isActive);
 
     // Очищаем старую область
     for (int y = 0; y < h; ++y)

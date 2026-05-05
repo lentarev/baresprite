@@ -100,6 +100,14 @@ void ClipboardService::PasteFromClipboard(AppState &appState)
         }
     }
 
+    // Обновляем выделение под вставленную область
+    appState.selection.x = targetX;
+    appState.selection.y = targetY;
+    appState.selection.w = appState.clipboard.width;
+    appState.selection.h = appState.clipboard.height;
+    appState.selection.isActive = true;
+    appState.selection.isDragging = false;
+
     appState.isDirty = true;
 
     InvalidateRect(appState.canvas ? appState.canvas->GetHWndCanvas() : nullptr, nullptr, FALSE);

@@ -328,28 +328,46 @@ void Canvas::OnToolChanged(ToolType newTool)
 
 void Canvas::OnCut()
 {
+    _appState.history.Commit(_appState.frames, _appState.selection.x, _appState.selection.y, _appState.selection.w, _appState.selection.h,
+                             _appState.selection.isActive);
+
     ClipboardService::CopySelectionToClipboard(_appState, true);
+    _appState.isDirty = true;
+    InvalidateRect(_hCanvas, nullptr, FALSE);
 }
 
 void Canvas::OnCopy()
 {
+    _appState.history.Commit(_appState.frames, _appState.selection.x, _appState.selection.y, _appState.selection.w, _appState.selection.h,
+                             _appState.selection.isActive);
+
     ClipboardService::CopySelectionToClipboard(_appState, false);
 }
 
 void Canvas::OnPaste()
 {
+    _appState.history.Commit(_appState.frames, _appState.selection.x, _appState.selection.y, _appState.selection.w, _appState.selection.h,
+                             _appState.selection.isActive);
+
     ClipboardService::PasteFromClipboard(_appState);
+
+    _appState.isDirty = true;
+    InvalidateRect(_hCanvas, nullptr, FALSE);
 }
 
 void Canvas::OnUndo()
 {
-    _appState.history.Undo(_appState.frames);
+    _appState.history.Undo(_appState.frames, _appState.selection.x, _appState.selection.y, _appState.selection.w, _appState.selection.h,
+                           _appState.selection.isActive);
+
     InvalidateRect(_hCanvas, nullptr, FALSE);
 }
 
 void Canvas::OnRedo()
 {
-    _appState.history.Redo(_appState.frames);
+    _appState.history.Redo(_appState.frames, _appState.selection.x, _appState.selection.y, _appState.selection.w, _appState.selection.h,
+                           _appState.selection.isActive);
+
     InvalidateRect(_hCanvas, nullptr, FALSE);
 }
 
@@ -462,7 +480,8 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
                 Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
 
                 // Save state for UNDO
-                pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
+                pCanvas->_appState.history.Commit(pCanvas->_appState.frames, pCanvas->_appState.selection.x, pCanvas->_appState.selection.y,
+                                                  pCanvas->_appState.selection.w, pCanvas->_appState.selection.h, pCanvas->_appState.selection.isActive);
 
                 // Получаем цвет из палитры (преобразуем COLORREF → 0xAARRGGBB)
                 COLORREF palColor = pCanvas->_appState.palette.color;
@@ -487,42 +506,25 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             int logY = y / pCanvas->_checkerSize;
             const auto &sel = pCanvas->_appState.selection;
 
-            // Начинаем драг только если клик внутри активного выделения
             if (sel.isActive && logX >= sel.x && logX < sel.x + sel.w && logY >= sel.y && logY < sel.y + sel.h)
             {
-                // Сохраняем состояние для Undo (один раз в начале действия)
-                pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
-
-                // Инициализируем состояние драга
-                pCanvas->_appState.moveDrag.isDragging = true;
-                pCanvas->_appState.moveDrag.startLogX = logX;
-                pCanvas->_appState.moveDrag.startLogY = logY;
-                pCanvas->_appState.moveDrag.prevDx = 0;
-                pCanvas->_appState.moveDrag.currDx = 0;
-                pCanvas->_appState.moveDrag.prevDy = 0;
-                pCanvas->_appState.moveDrag.currDy = 0;
-                pCanvas->_appState.moveDrag.origSelX = sel.x;
-                pCanvas->_appState.moveDrag.origSelY = sel.y;
-                pCanvas->_appState.moveDrag.w = sel.w;
-                pCanvas->_appState.moveDrag.h = sel.h;
-
-                // Копируем пиксели выделения в буфер
                 Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
 
-                pCanvas->_appState.moveDrag.pixelBuffer.resize(sel.w * sel.h);
+                // Сохраняем для Undo
+                pCanvas->_appState.history.Commit(pCanvas->_appState.frames, pCanvas->_appState.selection.x, pCanvas->_appState.selection.y,
+                                                  pCanvas->_appState.selection.w, pCanvas->_appState.selection.h, pCanvas->_appState.selection.isActive);
 
+                // Копируем пиксели в буфер
+                pCanvas->_appState.moveDrag.pixelBuffer.resize(sel.w * sel.h);
                 for (int dy = 0; dy < sel.h; ++dy)
                 {
                     for (int dx = 0; dx < sel.w; ++dx)
                     {
-                        int fx = sel.x + dx;
-                        int fy = sel.y + dy;
-                        // Безопасное чтение с учётом границ кадра
-                        pCanvas->_appState.moveDrag.pixelBuffer[dy * sel.w + dx] = frame.GetPixel(fx, fy);
+                        pCanvas->_appState.moveDrag.pixelBuffer[dy * sel.w + dx] = frame.GetPixel(sel.x + dx, sel.y + dy);
                     }
                 }
 
-                // Очищаем исходную область в кадре (прозрачность)
+                // Очищаем выделение в кадре (делает дырку прозрачной)
                 for (int dy = 0; dy < sel.h; ++dy)
                 {
                     for (int dx = 0; dx < sel.w; ++dx)
@@ -531,14 +533,14 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
                     }
                 }
 
-                // 5. Рисуем блок на текущей позиции (сдвиг 0)
-                for (int dy = 0; dy < sel.h; ++dy)
-                {
-                    for (int dx = 0; dx < sel.w; ++dx)
-                    {
-                        frame.SetPixel(sel.x + dx, sel.y + dy, pCanvas->_appState.moveDrag.pixelBuffer[dy * sel.w + dx]);
-                    }
-                }
+                // Инициализируем драг
+                pCanvas->_appState.moveDrag.isDragging = true;
+                pCanvas->_appState.moveDrag.startLogX = logX;
+                pCanvas->_appState.moveDrag.startLogY = logY;
+                pCanvas->_appState.moveDrag.origSelX = sel.x;
+                pCanvas->_appState.moveDrag.origSelY = sel.y;
+                pCanvas->_appState.moveDrag.w = sel.w;
+                pCanvas->_appState.moveDrag.h = sel.h;
 
                 InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
             }
@@ -547,7 +549,9 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
         else if (pCanvas->_appState.currentTool == ToolType::Brush || pCanvas->_appState.currentTool == ToolType::Eraser)
         {
-            pCanvas->_appState.history.Commit(pCanvas->_appState.frames);
+            pCanvas->_appState.history.Commit(pCanvas->_appState.frames, pCanvas->_appState.selection.x, pCanvas->_appState.selection.y,
+                                              pCanvas->_appState.selection.w, pCanvas->_appState.selection.h, pCanvas->_appState.selection.isActive);
+
             pCanvas->HandleDraw(wParam, lParam);
         }
 
@@ -611,11 +615,10 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             // Область нового курсора
             RECT newRect = {x - cursorSize / 2 - padding, y - cursorSize / 2 - padding, x + cursorSize / 2 + padding, y + cursorSize / 2 + padding};
 
-            // Объединяем области: Windows перерисует только этот прямоугольник
+            // Объединяем области
             RECT dirtyRect;
             UnionRect(&dirtyRect, &oldRect, &newRect);
 
-            // FALSE = не стирать фон (у нас двойная буферизация, фон рисуется в WM_PAINT)
             InvalidateRect(pCanvas->_hCanvas, &dirtyRect, FALSE);
         }
 
@@ -625,11 +628,9 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             int logX = x / pCanvas->_checkerSize;
             int logY = y / pCanvas->_checkerSize;
 
-            // Вычисляем смещение от точки нажатия
             int dx = logX - pCanvas->_appState.moveDrag.startLogX;
             int dy = logY - pCanvas->_appState.moveDrag.startLogY;
 
-            // Потенциальная новая позиция
             int newX = pCanvas->_appState.moveDrag.origSelX + dx;
             int newY = pCanvas->_appState.moveDrag.origSelY + dy;
 
@@ -637,82 +638,22 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             int w = pCanvas->_appState.moveDrag.w;
             int h = pCanvas->_appState.moveDrag.h;
 
-            // Ограничение границ холста
+            // Ограничиваем границами холста
             if (newX < 0)
-            {
                 newX = 0;
-            }
-
             if (newY < 0)
-            {
                 newY = 0;
-            }
-
             if (newX + w > frame.width)
-            {
                 newX = frame.width - w;
-            }
-
             if (newY + h > frame.height)
-            {
                 newY = frame.height - h;
-            }
 
-            // Защита на случай, если выделение больше самого кадра
-            if (newX < 0)
-            {
-                newX = 0;
-            }
-
-            if (newY < 0)
-            {
-                newY = 0;
-            }
-
-            // Если позиция не изменилась (мышь ушла за край), ничего не делаем
-            if (newX == pCanvas->_appState.selection.x && newY == pCanvas->_appState.selection.y)
-            {
-                return 0;
-            }
-
-            // 1. Очищаем старую позицию
-            int oldX = pCanvas->_appState.selection.x;
-            int oldY = pCanvas->_appState.selection.y;
-
-            for (int cy = 0; cy < h; ++cy)
-            {
-                for (int cx = 0; cx < w; ++cx)
-                {
-                    int px = oldX + cx;
-                    int py = oldY + cy;
-                    if (px >= 0 && px < frame.width && py >= 0 && py < frame.height)
-                    {
-                        frame.SetPixel(px, py, 0);
-                    }
-                }
-            }
-
-            // 2. Рисуем на новой позиции
-            for (int cy = 0; cy < h; ++cy)
-            {
-                for (int cx = 0; cx < w; ++cx)
-                {
-                    int px = newX + cx;
-                    int py = newY + cy;
-
-                    if (px >= 0 && px < frame.width && py >= 0 && py < frame.height)
-                    {
-                        frame.SetPixel(px, py, pCanvas->_appState.moveDrag.pixelBuffer[cy * w + cx]);
-                    }
-                }
-            }
-
-            // 3. Обновляем координаты выделения
+            // Обновляем координаты выделения (используем как превью-позицию)
             pCanvas->_appState.selection.x = newX;
             pCanvas->_appState.selection.y = newY;
 
+            // Перерисовываем весь холст (фон + кадр + превью выделения)
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
-
             return 0;
         }
 
@@ -744,6 +685,26 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         // Завершение перетаскивания - Move
         if (pCanvas->_appState.currentTool == ToolType::Move && pCanvas->_appState.moveDrag.isDragging)
         {
+            Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
+            const auto &drag = pCanvas->_appState.moveDrag;
+            int finalX = pCanvas->_appState.selection.x;
+            int finalY = pCanvas->_appState.selection.y;
+
+            // Коммитим буфер в кадр на финальную позицию
+            for (int cy = 0; cy < drag.h; ++cy)
+            {
+                for (int cx = 0; cx < drag.w; ++cx)
+                {
+                    int px = finalX + cx;
+                    int py = finalY + cy;
+                    if (px >= 0 && px < frame.width && py >= 0 && py < frame.height)
+                    {
+                        frame.SetPixel(px, py, drag.pixelBuffer[cy * drag.w + cx]);
+                    }
+                }
+            }
+
+            // Очищаем состояние драга
             pCanvas->_appState.moveDrag.isDragging = false;
             pCanvas->_appState.moveDrag.pixelBuffer.clear();
             pCanvas->_appState.moveDrag.pixelBuffer.shrink_to_fit();
@@ -859,6 +820,38 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         {
             const Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
             pCanvas->_frameRenderer->Render(frame, pCanvas->_checkerSize, hdcMem);
+
+            // Рисуем "летающее" выделение, если идёт перетаскивание
+            if (pCanvas->_appState.moveDrag.isDragging)
+            {
+                const auto &drag = pCanvas->_appState.moveDrag;
+                for (int cy = 0; cy < drag.h; ++cy)
+                {
+                    for (int cx = 0; cx < drag.w; ++cx)
+                    {
+                        int px = pCanvas->_appState.selection.x + cx;
+                        int py = pCanvas->_appState.selection.y + cy;
+
+                        if (px >= 0 && px < frame.width && py >= 0 && py < frame.height)
+                        {
+                            uint32_t pixel = drag.pixelBuffer[cy * drag.w + cx];
+                            unsigned char a = (pixel >> 24) & 0xFF;
+                            if (a > 0) // Не рисуем полностью прозрачные пиксели
+                            {
+                                COLORREF col = RGB((pixel >> 16) & 0xFF, (pixel >> 8) & 0xFF, pixel & 0xFF);
+                                // Рисуем квадратик с учётом зума
+                                for (int sy = 0; sy < pCanvas->_checkerSize; ++sy)
+                                {
+                                    for (int sx = 0; sx < pCanvas->_checkerSize; ++sx)
+                                    {
+                                        SetPixelV(hdcMem, px * pCanvas->_checkerSize + sx, py * pCanvas->_checkerSize + sy, col);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // Рисуем кастомный курсор
@@ -898,19 +891,17 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             {
             case 'C':
 
-                ClipboardService::CopySelectionToClipboard(pCanvas->_appState, false);
-
+                pCanvas->OnCopy();
                 return 0;
 
             case 'X':
 
-                ClipboardService::CopySelectionToClipboard(pCanvas->_appState, true);
+                pCanvas->OnCut();
                 return 0;
 
             case 'V':
 
-                ClipboardService::PasteFromClipboard(pCanvas->_appState);
-
+                pCanvas->OnPaste();
                 return 0;
             }
         }
