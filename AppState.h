@@ -1,15 +1,14 @@
 #pragma once
 
+#include "ClipboardData.h"
 #include "Frame.h"
+#include "HistoryState.h"
+#include "MoveDragState.h"
 #include "PaletteData.h"
+#include "SelectionState.h"
 #include "ToolType.h"
 #include <Windows.h>
 #include <string>
-#include "SelectionState.h"
-#include "ClipboardData.h"
-#include "HistoryState.h"
-#include "MoveDragState.h"
-
 
 namespace baresprite
 {
@@ -51,6 +50,10 @@ struct AppState
 
     // Move
     MoveDragState moveDrag;
+
+    // Animation
+    int playbackFPS = 12;
+    bool isPlaying = false;
 };
 
 } // namespace baresprite

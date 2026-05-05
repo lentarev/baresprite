@@ -17,6 +17,9 @@ FramePanel::FramePanel(HWND hWndBottomTolbar, HINSTANCE hInstance, AppState &app
 
     CreateOnionControls();
     UpdateOnionLabel();
+
+    CreatePlayControls();
+    UpdateSpeedLabel();
 }
 
 FramePanel::~FramePanel()
@@ -29,12 +32,27 @@ FramePanel::~FramePanel()
         }
     }
 
+    _buttons.clear();
+
     if (_hLabel && IsWindow(_hLabel))
     {
         DestroyWindow(_hLabel);
     }
 
-    _buttons.clear();
+    if (_hBtnPlay && IsWindow(_hBtnPlay))
+    {
+        DestroyWindow(_hBtnPlay);
+    }
+
+    if (_hSliderSpeed && IsWindow(_hSliderSpeed))
+    {
+        DestroyWindow(_hSliderSpeed);
+    }
+
+    if (_hLabelSpeed && IsWindow(_hLabelSpeed))
+    {
+        DestroyWindow(_hLabelSpeed);
+    }
 }
 
 void FramePanel::SetBounds(const RECT &rc)
@@ -48,6 +66,7 @@ void FramePanel::SetBounds(const RECT &rc)
     ResizeControlButtons(rc.right - rc.left, rc.bottom - rc.top);
     ResizeLabel(rc.right - rc.left, rc.bottom - rc.top);
     ResizeOnionControls(rc.right - rc.left, rc.bottom - rc.top);
+    ResizePlayControls(rc.right - rc.left, rc.bottom - rc.top);
 }
 
 int FramePanel::GetRightEdge() const
@@ -189,6 +208,127 @@ void FramePanel::ResizeOnionControls(int clientW, int clientH) const
     // Trackbar
     currentX += width - size + _SPACING;
     SetWindowPos(_hSliderOpacity, nullptr, currentX, _startY + offsetY, width + size, 20, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+/// <summary>
+/// Play
+/// </summary>
+void FramePanel::CreatePlayControls()
+{
+    int idCounter = 3071;
+
+    // Button - Manage tags
+    _hBtnPlay = CreateWindowExW(0, L"BUTTON", L"Play", WS_CHILD | WS_VISIBLE | BS_FLAT | BS_PUSHBUTTON, 0, 0, _BTN_SIZE_W, _BTN_SIZE_H, _hWndBottomTolbar,
+                                (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
+
+    // Label for speed
+    _hLabelSpeed = CreateWindowExW(0, L"STATIC", L"12fps", WS_CHILD | WS_VISIBLE | SS_CENTER | SS_CENTERIMAGE, 0, 0, 0, 0, _hWndBottomTolbar, nullptr,
+                                   _hInstance, nullptr);
+
+    // Slider (TrackBar)
+    _hSliderSpeed = CreateWindowExW(0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | TBS_HORZ | TBS_NOTICKS | TBS_TOOLTIPS, 0, 0, 0, 0, _hWndBottomTolbar,
+                                    (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
+
+    // Настройка диапазона (1 - 100)
+    SendMessageW(_hSliderSpeed, TBM_SETRANGE, TRUE, MAKELPARAM(1, 100));
+    // Установка текущей позиции
+    int startPos = _appState.playbackFPS;
+    SendMessageW(_hSliderSpeed, TBM_SETPOS, TRUE, startPos);
+}
+
+void FramePanel::ResizePlayControls(int clientW, int clientH) const
+{
+    const int offsetY = 37;
+    const int width = 90;
+    const int size = 22;
+
+    // Button
+    int currentX = _startX + _PANEL_OFFSET_X + 305;
+    SetWindowPos(_hBtnPlay, nullptr, currentX, _startY + offsetY, width - size, 20, SWP_NOZORDER | SWP_NOACTIVATE);
+
+    // Label
+    currentX += width - size + _SPACING;
+    SetWindowPos(_hLabelSpeed, nullptr, currentX, _startY + offsetY, width + 10, 20, SWP_NOZORDER | SWP_NOACTIVATE);
+
+    // Trackbar
+    currentX += width - size + _SPACING + 30;
+    SetWindowPos(_hSliderSpeed, nullptr, currentX, _startY + offsetY, width + 50, 20, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+void FramePanel::UpdateSpeedLabel()
+{
+    if (!_hLabelSpeed)
+        return; // Защита от нулевого хэндла
+
+    int fps = _appState.playbackFPS;
+    int ms = 1000 / fps;
+
+    wchar_t text[32];
+    swprintf_s(text, L"%d fps - %dms", fps, ms);
+
+    SetWindowTextW(_hLabelSpeed, text);
+}
+
+/// <summary>
+/// Play
+/// </summary>
+/// <returns></returns>
+bool FramePanel::OnPlay()
+{
+    _appState.isPlaying = !_appState.isPlaying;
+
+    // Обновляем текст кнопки
+    if (_appState.isPlaying)
+    {
+        SetWindowTextW(_hBtnPlay, L"Stop");
+
+        // Запускаем таймер (ID_TIMER_PLAY = 1)
+        // Интервал в мс = 1000 / FPS
+        int interval = 1000 / _appState.playbackFPS;
+        SetTimer(_hWndBottomTolbar, 1, interval, nullptr);
+    }
+    else
+    {
+        SetWindowTextW(_hBtnPlay, L"Play");
+
+        // Останавливаем таймер
+        KillTimer(_hWndBottomTolbar, 1);
+    }
+
+    return true;
+}
+
+bool FramePanel::OnSliderSpeed()
+{
+
+    // Получаем текущую позицию слайдера (FPS)
+    int fps = static_cast<int>(SendMessageW(_hSliderSpeed, TBM_GETPOS, 0, 0));
+
+    // Ограничиваем от 1 до 60
+    if (fps < 1)
+    {
+        fps = 1;
+    }
+
+    if (fps > 60)
+    {
+        fps = 60;
+    }
+
+    _appState.playbackFPS = fps;
+    _appState.isDirty = true;
+
+    // Обновляем метку
+    UpdateSpeedLabel();
+
+    // Если сейчас играет — обновляем скорость таймера на лету
+    if (_appState.isPlaying)
+    {
+        int interval = 1000 / fps;
+        SetTimer(_hWndBottomTolbar, 1, interval, nullptr);
+    }
+
+    return true;
 }
 
 /// <summary>

@@ -17,6 +17,7 @@
 #define IDD_DIALOG_MANAGE_TAGS          135
 #define IDD_EXPORT_SEQUENCE_DIALOG      136
 #define IDD_EXPORT_SPRITESHEET_DIALOG   137
+#define IDD_DIALOG_EXPORT_GIF           138
 #define IDC_COMBO_NEW_PROJECT_RESOLUTION 1000
 #define IDC_EDIT_NEW_PROJECT_BROWSE     1001
 #define IDC_BUTTON_NEW_PROJECT_BROWSE   1002
@@ -39,6 +40,12 @@
 #define IDC_ESS_EDIT_COL                1019
 #define IDC_ESS_EDIT_PAD_PIXELS         1020
 #define IDC_ESS_CHECK_GEN_JSON          1021
+#define IDC_EGA_COMBO_TAG_FILTER        1022
+#define IDC_EGA_EDIT_FILENAME           1023
+#define IDC_EGA_EDIT_OUTPUT_FOLDER      1024
+#define IDC_EGA_BUTTON_BROWSE           1025
+#define IDC_EGA_CHECK_INFINITE          1026
+#define IDC_EGA_COMBO_SCALE             1027
 #define ID_ZOOM_IN                      32771
 #define ID_ZOOM_OUT                     32773
 #define ID_TOOL_BRUSH                   32775
@@ -67,6 +74,7 @@
 #define ID_FILE_EXPORTFRAMETOPNG        32813
 #define ID_FILE_EXPORTSEQUENCE          32814
 #define ID_FILE_EXPORTSPRITESHEET       32815
+#define ID_FILE_EXPORTGIFANIMATION      32816
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -74,9 +82,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        138
-#define _APS_NEXT_COMMAND_VALUE         32816
-#define _APS_NEXT_CONTROL_VALUE         1022
+#define _APS_NEXT_RESOURCE_VALUE        139
+#define _APS_NEXT_COMMAND_VALUE         32817
+#define _APS_NEXT_CONTROL_VALUE         1028
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

@@ -194,6 +194,8 @@
     <ClInclude Include="ExportSequenceData.h" />
     <ClInclude Include="ExportService.h" />
     <ClInclude Include="export_frame_dialog.h" />
+    <ClInclude Include="export_gif_dialog.h" />
+    <ClInclude Include="export_gif_dialog_proc.h" />
     <ClInclude Include="export_sequence_dialog.h" />
     <ClInclude Include="export_sequence_dialog_proc.h" />
     <ClInclude Include="export_spritesheet_dialog.h" />
@@ -205,6 +207,8 @@
     <ClInclude Include="BottomToolbar.h" />
     <ClInclude Include="FrameService.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="gif.h" />
+    <ClInclude Include="GifExportService.h" />
     <ClInclude Include="HistoryService.h" />
     <ClInclude Include="HistoryState.h" />
     <ClInclude Include="LeftToolbar.h" />
@@ -244,6 +248,8 @@
     <ClCompile Include="CursorRenderer.cpp" />
     <ClCompile Include="ExportService.cpp" />
     <ClCompile Include="export_frame_dialog.cpp" />
+    <ClCompile Include="export_gif_dialog.cpp" />
+    <ClCompile Include="export_gif_dialog_proc.cpp" />
     <ClCompile Include="export_sequence_dialog.cpp" />
     <ClCompile Include="export_sequence_dialog_proc.cpp" />
     <ClCompile Include="export_spritesheet_dialog.cpp" />
@@ -253,6 +259,7 @@
     <ClCompile Include="FrameRenderer.cpp" />
     <ClCompile Include="BottomToolbar.cpp" />
     <ClCompile Include="FrameService.cpp" />
+    <ClCompile Include="GifExportService.cpp" />
     <ClCompile Include="HistoryService.cpp" />
     <ClCompile Include="LeftToolbar.cpp" />
     <ClCompile Include="load_project_dialog_proc.cpp" />

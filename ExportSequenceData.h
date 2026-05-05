@@ -16,6 +16,10 @@ struct ExportSequenceData
     int padding = 0;
     bool generateJson = true;
     bool confirmed = false;
+
+    // For GIF
+    bool infiniteLoop = true;
+    int scale = 1;
 };
 
 } // namespace baresprite

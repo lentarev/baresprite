@@ -29,6 +29,11 @@ class FramePanel
     bool OnOnionChecked();
     bool OnSliderOpacity();
 
+    // Play
+    bool OnPlay();
+    bool OnSliderSpeed();
+    void UpdateSpeedLabel();
+
   private:
     HWND _hWndBottomTolbar;
     HINSTANCE _hInstance;
@@ -44,6 +49,10 @@ class FramePanel
     HWND _hCheckOnion = nullptr;
     HWND _hSliderOpacity = nullptr;
     HWND _hLabelOpacity = nullptr;
+
+    HWND _hBtnPlay = nullptr;
+    HWND _hLabelSpeed = nullptr;
+    HWND _hSliderSpeed = nullptr;
 
     // Configuration
     int _startX = 180;
@@ -75,6 +84,9 @@ class FramePanel
 
     void CreateOnionControls();
     void ResizeOnionControls(int clientW, int clientH) const;
+
+    void CreatePlayControls();
+    void ResizePlayControls(int clientW, int clientH) const;
 };
 
 } // namespace baresprite

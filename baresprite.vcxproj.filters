@@ -225,6 +225,18 @@
     <ClInclude Include="SpritesheetService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="export_gif_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="export_gif_dialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="gif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GifExportService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -333,6 +345,15 @@
       <Filter>Source Files\DialogsWndProc</Filter>
     </ClCompile>
     <ClCompile Include="SpritesheetService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="export_gif_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="export_gif_dialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="GifExportService.cpp">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
   </ItemGroup>

@@ -200,10 +200,8 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             if (index == 2)
             {
                 // Show manage tags dialog
-                INT_PTR manageTagsResult = DialogBoxParam(_hInstance, MAKEINTRESOURCE(IDD_DIALOG_MANAGE_TAGS), _hWnd, ManageTagsDialogProc,
-                                                     reinterpret_cast<LPARAM>(&_appState)
-                );
-
+                INT_PTR manageTagsResult =
+                    DialogBoxParam(_hInstance, MAKEINTRESOURCE(IDD_DIALOG_MANAGE_TAGS), _hWnd, ManageTagsDialogProc, reinterpret_cast<LPARAM>(&_appState));
 
                 if (_tagPanel)
                 {
@@ -212,6 +210,18 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 
                 return true;
             }
+        }
+    }
+
+    // Play command
+    if (commandId >= 3071 && commandId < 3072)
+    {
+        const int index = commandId - 3071;
+
+        // Button - Play
+        if (index == 0)
+        {
+            return _framePanel->OnPlay();
         }
     }
 
@@ -239,6 +249,23 @@ bool BottomToolbar::OnHScroll(int scrollCode, HWND hSlider)
         }
     }
 
+
+     // Play command
+    if (controlId >= 3072 && controlId < 3073)
+    {
+        const int index = controlId - 3072;
+
+        // Button - Play
+        if (index == 0)
+        {
+            if (scrollCode == TB_ENDTRACK || scrollCode == TB_THUMBTRACK)
+            {
+
+                return _framePanel->OnSliderSpeed();
+            }
+        }
+    }
+
     return false;
 }
 
@@ -250,7 +277,7 @@ HWND BottomToolbar::GetHWndBottomToolbar() const
 LRESULT CALLBACK BottomToolbar::_BottomToolbarWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     // Forwarding notifications from child controls to the parent
-    if (message == WM_COMMAND || message == WM_NOTIFY || message == WM_HSCROLL)
+    if (message == WM_COMMAND || message == WM_NOTIFY || message == WM_HSCROLL || message == WM_TIMER)
     {
         HWND hParent = GetParent(hWnd);
         if (hParent)

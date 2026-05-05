@@ -160,6 +160,15 @@ bool ProjectSettings::Load()
                 }
             }
 
+            // === СЕКЦИЯ [ANIMATION] ===
+            else if (currentSection == L"ANIMATION")
+            {
+                if (key == L"playbackFPS")
+                {
+                    _appState.playbackFPS = std::stoi(value);
+                }
+            }
+
             // === СЕКЦИЯ [TAGS] ===
             else if (currentSection == L"TAGS")
             {
@@ -326,6 +335,10 @@ void ProjectSettings::Save()
     file << L"onionSkinPrevFrames=" << _appState.onionSkinPrevFrames << L"\n";
     file << L"onionSkinNextFrames=" << _appState.onionSkinNextFrames << L"\n";
     file << L"onionSkinOpacity=" << static_cast<int>(_appState.onionSkinOpacity * 100) << L"\n";
+
+    // Section [ANIMATION]
+    file << L"\n[ANIMATION]\n";
+    file << L"playbackFPS=" << _appState.playbackFPS << L"\n";
 
     // === СЕКЦИЯ [TAGS] ===
     if (!_appState.availableTags.empty())

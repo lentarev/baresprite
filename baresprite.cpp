@@ -18,12 +18,13 @@
 #include "RightToolbar.h"
 #include "ask_save_dialog.h"
 #include "export_frame_dialog.h"
+#include "export_gif_dialog.h"
+#include "export_sequence_dialog.h"
+#include "export_spritesheet_dialog.h"
 #include "load_project_dialog_proc.h"
 #include "new_project_dialog_proc.h"
 #include "restart_to_wizard.h"
 #include "start_screen_dialog_proc.h"
-#include "export_sequence_dialog.h"
-#include "export_spritesheet_dialog.h"
 
 // Manifesto and Libraries.
 #pragma comment(                                                                                                                                               \
@@ -425,6 +426,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return ExportSpritesheetDialog(hInst, hWnd, *gAppState);
         }
 
+        // Export GIF Animation
+        if (wmId == ID_FILE_EXPORTGIFANIMATION)
+        {
+            return ExportGifDialog(hInst, hWnd, *gAppState);
+        }
+
         // CUT
         if (wmId == ID_EDIT_CUT)
         {
@@ -731,6 +738,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     break;
+
+    case WM_TIMER: {
+        if (wParam == 1) // Наш таймер анимации
+        {
+
+            if (gAppState->isPlaying && gBottomToolbar)
+            {
+                gBottomToolbar->GetFramePanel()->OnButtonNext();
+            }
+        }
+        return 0;
+    }
 
     case WM_PAINT: {
         PAINTSTRUCT ps;
