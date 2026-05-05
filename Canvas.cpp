@@ -434,6 +434,10 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             int logX = x / pCanvas->_checkerSize;
             int logY = y / pCanvas->_checkerSize;
 
+            // Сохраняем точку старта отдельно
+            pCanvas->_appState.selection.startX = logX;
+            pCanvas->_appState.selection.startY = logY;
+
             // Начинаем новое выделение
             pCanvas->_appState.selection.x = logX;
             pCanvas->_appState.selection.y = logY;
@@ -565,9 +569,21 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         // Драг выделения для Select
         if (pCanvas->_appState.currentTool == ToolType::Select && pCanvas->_appState.selection.isDragging)
         {
-            // Вычисляем размеры с учётом последнего пикселя
-            pCanvas->_appState.selection.w = logX - pCanvas->_appState.selection.x + 1;
-            pCanvas->_appState.selection.h = logY - pCanvas->_appState.selection.y + 1;
+            // Читаем фиксированный старт
+            int startX = pCanvas->_appState.selection.startX;
+            int startY = pCanvas->_appState.selection.startY;
+
+            // Вычисляем границы
+            int left = min(startX, logX);
+            int top = min(startY, logY);
+            int right = max(startX, logX);
+            int bottom = max(startY, logY);
+
+            // Обновляем x,y,w,h для отрисовки
+            pCanvas->_appState.selection.x = left;
+            pCanvas->_appState.selection.y = top;
+            pCanvas->_appState.selection.w = right - left + 1;
+            pCanvas->_appState.selection.h = bottom - top + 1;
 
             // Перерисовываем только область выделения (оптимизация)
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
@@ -715,6 +731,10 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
             // Нормализуем прямоугольник (на случай драга влево/вверх)
             pCanvas->_appState.selection.Normalize();
+
+            // Очистка startX/startY
+            pCanvas->_appState.selection.startX = 0;
+            pCanvas->_appState.selection.startY = 0;
 
             // Перерисовываем для финального отображения
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);

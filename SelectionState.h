@@ -23,6 +23,9 @@ struct SelectionState
         rotationAngle = 0.0f;
     }
 
+    // Для драга: фиксируем точку старта
+    int startX, startY; 
+
     // Нормализация: гарантирует положительные w/h и корректные x/y
     void Normalize()
     {
