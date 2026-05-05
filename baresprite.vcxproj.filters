@@ -237,6 +237,12 @@
     <ClInclude Include="GifExportService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="MoveRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveDrag.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -355,6 +361,12 @@
     </ClCompile>
     <ClCompile Include="GifExportService.cpp">
       <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveRenderer.cpp">
+      <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveDrag.cpp">
+      <Filter>Source Files\Canvas</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -13,6 +13,8 @@ class FrameRenderer;
 class CursorRenderer;
 class OnionFrameRenderer;
 class SelectionRenderer;
+class MoveRenderer;
+class MoveDrag;
 
 class Canvas : public ChildWindow
 {
@@ -87,6 +89,8 @@ class Canvas : public ChildWindow
     std::unique_ptr<CursorRenderer> _cursorRenderer;
     std::unique_ptr<OnionFrameRenderer> _onionFrameRenderer;
     std::unique_ptr<SelectionRenderer> _selectionRenderer;
+    std::unique_ptr<MoveRenderer> _moveRenderer;
+    std::unique_ptr<MoveDrag> _moveDrag;
 
     // Configuration
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;

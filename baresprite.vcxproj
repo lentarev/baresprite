@@ -215,7 +215,9 @@
     <ClInclude Include="load_project_dialog_proc.h" />
     <ClInclude Include="manage_tags_dialog_proc.h" />
     <ClInclude Include="MirrorService.h" />
+    <ClInclude Include="MoveDrag.h" />
     <ClInclude Include="MoveDragState.h" />
+    <ClInclude Include="MoveRenderer.h" />
     <ClInclude Include="new_project_dialog_proc.h" />
     <ClInclude Include="OnionFrameRenderer.h" />
     <ClInclude Include="Palette.h" />
@@ -265,6 +267,8 @@
     <ClCompile Include="load_project_dialog_proc.cpp" />
     <ClCompile Include="manage_tags_dialog_proc.cpp" />
     <ClCompile Include="MirrorService.cpp" />
+    <ClCompile Include="MoveDrag.cpp" />
+    <ClCompile Include="MoveRenderer.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />
     <ClCompile Include="OnionFrameRenderer.cpp" />
     <ClCompile Include="Palette.cpp" />
