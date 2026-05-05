@@ -26,9 +26,12 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
         // Filling the ComboBox
         HWND hCombo = GetDlgItem(hDlg, IDC_COMBO_NEW_PROJECT_RESOLUTION);
 
+        ComboBox_AddString(hCombo, L"8 x 8 pixels");
+        ComboBox_AddString(hCombo, L"16 x 16 pixels");
+        ComboBox_AddString(hCombo, L"32 x 32 pixels");
         ComboBox_AddString(hCombo, L"64 x 64 pixels (Recommended)");
         ComboBox_AddString(hCombo, L"128 x 128 pixels");
-        ComboBox_SetCurSel(hCombo, 0);
+        ComboBox_SetCurSel(hCombo, 3);
 
         // Location folder
         HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_NEW_PROJECT_BROWSE);
@@ -131,9 +134,28 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
                 if (sel == 0)
                 {
+                    appState->imageSize = 8;
+                    appState->checkerSize = 64;
+                }
+
+                else if (sel == 1)
+                {
+                    appState->imageSize = 16;
+                    appState->checkerSize = 32;
+                }
+
+                else if (sel == 2)
+                {
+                    appState->imageSize = 32;
+                    appState->checkerSize = 16;
+                }
+
+                else if (sel == 3)
+                {
                     appState->imageSize = 64;
                     appState->checkerSize = 8;
                 }
+
                 else
                 {
                     appState->imageSize = 128;
@@ -163,9 +185,6 @@ INT_PTR CALLBACK NewProjectDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
         break;
     }
-
-    
-
 
     return (INT_PTR)FALSE;
 }
