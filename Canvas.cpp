@@ -742,7 +742,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
                 else
                 {
-                    hCur = LoadCursor(nullptr, IDC_CROSS);
+                    hCur = LoadCursor(nullptr, IDC_ARROW);
                 }
 
                 SetCursor(hCur);
