@@ -1,41 +1,69 @@
 #include "SelectionRenderer.h"
+#include <cmath>
 
 namespace baresprite
 {
 SelectionRenderer::SelectionRenderer() = default;
 SelectionRenderer::~SelectionRenderer() = default;
 
-void SelectionRenderer::Render(HDC hdc, const SelectionState &sel, int checkerSize)
+void SelectionRenderer::Render(HDC hdc, const SelectionState &selection, int checkerSize)
 {
-    if (!sel.isActive)
+    if (!selection.isActive || selection.w <= 0 || selection.h <= 0)
         return;
 
-    // Вычисляем экранные координаты
-    int x1 = sel.x * checkerSize;
-    int y1 = sel.y * checkerSize;
-    int x2 = (sel.x + sel.w) * checkerSize;
-    int y2 = (sel.y + sel.h) * checkerSize;
+    int left = selection.x * checkerSize;
+    int top = selection.y * checkerSize;
+    int right = (selection.x + selection.w) * checkerSize;
+    int bottom = (selection.y + selection.h) * checkerSize;
 
-    // Если ширина или высота 0 — добавляем 1 логический пиксель для визуализации
-    // Это только для отрисовки, реальные данные не меняем!
-    if (x1 == x2)
+    static ULONGLONG lastTime = GetTickCount64();
+    ULONGLONG now = GetTickCount64();
+
+    static int offset = 0;
+
+    // Обновляем смещение каждые 100мс
+    if (now - lastTime > 100)
     {
-        x2 = x1 + (sel.w >= 0 ? checkerSize : -checkerSize);
-    }
-    if (y1 == y2)
-    {
-        y2 = y1 + (sel.h >= 0 ? checkerSize : -checkerSize);
+        offset = (offset + 1) % 8;
+        lastTime = now;
     }
 
-    // Нормализуем прямоугольник для DrawFocusRect (left < right, top < bottom)
-    int left = (x1 < x2) ? x1 : x2;
-    int right = (x1 > x2) ? x1 : x2;
-    int top = (y1 < y2) ? y1 : y2;
-    int bottom = (y1 > y2) ? y1 : y2;
-
-    RECT rect = {left, top, right, bottom};
-
-    // DrawFocusRect сам анимирует пунктир и работает с любым фоном
-    DrawFocusRect(hdc, &rect);
+    // Рисуем 4 стороны
+    DrawDashedLine(hdc, left, top, right, top, offset);       // Верх
+    DrawDashedLine(hdc, right, top, right, bottom, offset);   // Право
+    DrawDashedLine(hdc, right, bottom, left, bottom, offset); // Низ
+    DrawDashedLine(hdc, left, bottom, left, top, offset);     // Лево
 }
+
+void SelectionRenderer::DrawDashedLine(HDC hdc, int x1, int y1, int x2, int y2, int offset)
+{
+    bool isHorizontal = (y1 == y2);
+    int length = isHorizontal ? std::abs(x2 - x1) : std::abs(y2 - y1);
+
+    int stepX = (x2 > x1) ? 1 : (x2 < x1) ? -1 : 0;
+    int stepY = (y2 > y1) ? 1 : (y2 < y1) ? -1 : 0;
+
+    const int dashLen = 4;
+    const int gapLen = 4;
+    const int patternLen = dashLen + gapLen;
+
+    for (int i = 0; i < length; ++i)
+    {
+        int pos = (i + offset) % patternLen;
+
+        if (pos < dashLen)
+        {
+            int curX = x1 + i * stepX;
+            int curY = y1 + i * stepY;
+
+            // Контрастная обводка (белый + черный)
+            int whiteX = curX + (isHorizontal ? 0 : -1);
+            int whiteY = curY + (isHorizontal ? -1 : 0);
+            SetPixelV(hdc, whiteX, whiteY, RGB(255, 255, 255));
+
+            SetPixelV(hdc, curX, curY, RGB(0, 0, 0));
+        }
+    }
+}
+
 } // namespace baresprite
