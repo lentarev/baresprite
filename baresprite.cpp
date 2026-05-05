@@ -501,7 +501,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0;
         }
 
-        if (wmId == ID_CURSOR_IN)
+        if (wmId == ID_CURSOR_IN || wmId == ID_TOOLS_INCREASEBRUSHSIZE)
         {
             if (gCanvasScrollView)
             {
@@ -510,7 +510,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0;
         }
 
-        if (wmId == ID_CURSOR_OUT)
+        if (wmId == ID_CURSOR_OUT || wmId == ID_TOOLS_DECREASEBRUSHSIZE)
         {
             if (gCanvasScrollView)
             {
