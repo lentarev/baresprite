@@ -1,23 +1,17 @@
-#include "export_sequence_dialog_proc.h"
+#include "export_spritesheet_dialog_proc.h"
 #include "ExportSequenceData.h"
 #include "resource.h"
 #include <algorithm>
 #include <unordered_set>
+#include <vector>
 #include <windowsx.h>
 
 #include <shlobj.h> // Browse folder
 
 namespace baresprite
 {
-/// <summary>
-/// Message handler for Export Sequence Dialog box
-/// </summary>
-/// <param name="hDlg"></param>
-/// <param name="message"></param>
-/// <param name="wParam"></param>
-/// <param name="lParam"></param>
-/// <returns></returns>
-INT_PTR CALLBACK ExportSequenceDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+
+INT_PTR CALLBACK ExportSpritesheetDialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto *pData = reinterpret_cast<ExportSequenceData *>(GetWindowLongPtr(hDlg, GWLP_USERDATA));
 
@@ -25,6 +19,7 @@ INT_PTR CALLBACK ExportSequenceDialogProc(HWND hDlg, UINT message, WPARAM wParam
     {
 
     case WM_INITDIALOG: {
+
         pData = reinterpret_cast<ExportSequenceData *>(lParam);
         SetWindowLongPtr(hDlg, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pData));
 
@@ -57,36 +52,30 @@ INT_PTR CALLBACK ExportSequenceDialogProc(HWND hDlg, UINT message, WPARAM wParam
 
         // >>>>>>>>>>>>>>>>>>>>>>>>>>
         // Output Folder
-        HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_OUTPUT_FOLDER);
-
+        HWND hEditFolder = GetDlgItem(hDlg, IDC_ESS_EDIT_OUTPUT_FOLDER);
         if (pData->appState->isExistAppConfig && !pData->appState->projectPath.empty())
         {
-            SetWindowTextW(hEdit, pData->appState->projectPath.c_str());
-
-            // Init path to save folder
+            SetWindowTextW(hEditFolder, pData->appState->projectPath.c_str());
             pData->outputFolder = pData->appState->projectPath;
         }
         else
         {
-            // Fallback: If the path is empty, use Documents
             PWSTR docsPath = nullptr;
             if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &docsPath)))
             {
                 std::wstring defaultPath = std::wstring(docsPath) + L"\\MySpriteProject";
-
-                SetWindowTextW(hEdit, defaultPath.c_str());
-
-                CoTaskMemFree(docsPath); // Freeing up memory!
+                SetWindowTextW(hEditFolder, defaultPath.c_str());
+                CoTaskMemFree(docsPath);
             }
             else
             {
-                SetWindowTextW(hEdit, L"C:\\Projects\\MySpriteProject");
+                SetWindowTextW(hEditFolder, L"C:\\Projects\\MySpriteProject");
             }
         }
 
         // >>>>>>>>>>>>>>>>>>>>>>>>>>
-        // Dropdown List
-        HWND hCombo = GetDlgItem(hDlg, IDC_COMBO_TAG);
+        // Dropdown List - Tag Filter
+        HWND hCombo = GetDlgItem(hDlg, IDC_ESS_COMBO_TAG_FILTER);
 
         // Всегда первый: All
         ComboBox_AddString(hCombo, L"All");
@@ -125,13 +114,19 @@ INT_PTR CALLBACK ExportSequenceDialogProc(HWND hDlg, UINT message, WPARAM wParam
         // По умолчанию выбран All
         ComboBox_SetCurSel(hCombo, 0);
 
+        // >>>>>>>>>>>>>>>>>>>>>>>>>>
+        // Default values
+        SetDlgItemInt(hDlg, IDC_ESS_EDIT_COL, 1, FALSE);           // 1 column by default
+        SetDlgItemInt(hDlg, IDC_ESS_EDIT_PAD_PIXELS, 0, FALSE);    // 0 padding
+        CheckDlgButton(hDlg, IDC_ESS_CHECK_GEN_JSON, BST_CHECKED); // JSON by default
+
         return TRUE;
     }
 
     case WM_COMMAND: {
         switch (LOWORD(wParam))
         {
-        case IDC_BTN_BROWSE_FOLDER: {
+        case IDC_ESS_BUTTON_BROWSE: {
 
             BROWSEINFOW bi = {};
             bi.hwndOwner = hDlg;
@@ -146,7 +141,7 @@ INT_PTR CALLBACK ExportSequenceDialogProc(HWND hDlg, UINT message, WPARAM wParam
                 if (SHGetPathFromIDListW(pidl, path))
                 {
                     pData->outputFolder = path;
-                    SetDlgItemTextW(hDlg, IDC_EDIT_OUTPUT_FOLDER, path);
+                    SetDlgItemTextW(hDlg, IDC_ESS_EDIT_OUTPUT_FOLDER, path);
                 }
                 CoTaskMemFree(pidl);
             }
@@ -155,10 +150,43 @@ INT_PTR CALLBACK ExportSequenceDialogProc(HWND hDlg, UINT message, WPARAM wParam
         }
 
         case IDOK: {
+
+            // Tag
             wchar_t tagBuf[64];
-            GetDlgItemTextW(hDlg, IDC_COMBO_TAG, tagBuf, _countof(tagBuf));
+            GetDlgItemTextW(hDlg, IDC_ESS_COMBO_TAG_FILTER, tagBuf, _countof(tagBuf));
             pData->selectedTag = tagBuf;
 
+            // Output Folder
+            wchar_t folderBuf[MAX_PATH];
+            GetDlgItemTextW(hDlg, IDC_ESS_EDIT_OUTPUT_FOLDER, folderBuf, _countof(folderBuf));
+            pData->outputFolder = folderBuf;
+
+            // File Name
+            wchar_t nameBuf[256];
+            GetDlgItemTextW(hDlg, IDC_ESS_EDIT_FILENAME, nameBuf, _countof(nameBuf));
+            pData->fileName = nameBuf;
+
+            if (pData->fileName.empty())
+            {
+                MessageBox(hDlg, L"Please enter a file name.", L"Error", MB_OK | MB_ICONWARNING);
+                return TRUE;
+            }
+
+            // Columns
+            pData->columns = GetDlgItemInt(hDlg, IDC_ESS_EDIT_COL, nullptr, FALSE);
+            if (pData->columns < 1)
+            {
+                MessageBox(hDlg, L"Columns must be at least 1.", L"Error", MB_OK | MB_ICONWARNING);
+                return TRUE;
+            }
+
+            // Padding
+            pData->padding = GetDlgItemInt(hDlg, IDC_ESS_EDIT_PAD_PIXELS, nullptr, FALSE);
+
+            // Generate JSON
+            pData->generateJson = (IsDlgButtonChecked(hDlg, IDC_ESS_CHECK_GEN_JSON) == BST_CHECKED);
+
+            // Validation
             if (pData->outputFolder.empty())
             {
                 MessageBox(hDlg, L"Please select an output folder.", L"Error", MB_OK | MB_ICONWARNING);
@@ -167,16 +195,20 @@ INT_PTR CALLBACK ExportSequenceDialogProc(HWND hDlg, UINT message, WPARAM wParam
 
             pData->confirmed = true;
             EndDialog(hDlg, IDOK);
+
             return TRUE;
         }
 
         case IDCANCEL:
             EndDialog(hDlg, IDCANCEL);
+
             return TRUE;
         }
+
         break;
     }
     }
+
     return FALSE;
 }
 

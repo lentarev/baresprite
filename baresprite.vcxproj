@@ -196,6 +196,8 @@
     <ClInclude Include="export_frame_dialog.h" />
     <ClInclude Include="export_sequence_dialog.h" />
     <ClInclude Include="export_sequence_dialog_proc.h" />
+    <ClInclude Include="export_spritesheet_dialog.h" />
+    <ClInclude Include="export_spritesheet_dialog_proc.h" />
     <ClInclude Include="FillService.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="FramePanel.h" />
@@ -223,6 +225,7 @@
     <ClInclude Include="SelectionRenderer.h" />
     <ClInclude Include="SelectionState.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="SpritesheetService.h" />
     <ClInclude Include="start_screen_dialog_proc.h" />
     <ClInclude Include="stb_image_write.h" />
     <ClInclude Include="TagPanel.h" />
@@ -243,6 +246,8 @@
     <ClCompile Include="export_frame_dialog.cpp" />
     <ClCompile Include="export_sequence_dialog.cpp" />
     <ClCompile Include="export_sequence_dialog_proc.cpp" />
+    <ClCompile Include="export_spritesheet_dialog.cpp" />
+    <ClCompile Include="export_spritesheet_dialog_proc.cpp" />
     <ClCompile Include="FillService.cpp" />
     <ClCompile Include="FramePanel.cpp" />
     <ClCompile Include="FrameRenderer.cpp" />
@@ -261,6 +266,7 @@
     <ClCompile Include="RightToolbar.cpp" />
     <ClCompile Include="RotateService.cpp" />
     <ClCompile Include="SelectionRenderer.cpp" />
+    <ClCompile Include="SpritesheetService.cpp" />
     <ClCompile Include="start_screen_dialog_proc.cpp" />
     <ClCompile Include="TagPanel.cpp" />
     <ClCompile Include="Tools.cpp" />

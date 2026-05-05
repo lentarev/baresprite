@@ -23,6 +23,7 @@
 #include "restart_to_wizard.h"
 #include "start_screen_dialog_proc.h"
 #include "export_sequence_dialog.h"
+#include "export_spritesheet_dialog.h"
 
 // Manifesto and Libraries.
 #pragma comment(                                                                                                                                               \
@@ -416,6 +417,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
 
             return ExportSequenceDialog(hInst, hWnd, *gAppState);
+        }
+
+        // Export Spritesheet
+        if (wmId == ID_FILE_EXPORTSPRITESHEET)
+        {
+            return ExportSpritesheetDialog(hInst, hWnd, *gAppState);
         }
 
         // CUT
