@@ -16,17 +16,59 @@
     <Filter Include="Header Files\Structures">
       <UniqueIdentifier>{fd742bce-f751-4491-ac08-866f84d68394}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Dialogs">
-      <UniqueIdentifier>{3a25d0eb-6caa-46d3-93d7-a8b507a940cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Dialogs">
-      <UniqueIdentifier>{269afc35-ca21-43ce-be79-ddf815da3ea0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Settings">
       <UniqueIdentifier>{f673c62d-2ee0-457e-8d5e-fcac0c28f751}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Settings">
       <UniqueIdentifier>{e13fe75f-fb3b-4637-8671-ad084a0b82cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Canvas">
+      <UniqueIdentifier>{2ee2ea5e-5414-4d44-9ff3-2b0ca27a5efa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Canvas">
+      <UniqueIdentifier>{896d9b0d-7fc9-4103-ae11-dbcc9655fc8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LeftToolbar">
+      <UniqueIdentifier>{bf01eb47-c178-4db9-a7d7-3fae087cb172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LeftToolbar">
+      <UniqueIdentifier>{ea91e1a6-5923-4307-9fb6-9b3658561160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DialogsWndProc">
+      <UniqueIdentifier>{3a25d0eb-6caa-46d3-93d7-a8b507a940cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DialogsWndProc">
+      <UniqueIdentifier>{269afc35-ca21-43ce-be79-ddf815da3ea0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Dialogs">
+      <UniqueIdentifier>{e45764e6-a790-4d39-bd51-09239865ed1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Dialogs">
+      <UniqueIdentifier>{77347ae0-5433-422b-9a3c-8304bdda9cfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BottomToolbar">
+      <UniqueIdentifier>{60746537-174a-4533-8273-da22b7ddb359}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BottomToolbar">
+      <UniqueIdentifier>{bed3c3fa-ec4b-4a42-acaf-66f11ae8df51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Services">
+      <UniqueIdentifier>{5aa469db-cc92-46ad-b87e-b31bc1f0c850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Services">
+      <UniqueIdentifier>{7af86eb2-cd79-4093-b37c-847da81331da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers">
+      <UniqueIdentifier>{b118e71d-f868-4cfd-b22e-82ce45ffa972}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helpers">
+      <UniqueIdentifier>{4fa116bf-0228-4619-952b-1aed2952e6bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Child">
+      <UniqueIdentifier>{4741b583-b4e0-485c-8dec-217290c3eaaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Child">
+      <UniqueIdentifier>{39004a90-855b-4eeb-a03b-5a899ac98e67}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -42,17 +84,14 @@
     <ClInclude Include="baresprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="App.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="start_screen_dialog_proc.h">
-      <Filter>Header Files\Dialogs</Filter>
+      <Filter>Header Files\DialogsWndProc</Filter>
     </ClInclude>
-    <ClInclude Include="Project.h">
+    <ClInclude Include="AppState.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
     <ClInclude Include="new_project_dialog_proc.h">
-      <Filter>Header Files\Dialogs</Filter>
+      <Filter>Header Files\DialogsWndProc</Filter>
     </ClInclude>
     <ClInclude Include="Settings.h">
       <Filter>Header Files\Settings</Filter>
@@ -60,22 +99,289 @@
     <ClInclude Include="AppSettings.h">
       <Filter>Header Files\Settings</Filter>
     </ClInclude>
+    <ClInclude Include="LeftToolbar.h">
+      <Filter>Header Files\Child</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildWindow.h">
+      <Filter>Header Files\Child</Filter>
+    </ClInclude>
+    <ClInclude Include="BottomToolbar.h">
+      <Filter>Header Files\Child</Filter>
+    </ClInclude>
+    <ClInclude Include="RightToolbar.h">
+      <Filter>Header Files\Child</Filter>
+    </ClInclude>
+    <ClInclude Include="Canvas.h">
+      <Filter>Header Files\Child</Filter>
+    </ClInclude>
+    <ClInclude Include="ChessBackground.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="Palette.h">
+      <Filter>Header Files\LeftToolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="PaletteData.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="ask_save_dialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectSettings.h">
+      <Filter>Header Files\Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="load_project_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools.h">
+      <Filter>Header Files\LeftToolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolType.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="Frame.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="CanvasScrollView.h">
+      <Filter>Header Files\Child</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="CursorRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="FramePanel.h">
+      <Filter>Header Files\BottomToolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="TagPanel.h">
+      <Filter>Header Files\BottomToolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="OnionFrameRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="manage_tags_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="ClipboardData.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="ClipboardService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionState.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryState.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="FillService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveDragState.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="RotateService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="MirrorService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="restart_to_wizard.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="export_frame_dialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="export_sequence_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportSequenceData.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="export_sequence_dialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="export_spritesheet_dialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="export_spritesheet_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="SpritesheetService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="export_gif_dialog_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="export_gif_dialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="gif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GifExportService.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveRenderer.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveDrag.h">
+      <Filter>Header Files\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="reorder_frames_dlg_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="reorder_frames_dlg.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ReorderDlgData.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="start_screen_dialog_proc.cpp">
-      <Filter>Source Files\Dialogs</Filter>
+      <Filter>Source Files\DialogsWndProc</Filter>
     </ClCompile>
     <ClCompile Include="new_project_dialog_proc.cpp">
-      <Filter>Source Files\Dialogs</Filter>
+      <Filter>Source Files\DialogsWndProc</Filter>
     </ClCompile>
     <ClCompile Include="AppSettings.cpp">
       <Filter>Source Files\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="LeftToolbar.cpp">
+      <Filter>Source Files\Child</Filter>
+    </ClCompile>
+    <ClCompile Include="BottomToolbar.cpp">
+      <Filter>Source Files\Child</Filter>
+    </ClCompile>
+    <ClCompile Include="RightToolbar.cpp">
+      <Filter>Source Files\Child</Filter>
+    </ClCompile>
+    <ClCompile Include="Canvas.cpp">
+      <Filter>Source Files\Child</Filter>
+    </ClCompile>
+    <ClCompile Include="ChessBackground.cpp">
+      <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="Palette.cpp">
+      <Filter>Source Files\LeftToolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="ask_save_dialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectSettings.cpp">
+      <Filter>Source Files\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="load_project_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools.cpp">
+      <Filter>Source Files\LeftToolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="CanvasScrollView.cpp">
+      <Filter>Source Files\Child</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameRenderer.cpp">
+      <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="CursorRenderer.cpp">
+      <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="FramePanel.cpp">
+      <Filter>Source Files\BottomToolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="TagPanel.cpp">
+      <Filter>Source Files\BottomToolbar</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="OnionFrameRenderer.cpp">
+      <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="manage_tags_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectionRenderer.cpp">
+      <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="ClipboardService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="FillService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="RotateService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="MirrorService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="restart_to_wizard.cpp">
+      <Filter>Source Files\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="ExportService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="export_frame_dialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="export_sequence_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="export_sequence_dialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="export_spritesheet_dialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="export_spritesheet_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="SpritesheetService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="export_gif_dialog_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="export_gif_dialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="GifExportService.cpp">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveRenderer.cpp">
+      <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveDrag.cpp">
+      <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="reorder_frames_dlg_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="reorder_frames_dlg.cpp">
+      <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -90,5 +396,10 @@
     <Image Include="icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="custom_cross_cursor.cur">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

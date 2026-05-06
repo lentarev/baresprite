@@ -1,0 +1,67 @@
+#pragma once
+#include "AppState.h"
+#include <Windows.h>
+#include <string>
+
+namespace baresprite
+{
+
+class TagPanel
+{
+  public:
+    TagPanel(HWND hWndBottomTolbar, HINSTANCE hInstance, AppState &appState);
+    ~TagPanel();
+
+    void SetBounds(const RECT &rc);
+
+    void PopulateComboBoxes(); 
+    void UpdateFilterSelection();
+    void UpdateTagSelection();                          
+    bool OnComboBoxChange(HWND hWndCtrl, int selIndex); 
+
+    bool OnChangeFilter();
+    bool OnChangeTag();
+
+    std::vector<std::wstring> GetActiveFilterTags() const;
+
+  private:
+    HWND _hWndBottomTolbar;
+    HINSTANCE _hInstance;
+
+    // Filter
+    HWND _hLabelFilter = nullptr;
+    HWND _hComboFilter = nullptr;
+
+    // Tag
+    HWND _hLabelTag = nullptr;
+    HWND _hComboTag = nullptr;
+
+    // Button
+    HWND _hButton = nullptr;
+
+    AppState &_appState;
+
+    // Configuration
+    int _startX = 180;
+    int _startY = 10;
+
+    static constexpr int LEFT_TOOLBAR_WIDTH = 180;
+    static constexpr int RIGHT_TOOLBAR_WIDTH = 180;
+
+    static constexpr int _LABEL_W = 40;
+    static constexpr int _LABEL_H = 30;
+    static constexpr int _SPACING = 4;
+
+    static constexpr int _COMBO_W = 100;
+    static constexpr int _COMBO_H = 30;
+
+    static constexpr int _BTN_SIZE_W = 100;
+    static constexpr int _BTN_SIZE_H = 30;
+
+    // METHODS
+    void CreateControls();
+    void ResizeControls(int clientW, int clientH) const;
+    int FindFirstMatchingFrame() const;
+};
+
+} // namespace baresprite

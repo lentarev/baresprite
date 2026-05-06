@@ -181,23 +181,111 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="App.h" />
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="baresprite.h" />
+    <ClInclude Include="Canvas.h" />
+    <ClInclude Include="ask_save_dialog.h" />
+    <ClInclude Include="CanvasScrollView.h" />
+    <ClInclude Include="ChessBackground.h" />
+    <ClInclude Include="ChildWindow.h" />
+    <ClInclude Include="ClipboardData.h" />
+    <ClInclude Include="ClipboardService.h" />
+    <ClInclude Include="CursorRenderer.h" />
+    <ClInclude Include="ExportSequenceData.h" />
+    <ClInclude Include="ExportService.h" />
+    <ClInclude Include="export_frame_dialog.h" />
+    <ClInclude Include="export_gif_dialog.h" />
+    <ClInclude Include="export_gif_dialog_proc.h" />
+    <ClInclude Include="export_sequence_dialog.h" />
+    <ClInclude Include="export_sequence_dialog_proc.h" />
+    <ClInclude Include="export_spritesheet_dialog.h" />
+    <ClInclude Include="export_spritesheet_dialog_proc.h" />
+    <ClInclude Include="FillService.h" />
+    <ClInclude Include="Frame.h" />
+    <ClInclude Include="FramePanel.h" />
+    <ClInclude Include="FrameRenderer.h" />
+    <ClInclude Include="BottomToolbar.h" />
+    <ClInclude Include="FrameService.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="gif.h" />
+    <ClInclude Include="GifExportService.h" />
+    <ClInclude Include="HistoryService.h" />
+    <ClInclude Include="HistoryState.h" />
+    <ClInclude Include="LeftToolbar.h" />
+    <ClInclude Include="load_project_dialog_proc.h" />
+    <ClInclude Include="manage_tags_dialog_proc.h" />
+    <ClInclude Include="MirrorService.h" />
+    <ClInclude Include="MoveDrag.h" />
+    <ClInclude Include="MoveDragState.h" />
+    <ClInclude Include="MoveRenderer.h" />
     <ClInclude Include="new_project_dialog_proc.h" />
-    <ClInclude Include="Project.h" />
+    <ClInclude Include="OnionFrameRenderer.h" />
+    <ClInclude Include="Palette.h" />
+    <ClInclude Include="PaletteData.h" />
+    <ClInclude Include="AppState.h" />
+    <ClInclude Include="ProjectSettings.h" />
+    <ClInclude Include="ReorderDlgData.h" />
+    <ClInclude Include="reorder_frames_dlg.h" />
+    <ClInclude Include="reorder_frames_dlg_proc.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="restart_to_wizard.h" />
+    <ClInclude Include="RightToolbar.h" />
+    <ClInclude Include="RotateService.h" />
+    <ClInclude Include="SelectionRenderer.h" />
+    <ClInclude Include="SelectionState.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="SpritesheetService.h" />
     <ClInclude Include="start_screen_dialog_proc.h" />
+    <ClInclude Include="stb_image_write.h" />
+    <ClInclude Include="TagPanel.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Tools.h" />
+    <ClInclude Include="ToolType.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="App.cpp" />
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="baresprite.cpp" />
+    <ClCompile Include="Canvas.cpp" />
+    <ClCompile Include="ask_save_dialog.cpp" />
+    <ClCompile Include="CanvasScrollView.cpp" />
+    <ClCompile Include="ChessBackground.cpp" />
+    <ClCompile Include="ClipboardService.cpp" />
+    <ClCompile Include="CursorRenderer.cpp" />
+    <ClCompile Include="ExportService.cpp" />
+    <ClCompile Include="export_frame_dialog.cpp" />
+    <ClCompile Include="export_gif_dialog.cpp" />
+    <ClCompile Include="export_gif_dialog_proc.cpp" />
+    <ClCompile Include="export_sequence_dialog.cpp" />
+    <ClCompile Include="export_sequence_dialog_proc.cpp" />
+    <ClCompile Include="export_spritesheet_dialog.cpp" />
+    <ClCompile Include="export_spritesheet_dialog_proc.cpp" />
+    <ClCompile Include="FillService.cpp" />
+    <ClCompile Include="FramePanel.cpp" />
+    <ClCompile Include="FrameRenderer.cpp" />
+    <ClCompile Include="BottomToolbar.cpp" />
+    <ClCompile Include="FrameService.cpp" />
+    <ClCompile Include="GifExportService.cpp" />
+    <ClCompile Include="HistoryService.cpp" />
+    <ClCompile Include="LeftToolbar.cpp" />
+    <ClCompile Include="load_project_dialog_proc.cpp" />
+    <ClCompile Include="manage_tags_dialog_proc.cpp" />
+    <ClCompile Include="MirrorService.cpp" />
+    <ClCompile Include="MoveDrag.cpp" />
+    <ClCompile Include="MoveRenderer.cpp" />
     <ClCompile Include="new_project_dialog_proc.cpp" />
+    <ClCompile Include="OnionFrameRenderer.cpp" />
+    <ClCompile Include="Palette.cpp" />
+    <ClCompile Include="ProjectSettings.cpp" />
+    <ClCompile Include="reorder_frames_dlg.cpp" />
+    <ClCompile Include="reorder_frames_dlg_proc.cpp" />
+    <ClCompile Include="restart_to_wizard.cpp" />
+    <ClCompile Include="RightToolbar.cpp" />
+    <ClCompile Include="RotateService.cpp" />
+    <ClCompile Include="SelectionRenderer.cpp" />
+    <ClCompile Include="SpritesheetService.cpp" />
     <ClCompile Include="start_screen_dialog_proc.cpp" />
+    <ClCompile Include="TagPanel.cpp" />
+    <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="baresprite.rc" />
@@ -205,6 +293,9 @@
   <ItemGroup>
     <Image Include="icon.ico" />
     <Image Include="logo.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="custom_cross_cursor.cur" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

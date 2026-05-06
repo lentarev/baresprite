@@ -1,6 +1,7 @@
 #pragma once
-#include "Project.h"
+#include "AppState.h"
 #include "Settings.h"
+
 
 namespace baresprite
 {
@@ -8,14 +9,16 @@ namespace baresprite
 class AppSettings : public Settings
 {
   public:
-    AppSettings(Project &projectData);
+    AppSettings(AppState &appState);
     ~AppSettings() override;
 
     bool Load() override;
     void Save() override;
 
+    bool IsProjectExist(const std::wstring &projectPath);
+
   private:
-    Project &_projectData;
+    AppState &_appState;
 };
 
 } // namespace baresprite

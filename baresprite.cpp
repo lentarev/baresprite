@@ -8,8 +8,23 @@
 #include <shlwapi.h>
 
 #include "AppSettings.h"
-#include "Project.h"
+#include "AppState.h"
+#include "BottomToolbar.h"
+#include "Canvas.h"
+#include "CanvasScrollView.h"
+#include "FramePanel.h"
+#include "LeftToolbar.h"
+#include "ProjectSettings.h"
+#include "RightToolbar.h"
+#include "ask_save_dialog.h"
+#include "export_frame_dialog.h"
+#include "export_gif_dialog.h"
+#include "export_sequence_dialog.h"
+#include "export_spritesheet_dialog.h"
+#include "load_project_dialog_proc.h"
 #include "new_project_dialog_proc.h"
+#include "reorder_frames_dlg.h"
+#include "restart_to_wizard.h"
 #include "start_screen_dialog_proc.h"
 
 // Manifesto and Libraries.
@@ -19,6 +34,7 @@
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "shell32.lib")
+#pragma comment(lib, "Msimg32.lib")
 
 using namespace baresprite;
 
@@ -29,8 +45,19 @@ HINSTANCE hInst;                     // current instance
 WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
 
+HWND gHWnd = nullptr;
+
+// Глобальные переменные для скролла (или добавь в класс главного окна)
+static int g_ScrollX = 0;
+static int g_ScrollY = 0;
+
 // All data of project
-std::unique_ptr<Project> gProjectData;
+std::unique_ptr<AppState> gAppState;
+std::unique_ptr<LeftToolbar> gLeftToolbar;
+std::unique_ptr<BottomToolbar> gBottomToolbar;
+std::unique_ptr<RightToolbar> gRightToolbar;
+std::unique_ptr<CanvasScrollView> gCanvasScrollView;
+std::unique_ptr<ProjectSettings> gProjectSettings;
 
 // Forward declarations of functions included in this code module:
 ATOM MyRegisterClass(HINSTANCE hInstance);
@@ -42,6 +69,11 @@ INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 #pragma comment(linker, "/subsystem:console")
 int main(int argc, const char **argv)
 {
+#if _DEBUG
+    // disable buffering
+    setvbuf(stdout, nullptr, _IONBF, 0);
+#endif
+
     return wWinMain(GetModuleHandle(NULL), NULL, GetCommandLine(), SW_SHOWDEFAULT);
 }
 #else
@@ -68,34 +100,137 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     LoadStringW(hInstance, IDC_BARESPRITE, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-    gProjectData = std::make_unique<Project>();
+    gAppState = std::make_unique<AppState>();
+    gProjectSettings = std::make_unique<ProjectSettings>(*gAppState);
 
-    auto appSettings = std::make_unique<AppSettings>(*gProjectData);
+    // Initializing the project data change flag
+    gAppState->isDirty = false;
+
+    auto appSettings = std::make_unique<AppSettings>(*gAppState);
 
     if (appSettings->Load())
     {
-        gProjectData->isExistAppConfig = true;
+        gAppState->isExistAppConfig = true;
     }
     else
     {
-        gProjectData->isExistAppConfig = false;
+        gAppState->isExistAppConfig = false;
     }
 
-    // Show start screen dialog
-    INT_PTR startScreenDialog = DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG_START_SCREEN), nullptr, StartScreenDialogProc);
+    int startupMode = 0;
 
-    if (startScreenDialog == IDOK) // New Project
+    if (wcsstr(lpCmdLine, L"--new"))
     {
-        // Show new project dialog
-        INT_PTR newProjectDialog =
-            DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_NEW_PROJECT), nullptr, NewProjectDialogProc, reinterpret_cast<LPARAM>(gProjectData.get()));
-
-        appSettings->Save();
+        startupMode = 1;
     }
-    else
+    else if (wcsstr(lpCmdLine, L"--load"))
     {
-        // Start screen dialog (Cancel)
-        return 0;
+        startupMode = 2;
+    }
+
+    // === Startup Loop ===
+    bool launchEditor = false;
+
+    while (!launchEditor)
+    {
+
+        if (startupMode == 1)
+        {
+            // Принудительный New Project
+
+            INT_PTR res =
+                DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_NEW_PROJECT), nullptr, NewProjectDialogProc, reinterpret_cast<LPARAM>(gAppState.get()));
+
+            if (res == IDOK)
+            {
+
+                if (appSettings->IsProjectExist(gAppState->projectPath))
+                {
+                    MessageBox(nullptr, L"The project you are trying to create already exists.", L"Error", MB_OK | MB_ICONEXCLAMATION);
+                }
+                else
+                {
+                    // Saves information in config.ini about the new project.
+                    appSettings->Save();
+
+                    // Создаем конфиг для нового проека
+                    gProjectSettings->Save();
+
+                    // Initialization
+                    gAppState->frames.emplace_back(gAppState->imageSize, gAppState->imageSize);
+                    gAppState->availableTags = {L"None", L"Idle", L"Walk", L"Run", L"Jump", L"Die", L"Attack"};
+
+                    launchEditor = true;
+
+                    gAppState->isProjectLoadedFromConfig = false;
+                }
+            }
+            else
+            {
+                // Cancel. Cбрасываем флаг, следующая итерация покажет Start Screen
+                startupMode = 0;
+            }
+        }
+        else if (startupMode == 2)
+        {
+            // Принудительный Load Project
+
+            INT_PTR res =
+                DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG_LOAD_PROJECT), nullptr, LoadProjectDialogProc, reinterpret_cast<LPARAM>(gAppState.get()));
+
+            if (res == IDOK)
+            {
+                // Check is project exists
+                if (appSettings->IsProjectExist(gAppState->projectPath))
+                {
+                    // Load project
+                    if (gProjectSettings->Load())
+                    {
+                        // Saves information in config.ini about the loaded project.
+                        appSettings->Save();
+
+                        // Initialization
+                        if (gAppState->currentFrameIndex < 0 || gAppState->currentFrameIndex >= static_cast<int>(gAppState->frames.size()))
+                        {
+                            gAppState->currentFrameIndex = 0;
+                        }
+
+                        launchEditor = true;
+
+                        gAppState->isProjectLoadedFromConfig = true;
+                    }
+                }
+                else
+                {
+                    MessageBox(nullptr, L"The project you are trying to load is missing configuration data.", L"Error", MB_OK | MB_ICONEXCLAMATION);
+                }
+            }
+            else
+            {
+                // Cancel. Cбрасываем флаг, следующая итерация покажет Start Screen
+                startupMode = 0;
+            }
+        }
+        else
+        {
+            // Show start screen dialog
+            INT_PTR res = DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG_START_SCREEN), nullptr, StartScreenDialogProc);
+
+            // If you closed the start screen (cross / Esc / Cancel), exit the application
+            if (res == IDCANCEL || res == 0)
+            {
+                // Закрыли крестиком
+                return 0;
+            }
+            else if (res == IDOK)
+            {
+                startupMode = 1;
+            }
+            else if (res == IDC_BUTTON_LOAD_PROJECT)
+            {
+                startupMode = 2;
+            }
+        }
     }
 
     // Perform application initialization:
@@ -111,7 +246,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (!TranslateAccelerator(gHWnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
@@ -139,7 +274,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance = hInstance;
     wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_BARESPRITE));
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
     wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_BARESPRITE);
     wcex.lpszClassName = szWindowClass;
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON_BARESPRITE));
@@ -163,6 +298,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
+    gHWnd = hWnd;
+
     if (!hWnd)
     {
         return FALSE;
@@ -170,6 +307,55 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
+
+    // Create left toolbar child window
+    gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gAppState);
+
+    // Create right toolbar child window
+    gRightToolbar = std::make_unique<RightToolbar>(hWnd, hInstance);
+
+    // Create canvas scroll view container
+    gCanvasScrollView = std::make_unique<CanvasScrollView>(hWnd, hInstance, *gAppState);
+
+    // Create frame toolbar child window
+    gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance, *gAppState);
+
+    // If the project was loaded from a configuration file
+    if (gAppState->isProjectLoadedFromConfig)
+    {
+        if (gAppState->canvas && !gAppState->frames.empty())
+        {
+            gAppState->canvas->LoadFrame(gAppState->frames[gAppState->currentFrameIndex]);
+        }
+    }
+
+    // Update window title
+    std::wstring title = L"BareSprite - " + gProjectSettings->GetProjectNameFromPath(gAppState->projectPath);
+    SetWindowTextW(hWnd, title.c_str());
+
+    RECT rc;
+
+    GetClientRect(hWnd, &rc); // Get the current size of the client area
+
+    if (gLeftToolbar)
+    {
+        gLeftToolbar->OnSize(rc.right, rc.bottom);
+    }
+
+    if (gBottomToolbar)
+    {
+        gBottomToolbar->OnSize(rc.right, rc.bottom);
+    }
+
+    if (gRightToolbar)
+    {
+        gRightToolbar->OnSize(rc.right, rc.bottom);
+    }
+
+    if (gCanvasScrollView)
+    {
+        gCanvasScrollView->OnSize(rc.right, rc.bottom);
+    }
 
     return TRUE;
 }
@@ -188,22 +374,406 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+
     case WM_COMMAND: {
         int wmId = LOWORD(wParam);
-        // Parse the menu selections:
+        int wmEvent = HIWORD(wParam); // notification code (BN_CLICKED or BN_DBLCLK)
+
+        // New Project
+        if (wmId == ID_FILE_NEWPROJECT || wmId == ID_HOTKEY_NEW_PROJECT)
+        {
+            if (AskSaveDialog(hWnd, *gAppState, *gProjectSettings))
+            {
+                // Restart app
+                RestartToWizard(hWnd, L"--new");
+            }
+            return 0;
+        }
+
+        // Load Project
+        if (wmId == ID_FILE_LOADPROJECT || wmId == ID_HOTKEY_LOAD_PROJECT)
+        {
+            if (AskSaveDialog(hWnd, *gAppState, *gProjectSettings))
+            {
+                // Restart app
+                RestartToWizard(hWnd, L"--load");
+            }
+            return 0;
+        }
+
+        // Save Project
+        if (wmId == ID_FILE_SAVEPROJECT || wmId == ID_HOTKEY_SAVE_PROJECT)
+        {
+            gProjectSettings->Save();
+
+            gAppState->isDirty = false;
+
+            return 0;
+        }
+
+        // Export Frame to PNG
+        if (wmId == ID_FILE_EXPORTFRAMETOPNG)
+        {
+
+            return ExportFrameDialog(hWnd, *gAppState);
+        }
+
+        // Export Sequence
+        if (wmId == ID_FILE_EXPORTSEQUENCE)
+        {
+
+            return ExportSequenceDialog(hInst, hWnd, *gAppState);
+        }
+
+        // Export Spritesheet
+        if (wmId == ID_FILE_EXPORTSPRITESHEET)
+        {
+            return ExportSpritesheetDialog(hInst, hWnd, *gAppState);
+        }
+
+        // Export GIF Animation
+        if (wmId == ID_FILE_EXPORTGIFANIMATION)
+        {
+            return ExportGifDialog(hInst, hWnd, *gAppState);
+        }
+
+        // Reorder frames
+        if (wmId == ID_FRAME_REORDERFRAMES)
+        {
+            return ReorderFramesDlg(hInst, hWnd, *gAppState);
+        }
+
+        // CUT
+        if (wmId == ID_EDIT_CUT)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnCut();
+            }
+            return 0;
+        }
+
+        // COPY
+        if (wmId == ID_EDIT_COPY)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnCopy();
+            }
+            return 0;
+        }
+
+        // PASTE
+        if (wmId == ID_EDIT_PASTE)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnPaste();
+            }
+            return 0;
+        }
+
+        // UNDO
+        if (wmId == ID_EDIT_UNDO || wmId == ID_UNDO)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnUndo();
+            }
+            return 0;
+        }
+
+        // REDO
+        if (wmId == ID_EDIT_REDO || wmId == ID_REDO)
+        {
+            if (gAppState->canvas)
+            {
+                gAppState->canvas->OnRedo();
+            }
+            return 0;
+        }
+
+        if (wmId == ID_PREV_FRAME)
+        {
+            if (gBottomToolbar)
+            {
+                gBottomToolbar->GetFramePanel()->OnButtonPrev();
+            }
+            return 0;
+        }
+
+        // ID_NEXT_FRAME
+        if (wmId == ID_NEXT_FRAME)
+        {
+            if (gBottomToolbar)
+            {
+                gBottomToolbar->GetFramePanel()->OnButtonNext();
+            }
+            return 0;
+        }
+
+        if (wmId == ID_CURSOR_IN || wmId == ID_TOOLS_INCREASEBRUSHSIZE)
+        {
+            if (gCanvasScrollView)
+            {
+                gCanvasScrollView->GetCanvas()->IncreaseBrushSize();
+            }
+            return 0;
+        }
+
+        if (wmId == ID_CURSOR_OUT || wmId == ID_TOOLS_DECREASEBRUSHSIZE)
+        {
+            if (gCanvasScrollView)
+            {
+                gCanvasScrollView->GetCanvas()->DecreaseBrushSize();
+            }
+            return 0;
+        }
+
+        if (wmId == ID_ZOOM_IN || wmId == ID_VIEW_ZOOMIN)
+        {
+            RECT rc;
+            GetClientRect(hWnd, &rc);
+
+            if (gCanvasScrollView)
+            {
+                if (gCanvasScrollView->GetCanvas()->ZoomIn())
+                {
+                    gCanvasScrollView->RecalculateCanvasCentering();
+                }
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_ZOOM_OUT || wmId == ID_VIEW_ZOOMOUT)
+        {
+            RECT rc;
+            GetClientRect(hWnd, &rc);
+
+            if (gCanvasScrollView)
+            {
+                if (gCanvasScrollView->GetCanvas()->ZoomOut())
+                {
+                    gCanvasScrollView->RecalculateCanvasCentering();
+                }
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_TOOL_BRUSH)
+        {
+
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->SelectTool(0);
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_TOOL_ERASER)
+        {
+
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->SelectTool(1);
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_TOOL_SELECT)
+        {
+
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->SelectTool(2);
+            }
+
+            return 0;
+        }
+
+        if (wmId == ID_TOOL_FILL)
+        {
+
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->SelectTool(3);
+            }
+
+            return 0;
+        }
+
+        // Animation (Hotkey)
+        if (wmId == ID_SPACE)
+        {
+
+            if (gBottomToolbar)
+            {
+                gBottomToolbar->GetFramePanel()->OnPlay();
+            }
+
+            return 0;
+        }
+
+        // LeftToolbar
+        if (gLeftToolbar && gLeftToolbar->OnCommand(wmId, wmEvent))
+        {
+            return 0; // Command processed.
+        }
+
+        // BottomToolbar
+        if (gBottomToolbar && gBottomToolbar->OnCommand(wmId, wmEvent))
+        {
+            return 0; // Command processed.
+        }
+
+        // RightToolbar
+        if (gRightToolbar && gRightToolbar->OnCommand(wmId, wmEvent))
+        {
+            return 0; // Command processed.
+        }
+
         switch (wmId)
         {
         case IDM_ABOUT:
+
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
             break;
+
         case IDM_EXIT:
-            DestroyWindow(hWnd);
-            break;
+            if (gAppState && gProjectSettings && AskSaveDialog(hWnd, *gAppState, *gProjectSettings))
+            {
+                DestroyWindow(hWnd);
+            }
+
+            return 0;
+
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
     }
+
+        SetFocus(hWnd);
+        break;
+
+    case WM_HSCROLL: {
+        int csrollCode = LOWORD(wParam);
+        HWND hSlider = (HWND)lParam;
+
+        // BottomToolbar
+        if (gBottomToolbar && gBottomToolbar->OnHScroll(csrollCode, hSlider))
+        {
+            return 0; // HScroll processed.
+        }
+    }
+
     break;
+
+    case WM_SIZE:
+
+        if (wParam != SIZE_MINIMIZED)
+        {
+            if (gLeftToolbar)
+            {
+                gLeftToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+            }
+
+            if (gBottomToolbar)
+            {
+                gBottomToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+            }
+
+            if (gRightToolbar)
+            {
+                gRightToolbar->OnSize(LOWORD(lParam), HIWORD(lParam));
+            }
+
+            if (gCanvasScrollView)
+            {
+                gCanvasScrollView->OnSize(LOWORD(lParam), HIWORD(lParam));
+            }
+        }
+
+        return 0;
+
+    case WM_SETCURSOR: {
+        if (LOWORD(lParam) != HTCLIENT)
+        {
+            if (gCanvasScrollView && gCanvasScrollView->GetCanvas())
+            {
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
+            }
+            // The system cursor will be restored via DefWindowProc
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+
+        // Cursor over the client area
+        POINT screenPos;
+        GetCursorPos(&screenPos);
+        HWND hwndUnderCursor = WindowFromPoint(screenPos);
+
+        if (gCanvasScrollView && gCanvasScrollView->GetCanvas() && hwndUnderCursor == gCanvasScrollView->GetCanvas()->GetHWndCanvas())
+        {
+
+            // Convert to canvas coordinates
+            POINT clientPos = screenPos;
+            ScreenToClient(gCanvasScrollView->GetCanvas()->GetHWndCanvas(), &clientPos);
+
+            // Logical coordinates
+            int logX = clientPos.x / gAppState->checkerSize;
+            int logY = clientPos.y / gAppState->checkerSize;
+
+            // Checking canvas boundaries
+            bool isInside = false;
+            if (!gAppState->frames.empty())
+            {
+
+                isInside = (logX >= 0 && logX < gAppState->imageSize && logY >= 0 && logY < gAppState->imageSize);
+            }
+
+            if (isInside)
+            {
+                // Inside the canvas: displaying a custom cursor
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(true);
+                SetCursor(nullptr); // Скрыть системный
+            }
+            else
+            {
+                // In the gray area: the system cursor
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
+                SetCursor(LoadCursor(nullptr, IDC_ARROW));
+            }
+            return TRUE;
+        }
+        else
+        {
+            // The cursor over the toolbar or another panel is the system cursor.
+            if (gCanvasScrollView && gCanvasScrollView->GetCanvas())
+            {
+                gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
+            }
+            // The system cursor will be restored automatically.
+        }
+
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    break;
+
+    case WM_TIMER: {
+        if (wParam == 1) // animation timer
+        {
+
+            if (gAppState->isPlaying && gBottomToolbar)
+            {
+                gBottomToolbar->GetFramePanel()->OnButtonNext();
+            }
+        }
+        return 0;
+    }
+
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
@@ -211,6 +781,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         EndPaint(hWnd, &ps);
     }
     break;
+
+    case WM_GETMINMAXINFO: {
+        MINMAXINFO *mmi = reinterpret_cast<MINMAXINFO *>(lParam);
+
+        // Minimum client area size (without borders)
+        constexpr int MIN_CLIENT_W = 900;
+        constexpr int MIN_CLIENT_H = 650;
+
+        RECT rc = {0, 0, MIN_CLIENT_W, MIN_CLIENT_H};
+
+        AdjustWindowRect(&rc, (DWORD)GetWindowLongPtr(hWnd, GWL_STYLE), FALSE);
+
+        mmi->ptMinTrackSize.x = rc.right - rc.left;
+        mmi->ptMinTrackSize.y = rc.bottom - rc.top;
+
+        return 0;
+    }
+
+    case WM_CLOSE: {
+        if (gAppState && gProjectSettings && AskSaveDialog(hWnd, *gAppState, *gProjectSettings))
+        {
+            DestroyWindow(hWnd);
+        }
+
+        return 0;
+    }
+
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
