@@ -18,6 +18,7 @@
 #define IDD_EXPORT_SEQUENCE_DIALOG      136
 #define IDD_EXPORT_SPRITESHEET_DIALOG   137
 #define IDD_DIALOG_EXPORT_GIF           138
+#define IDD_DIALOG_REORDER_FRAMES       139
 #define IDC_COMBO_NEW_PROJECT_RESOLUTION 1000
 #define IDC_EDIT_NEW_PROJECT_BROWSE     1001
 #define IDC_BUTTON_NEW_PROJECT_BROWSE   1002
@@ -46,6 +47,11 @@
 #define IDC_EGA_BUTTON_BROWSE           1025
 #define IDC_EGA_CHECK_INFINITE          1026
 #define IDC_EGA_COMBO_SCALE             1027
+#define IDC_REORDER_AREA                1028
+#define IDC_COMBO1                      1029
+#define IDC_REORDER_FRAME_COMBO_TAG_FILTER 1029
+#define IDC_SCROLLBAR1                  1030
+#define IDC_REORDER_SCROLL              1030
 #define ID_ZOOM_IN                      32771
 #define ID_ZOOM_OUT                     32773
 #define ID_TOOL_BRUSH                   32775
@@ -78,6 +84,7 @@
 #define ID_SPACE                        32817
 #define ID_TOOLS_INCREASEBRUSHSIZE      32819
 #define ID_TOOLS_DECREASEBRUSHSIZE      32820
+#define ID_FRAME_REORDERFRAMES          32821
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -85,9 +92,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        139
-#define _APS_NEXT_COMMAND_VALUE         32821
-#define _APS_NEXT_CONTROL_VALUE         1028
+#define _APS_NEXT_RESOURCE_VALUE        140
+#define _APS_NEXT_COMMAND_VALUE         32822
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

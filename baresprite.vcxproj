@@ -224,6 +224,9 @@
     <ClInclude Include="PaletteData.h" />
     <ClInclude Include="AppState.h" />
     <ClInclude Include="ProjectSettings.h" />
+    <ClInclude Include="ReorderDlgData.h" />
+    <ClInclude Include="reorder_frames_dlg.h" />
+    <ClInclude Include="reorder_frames_dlg_proc.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="restart_to_wizard.h" />
     <ClInclude Include="RightToolbar.h" />
@@ -273,6 +276,8 @@
     <ClCompile Include="OnionFrameRenderer.cpp" />
     <ClCompile Include="Palette.cpp" />
     <ClCompile Include="ProjectSettings.cpp" />
+    <ClCompile Include="reorder_frames_dlg.cpp" />
+    <ClCompile Include="reorder_frames_dlg_proc.cpp" />
     <ClCompile Include="restart_to_wizard.cpp" />
     <ClCompile Include="RightToolbar.cpp" />
     <ClCompile Include="RotateService.cpp" />

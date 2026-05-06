@@ -243,6 +243,15 @@
     <ClInclude Include="MoveDrag.h">
       <Filter>Header Files\Canvas</Filter>
     </ClInclude>
+    <ClInclude Include="reorder_frames_dlg_proc.h">
+      <Filter>Header Files\DialogsWndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="reorder_frames_dlg.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ReorderDlgData.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baresprite.cpp">
@@ -367,6 +376,12 @@
     </ClCompile>
     <ClCompile Include="MoveDrag.cpp">
       <Filter>Source Files\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="reorder_frames_dlg_proc.cpp">
+      <Filter>Source Files\DialogsWndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="reorder_frames_dlg.cpp">
+      <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

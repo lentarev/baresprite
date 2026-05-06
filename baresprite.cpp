@@ -25,6 +25,7 @@
 #include "new_project_dialog_proc.h"
 #include "restart_to_wizard.h"
 #include "start_screen_dialog_proc.h"
+#include "reorder_frames_dlg.h"
 
 // Manifesto and Libraries.
 #pragma comment(                                                                                                                                               \
@@ -430,6 +431,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (wmId == ID_FILE_EXPORTGIFANIMATION)
         {
             return ExportGifDialog(hInst, hWnd, *gAppState);
+        }
+
+        // Reorder frames
+        if (wmId == ID_FRAME_REORDERFRAMES)
+        {
+            return ReorderFramesDlg(hInst, hWnd, *gAppState);
         }
 
         // CUT
