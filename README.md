@@ -18,7 +18,6 @@
 
 ## 📸 Screenshots
 
-*Replace the placeholders below with your actual screenshots (e.g., `main.png`, `export.png`)*
 
 ### Main Interface
 ![Main Interface](screenshots/main_interface.png)
