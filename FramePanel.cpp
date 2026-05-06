@@ -57,12 +57,9 @@ FramePanel::~FramePanel()
 
 void FramePanel::SetBounds(const RECT &rc)
 {
-    // rc теперь — это область, выделенная родителем специально для FramePanel
-    // Пересчитываем _startX относительно левой границы этой области
-    _startX = rc.left;
-    //_startY = rc.top;
 
-    // Пересоздаём/перемещаем контролы внутри этих границ
+    _startX = rc.left;
+
     ResizeControlButtons(rc.right - rc.left, rc.bottom - rc.top);
     ResizeLabel(rc.right - rc.left, rc.bottom - rc.top);
     ResizeOnionControls(rc.right - rc.left, rc.bottom - rc.top);
@@ -74,7 +71,6 @@ int FramePanel::GetRightEdge() const
     if (_buttons.empty())
         return _startX;
 
-    // Возвращаем правую границу последней кнопки
     HWND hLastBtn = _buttons.back();
     RECT rc;
     GetWindowRect(hLastBtn, &rc);
@@ -129,7 +125,7 @@ void FramePanel::ResizeControlButtons(int clientW, int clientH)
 
 void FramePanel::CreateLabel()
 {
-    // Создаём лейбл временно (позиция будет исправлена в ResizeLabel)
+
     _hLabel = CreateWindowExW(0, L"STATIC", L"1 / 1", WS_CHILD | WS_VISIBLE | SS_CENTER | SS_CENTERIMAGE, 0, 0, LABEL_W, LABEL_H, _hWndBottomTolbar, nullptr,
                               _hInstance, nullptr);
 }
@@ -139,19 +135,18 @@ void FramePanel::ResizeLabel(int clientW, int clientH)
     if (_buttons.size() < 2 || !_hLabel)
         return;
 
-    // Получаем реальные позиции кнопок "<" и ">"
     RECT rectBtnPrev, rectBtnNext;
-    GetWindowRect(_buttons[0], &rectBtnPrev); // Кнопка "<"
-    GetWindowRect(_buttons[1], &rectBtnNext); // Кнопка ">"
+    GetWindowRect(_buttons[0], &rectBtnPrev); // Button "<"
+    GetWindowRect(_buttons[1], &rectBtnNext); // Button ">"
 
-    // Конвертируем в координаты родителя
+    // Convert to parent coordinates
     POINT prevRight = {rectBtnPrev.right, rectBtnPrev.top};
     POINT nextLeft = {rectBtnNext.left, rectBtnNext.top};
     ScreenToClient(_hWndBottomTolbar, &prevRight);
     ScreenToClient(_hWndBottomTolbar, &nextLeft);
 
-    // Вычисляем центр между кнопками
-    int gap = nextLeft.x - prevRight.x; // Расстояние между кнопками
+    // Calculating the center between buttons
+    int gap = nextLeft.x - prevRight.x;
     int labelX = prevRight.x + (gap - LABEL_W) / 2;
 
     SetWindowPos(_hLabel, nullptr, labelX, _startY, LABEL_W, LABEL_H, SWP_NOZORDER | SWP_NOACTIVATE);
@@ -178,10 +173,10 @@ void FramePanel::CreateOnionControls()
     _hSliderOpacity = CreateWindowExW(0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | TBS_HORZ | TBS_NOTICKS | TBS_TOOLTIPS, 0, 0, 0, 0, _hWndBottomTolbar,
                                       (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
 
-    // Настройка диапазона (0 - 100)
+    // Setting the range (0 - 100)
     SendMessageW(_hSliderOpacity, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
 
-    // Установка текущей позиции
+    // Setting the current position
     int startPos = static_cast<int>(_appState.onionSkinOpacity * 100);
     SendMessageW(_hSliderOpacity, TBM_SETPOS, TRUE, startPos);
 }
@@ -229,9 +224,9 @@ void FramePanel::CreatePlayControls()
     _hSliderSpeed = CreateWindowExW(0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | TBS_HORZ | TBS_NOTICKS | TBS_TOOLTIPS, 0, 0, 0, 0, _hWndBottomTolbar,
                                     (HMENU)(INT_PTR)idCounter++, _hInstance, nullptr);
 
-    // Настройка диапазона (1 - 100)
+    // Setting the range (1 - 100)
     SendMessageW(_hSliderSpeed, TBM_SETRANGE, TRUE, MAKELPARAM(1, 100));
-    // Установка текущей позиции
+    // Setting the current position
     int startPos = _appState.playbackFPS;
     SendMessageW(_hSliderSpeed, TBM_SETPOS, TRUE, startPos);
 }
@@ -258,7 +253,7 @@ void FramePanel::ResizePlayControls(int clientW, int clientH) const
 void FramePanel::UpdateSpeedLabel()
 {
     if (!_hLabelSpeed)
-        return; // Защита от нулевого хэндла
+        return;
 
     int fps = _appState.playbackFPS;
     int ms = 1000 / fps;
@@ -277,13 +272,12 @@ bool FramePanel::OnPlay()
 {
     _appState.isPlaying = !_appState.isPlaying;
 
-    // Обновляем текст кнопки
+    // Updating the button text
     if (_appState.isPlaying)
     {
         SetWindowTextW(_hBtnPlay, L"Stop");
 
-        // Запускаем таймер (ID_TIMER_PLAY = 1)
-        // Интервал в мс = 1000 / FPS
+        // Start timter
         int interval = 1000 / _appState.playbackFPS;
         SetTimer(_hWndBottomTolbar, 1, interval, nullptr);
     }
@@ -291,7 +285,7 @@ bool FramePanel::OnPlay()
     {
         SetWindowTextW(_hBtnPlay, L"Play");
 
-        // Останавливаем таймер
+        // Stop the timer
         KillTimer(_hWndBottomTolbar, 1);
     }
 
@@ -301,10 +295,9 @@ bool FramePanel::OnPlay()
 bool FramePanel::OnSliderSpeed()
 {
 
-    // Получаем текущую позицию слайдера (FPS)
     int fps = static_cast<int>(SendMessageW(_hSliderSpeed, TBM_GETPOS, 0, 0));
 
-    // Ограничиваем от 1 до 60
+    // We limit from 1 to 60
     if (fps < 1)
     {
         fps = 1;
@@ -318,10 +311,8 @@ bool FramePanel::OnSliderSpeed()
     _appState.playbackFPS = fps;
     _appState.isDirty = true;
 
-    // Обновляем метку
     UpdateSpeedLabel();
 
-    // Если сейчас играет — обновляем скорость таймера на лету
     if (_appState.isPlaying)
     {
         int interval = 1000 / fps;
@@ -336,14 +327,12 @@ bool FramePanel::OnSliderSpeed()
 /// </summary>
 bool FramePanel::OnOnionChecked()
 {
-    // Получаем текущее состояние чекбокса из окна
+
     LRESULT isChecked = SendMessageW(_hCheckOnion, BM_GETCHECK, 0, 0);
     bool newState = (isChecked == BST_CHECKED);
 
-    // Обновляем AppState
     _appState.onionSkinEnabled = newState;
 
-    // 3. Перерисовываем холст, чтобы применить изменения
     if (_appState.canvas)
     {
         InvalidateRect(_appState.canvas->GetHWndCanvas(), nullptr, TRUE);
@@ -381,7 +370,7 @@ bool FramePanel::OnSliderOpacity()
 void FramePanel::UpdateOnionLabel()
 {
     if (!_hLabelOpacity)
-        return; // Защита от нулевого хэндла
+        return;
 
     // 0.35 to 35
     int percent = static_cast<int>(_appState.onionSkinOpacity * 100);
@@ -397,13 +386,11 @@ void FramePanel::UpdateOnionLabel()
 void FramePanel::UpdateFrameLabel()
 {
     if (!_hLabel)
-        return; // Защита от нулевого хэндла
+        return;
 
-    // Берём данные напрямую из AppState
-    int current = _appState.currentFrameIndex + 1; // +1 для человеческого отображения
+    int current = _appState.currentFrameIndex + 1;
     int total = static_cast<int>(_appState.frames.size());
 
-    // Фолбэк на случай, если список вдруг пуст
     if (total < 1)
         total = 1;
     if (current < 1)
@@ -411,11 +398,11 @@ void FramePanel::UpdateFrameLabel()
     if (current > total)
         current = total;
 
-    // Форматируем строку
+    // Format the string
     wchar_t text[32];
     swprintf_s(text, L"%d / %d", current, total);
 
-    // Обновляем Win32 контрол
+    // Updating Win32 control
     SetWindowTextW(_hLabel, text);
 }
 
@@ -539,7 +526,7 @@ bool FramePanel::OnButtonDelete()
         return true;
     }
 
-    return false; // Удаление отклонено (остался последний кадр)
+    return false; // Deletion rejected (last frame remaining)
 }
 
 } // namespace baresprite

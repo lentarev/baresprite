@@ -25,7 +25,7 @@ void OnionFrameRenderer::Render(int frameIndex, float opacity, const Frame &fram
 
     int srcW = frame.width;
     int srcH = frame.height;
-    int dstW = srcW * checkerSize; // 🔥 Используем переданный checkerSize (с зумом!)
+    int dstW = srcW * checkerSize;
     int dstH = srcH * checkerSize;
 
     BITMAPINFO bmi = {};

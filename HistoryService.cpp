@@ -5,7 +5,7 @@
 namespace baresprite
 {
 
-// Внутренняя функция копирования одного кадра
+// Internal single frame copy function
 Frame HistoryService::DeepCopyFrame(const Frame &src)
 {
     Frame dst(src.width, src.height);
@@ -28,7 +28,7 @@ void HistoryService::DeepCopyFrames(const std::vector<Frame> &src, std::vector<F
 
     for (const auto &f : src)
     {
-        // Явно перемещаем результат в вектор-приёмник
+        // We explicitly move the result to the destination vector
         dst.push_back(std::move(DeepCopyFrame(f)));
     }
 }

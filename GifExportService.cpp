@@ -10,7 +10,7 @@ namespace baresprite
 {
 bool GifExportService::ExportGif(const ExportSequenceData &exportData)
 {
-    // Фильтрация кадров по тегу
+    // Filtering frames by tag
     std::vector<const Frame *> filteredFrames;
 
     for (const auto &frame : exportData.appState->frames)
@@ -29,22 +29,22 @@ bool GifExportService::ExportGif(const ExportSequenceData &exportData)
         return false;
     }
 
-    // Параметры
+    // Parameters
     int frameW = exportData.appState->imageSize * exportData.scale;
     int frameH = exportData.appState->imageSize * exportData.scale;
     int count = static_cast<int>(filteredFrames.size());
 
-    // Создаём GIF
+    // Create a GIF
     std::wstring gifPath = exportData.outputFolder + L"\\" + exportData.fileName + L".gif";
 
-    // Конвертируем путь в UTF-8 для gif.h
+    // Converting the path to UTF-8 for gif.h
     int size = WideCharToMultiByte(CP_UTF8, 0, gifPath.c_str(), -1, nullptr, 0, nullptr, nullptr);
     std::vector<char> utf8Path(size);
     WideCharToMultiByte(CP_UTF8, 0, gifPath.c_str(), -1, utf8Path.data(), size, nullptr, nullptr);
 
     GifWriter writer = {};
 
-    // Длительность по умолчанию (из первого кадра)
+    // Default duration (from first frame)
     int defaultDuration = 100 / exportData.appState->playbackFPS;
     
     if (defaultDuration < 1)
@@ -58,15 +58,15 @@ bool GifExportService::ExportGif(const ExportSequenceData &exportData)
         return false;
     }
 
-    // Пишем каждый кадр
+    // We write every frame
     for (const auto *frame : filteredFrames)
     {
-        // Создаём буфер для масштабированного кадра (RGBA)
+        // Creating a buffer for a scaled frame (RGBA)
         std::vector<uint8_t> rgbaBuffer(frameW * frameH * 4);
 
         if (exportData.scale == 1)
         {
-            // Без масштабирования — просто копируем
+            // No scaling - just copy
             for (int y = 0; y < exportData.appState->imageSize; ++y)
             {
                 for (int x = 0; x < exportData.appState->imageSize; ++x)
@@ -88,12 +88,12 @@ bool GifExportService::ExportGif(const ExportSequenceData &exportData)
         }
         else
         {
-            // Масштабирование (nearest neighbor)
+            // Scaling (nearest neighbor)
             for (int sy = 0; sy < frameH; ++sy)
             {
                 for (int sx = 0; sx < frameW; ++sx)
                 {
-                    // Координаты в исходном кадре
+                    // Coordinates in the original frame
                     int srcX = sx / exportData.scale;
                     int srcY = sy / exportData.scale;
 
@@ -113,12 +113,12 @@ bool GifExportService::ExportGif(const ExportSequenceData &exportData)
             }
         }
 
-        // Длительность кадра в deciseconds (единая для всех кадров)
+        // Frame duration in deciseconds (uniform for all frames)
         int duration = 100 / exportData.appState->playbackFPS;
         if (duration < 1)
-            duration = 1; // Минимум 1 decisecond (100ms)
+            duration = 1; // Minimum 1 decisecond (100ms)
 
-        // Записываем кадр
+        // We record a frame.
         GifWriteFrame(&writer, rgbaBuffer.data(), frameW, frameH, duration);
     }
 

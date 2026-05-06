@@ -24,11 +24,11 @@ void MoveRenderer::Render(const Frame &frame, int checkerSize, AppState &appStat
                     uint32_t pixel = drag.pixelBuffer[cy * drag.w + cx];
                     unsigned char a = (pixel >> 24) & 0xFF;
 
-                    if (a > 0) // Не рисуем полностью прозрачные пиксели
+                    if (a > 0)
                     {
                         COLORREF col = RGB((pixel >> 16) & 0xFF, (pixel >> 8) & 0xFF, pixel & 0xFF);
                         
-                        // Рисуем квадратик с учётом зума
+                        // Draw a square taking into account the zoom
                         for (int sy = 0; sy < checkerSize; ++sy)
                         {
                             for (int sx = 0; sx < checkerSize; ++sx)

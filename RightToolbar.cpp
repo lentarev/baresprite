@@ -20,7 +20,7 @@ void RightToolbar::OnSize(int clientW, int clientH)
 {
     if (_hToolbar)
     {
-        // Растягиваем тулбар на всю высоту главного окна
+        // Stretch the toolbar to the full height of the main window
         SetWindowPos(_hToolbar, nullptr, clientW - WIDTH, 0, WIDTH, clientH - BOTTOM, SWP_NOZORDER | SWP_NOACTIVATE);
     }
 }

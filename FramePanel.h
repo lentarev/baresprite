@@ -64,16 +64,14 @@ class FramePanel
     static constexpr int _SPACING = 10;
     static constexpr int _COLS = 1;
 
-    // Единый оффсет для центрирования всей панели
     static constexpr int _PANEL_OFFSET_X = -442;
 
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;
     static constexpr int RIGHT_TOOLBAR_WIDTH = 180;
 
-    // Константы для лейбла
     static constexpr int LABEL_W = 70;
     static constexpr int LABEL_H = _BTN_SIZE_H;
-    static constexpr int GAP_AFTER_FIRST_BTN = 70; // Отступ после кнопки "<"
+    static constexpr int GAP_AFTER_FIRST_BTN = 70;
 
     // METHODS
     void CreateControlButtons();

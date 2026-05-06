@@ -16,8 +16,8 @@ struct SelectionSnapshot
 
 struct HistorySnapshot
 {
-    std::unique_ptr<std::vector<Frame>> frames; // Копия кадров
-    SelectionSnapshot selection;                // Копия выделения
+    std::unique_ptr<std::vector<Frame>> frames;
+    SelectionSnapshot selection;
 };
 
 struct HistoryState
@@ -26,14 +26,14 @@ struct HistoryState
     std::vector<HistorySnapshot> redoStack;
     static constexpr int MAX_STEPS = 32;
 
-    // Принимает поля выделения по отдельности
+    // Accepts selection fields individually
     void Commit(std::vector<Frame> &currentFrames, int selX, int selY, int selW, int selH, bool selActive)
     {
         HistorySnapshot snapshot;
         snapshot.frames = std::make_unique<std::vector<Frame>>();
         HistoryService::DeepCopyFrames(currentFrames, *snapshot.frames);
 
-        // Сохраняем параметры выделения
+        // Save selection parameters
         snapshot.selection = {selX, selY, selW, selH, selActive};
 
         undoStack.push_back(std::move(snapshot));
@@ -53,23 +53,22 @@ struct HistoryState
         return !redoStack.empty();
     }
 
-    // Восстанавливаем и кадры, и выделение
+    // We restore both frames and selections
     void Undo(std::vector<Frame> &currentFrames, int &selX, int &selY, int &selW, int &selH, bool &selActive)
     {
         if (undoStack.empty())
             return;
 
-        // Текущее состояние → в redo
+        // Current state in redo
         HistorySnapshot redoSnap;
         redoSnap.frames = std::make_unique<std::vector<Frame>>(std::move(currentFrames));
         redoSnap.selection = {selX, selY, selW, selH, selActive};
         redoStack.push_back(std::move(redoSnap));
 
-        // Предыдущее состояние → текущее
         auto &prev = undoStack.back();
         currentFrames.swap(*prev.frames);
 
-        // Восстанавливаем поля выделения
+        // Restore selection fields
         selX = prev.selection.x;
         selY = prev.selection.y;
         selW = prev.selection.w;
@@ -92,7 +91,7 @@ struct HistoryState
         auto &next = redoStack.back();
         currentFrames.swap(*next.frames);
 
-        // Восстанавливаем поля выделения
+        // Restore selection fields
         selX = next.selection.x;
         selY = next.selection.y;
         selW = next.selection.w;

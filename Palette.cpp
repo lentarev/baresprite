@@ -49,12 +49,12 @@ void Palette::SelectColor(int index)
     HDC hdc = GetDC(_hWndToolbar);
     HDC hdcMem = CreateCompatibleDC(hdc);
 
-    // Кнопка принимает владение битмапом. Удалять не нужно, кнопка удалит сама
+    // The button takes ownership of the bitmap. There's no need to delete it; the button will delete it automatically.
     HBITMAP hBitmap = CreateCompatibleBitmap(hdc, _BTN_SIZE, _BTN_SIZE);
 
     HGDIOBJ oldObj = SelectObject(hdcMem, hBitmap);
 
-    // Задаём прямоугольник для заливки
+    // We set a rectangle for filling
     RECT rc = {0, 0, _BTN_SIZE, _BTN_SIZE};
 
     HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _selectedBorder);
@@ -65,26 +65,26 @@ void Palette::SelectColor(int index)
 
     Rectangle(hdcMem, 0, 0, _BTN_SIZE, _BTN_SIZE);
 
-    // Восстанавливаем состояние контекста (Pen)
+    // Restoring the context state (Pen)
     SelectObject(hdcMem, hOldPen);
     SelectObject(hdcMem, hOldBrush);
 
-    // Удаляем, то что сами создали
+    // We delete what we created ourselves
     DeleteObject(hPen);
     DeleteObject(hBrush);
 
-    // Восстанавливаем сосотояние контекста (Bitmap)
+    // Restore the context state (Bitmap)
     SelectObject(hdcMem, oldObj);
 
-    // 2. Удаляем виртуальный холст из памяти
+    // Deleting the virtual canvas from memory
     DeleteDC(hdcMem);
 
-    // 1. Освобождаем контекст окна, полученный через GetDC
+    // Freeing the window context obtained via GetDC
     ReleaseDC(_hWndToolbar, hdc);
 
     HBITMAP hOldBitmap = (HBITMAP)SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
 
-    // Удаляем старый битмап
+    // Deleting the old bitmap
     if (hOldBitmap && hOldBitmap != hBitmap)
     {
         DeleteObject(hOldBitmap);
@@ -101,12 +101,10 @@ void Palette::ResetColor(int index)
 
     HDC hdcMem = CreateCompatibleDC(hdc);
 
-    // Кнопка принимает владение битмапом. Удалять не нужно, кнопка удалит сама
     HBITMAP hBitmap = CreateCompatibleBitmap(hdc, _BTN_SIZE, _BTN_SIZE);
 
     HGDIOBJ oldObj = SelectObject(hdcMem, hBitmap);
 
-    // Задаём прямоугольник для заливки
     RECT rc = {0, 0, _BTN_SIZE, _BTN_SIZE};
 
     HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _defaultBorder);
@@ -117,26 +115,20 @@ void Palette::ResetColor(int index)
 
     Rectangle(hdcMem, 0, 0, _BTN_SIZE, _BTN_SIZE);
 
-    // Восстанавливаем состояние контекста (Pen)
     SelectObject(hdcMem, hOldPen);
     SelectObject(hdcMem, hOldBrush);
 
-    // Удаляем, то что сами создали
     DeleteObject(hPen);
     DeleteObject(hBrush);
 
-    // Восстанавливаем сосотояние контекста (Bitmap)
     SelectObject(hdcMem, oldObj);
 
-    // 2. Удаляем виртуальный холст из памяти
     DeleteDC(hdcMem);
 
-    // 1. Освобождаем контекст окна, полученный через GetDC
     ReleaseDC(_hWndToolbar, hdc);
 
     HBITMAP hOldBitmap = (HBITMAP)SendMessage(_paletteButtons[index], BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBitmap);
 
-    // Удаляем старый битмап
     if (hOldBitmap && hOldBitmap != hBitmap)
     {
         DeleteObject(hOldBitmap);
@@ -168,48 +160,48 @@ void Palette::CreatePalette()
 
 HBITMAP Palette::CreateBitmap(COLORREF color, int width, int height) const
 {
-    // 1.  Получаем контекст устройства родительского окна
+    // Parent window device context
     HDC hdc = GetDC(_hWndToolbar);
 
-    // 2. Создаём виртуальный холст в памяти
+    // Create a virtual canvas in memory
     HDC hdcMem = CreateCompatibleDC(hdc);
 
-    // Создаём сам битмап (пустой) нужного размера
+    // Create the bitmap itself (empty) of the required size
     HBITMAP hBitmap = CreateCompatibleBitmap(hdc, width, height);
 
-    // Выбираем наш новый битмап в контекст устройства
+    // We select our new bitmap in the device context
     HGDIOBJ oldObj = SelectObject(hdcMem, hBitmap);
 
-    // Задаём прямоугольник для заливки
+    // We set a rectangle for filling
     RECT rc = {0, 0, width, height};
 
     HPEN hPen = CreatePen(PS_SOLID, _BORDER_WIDTH, _defaultBorder);
     HPEN hOldPen = (HPEN)SelectObject(hdcMem, hPen);
 
-    // Создаём кисть (brush) нужного цвета
+    // Create a brush of the desired color
     HBRUSH hBrush = CreateSolidBrush(color);
     HBRUSH hOldBrush = (HBRUSH)SelectObject(hdcMem, hBrush);
 
-    // Заливаем прямоугольник в памяти DC нашей кистью
+    // Fill a rectangle in DC memory with our brush
     // FillRect(hdcMem, &rc, hBrush);
 
     Rectangle(hdcMem, 0, 0, _BTN_SIZE, _BTN_SIZE);
 
-    // Восстанавливаем состояние контекста (Pen)
+    // Restoring the context state (Pen)
     SelectObject(hdcMem, hOldPen);
     SelectObject(hdcMem, hOldBrush);
 
-    // Удаляем ТОЛЬКО то, что создали мы
+    // We delete only what we have created.
     DeleteObject(hPen);
     DeleteObject(hBrush);
 
-    // Возвращаем старый объект обратно в hdcMem
+    // Return the old object back to hdcMem
     SelectObject(hdcMem, oldObj);
 
-    // 2. Удаляем виртуальный холст из памяти
+    // Deleting the virtual canvas from memory
     DeleteDC(hdcMem);
 
-    // 1. Освобождаем контекст окна, полученный через GetDC
+    // Freeing the window context obtained via GetDC
     ReleaseDC(_hWndToolbar, hdc);
 
     return hBitmap;
@@ -242,11 +234,11 @@ bool Palette::EditColor(int index, HWND hWndOwner)
     static COLORREF custColors[16] = {};
     cc.lpCustColors = custColors;
 
-    // Показываем диалог
+    // Showing the dialogue
     if (ChooseColorW(&cc))
     {
-        // Пользователь выбрал новый цвет!
-        _appState.palette.colors[index] = cc.rgbResult; // Обновляем массив
+        // The user has chosen a new color!
+        _appState.palette.colors[index] = cc.rgbResult; // Updating the array
         return true;
     }
 
@@ -267,13 +259,13 @@ UINT_PTR CALLBACK Palette::_PickerColorDialogHook(HWND hDlg, UINT message, WPARA
             RECT rcMain;
             if (GetWindowRect(hMainWindow, &rcMain))
             {
-                // Просто смещаем от левого верхнего угла главного окна
+                // Just move it from the upper left corner of the main window
                 x = rcMain.left + 200;
                 y = rcMain.top + 50;
             }
         }
 
-        // Применяем позицию
+        // Apply the position
         SetWindowPos(hDlg, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
     }
 

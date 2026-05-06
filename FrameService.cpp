@@ -13,15 +13,15 @@ bool FrameService::NewFrame(AppState &appState)
 {
     try
     {
-        // Создаём кадр
+        // Create frame
         Frame newFrame(appState.imageSize, appState.imageSize);
         newFrame.tag = L"";
 
-        // Вставляем после текущего
+        // Insert after the current one
         auto it = appState.frames.begin() + appState.currentFrameIndex + 1;
         appState.frames.insert(it, std::move(newFrame));
 
-        // Переключаемся на новый
+        // Switching to a new one
         ++appState.currentFrameIndex;
         return true;
     }
@@ -49,16 +49,16 @@ bool FrameService::PrevFrame(AppState &appState)
     int newIndex = startIndex;
     bool wrapped = false;
 
-    // Если фильтр активен — ищем предыдущий подходящий кадр с зацикливанием
+    // If the filter is active, we search for the previous suitable frame with a loop
     if (!filter.empty())
     {
         do
         {
-            // Двигаемся назад
+            // Moving back
             newIndex--;
             if (newIndex < 0)
             {
-                newIndex = static_cast<int>(appState.frames.size()) - 1; // Зацикливание: начало → конец
+                newIndex = static_cast<int>(appState.frames.size()) - 1; // Looping: start -> end
                 if (wrapped)
                 {
                     break;
@@ -67,7 +67,7 @@ bool FrameService::PrevFrame(AppState &appState)
                 wrapped = true;
             }
 
-            // Проверка на соответствие фильтру
+            // Checking for filter compliance
             if (MatchesFilter(appState.frames[newIndex], filter))
             {
                 appState.currentFrameIndex = newIndex;
@@ -76,12 +76,12 @@ bool FrameService::PrevFrame(AppState &appState)
             }
         } while (newIndex != startIndex);
 
-        // Если ни один кадр не подошёл — остаёмся на текущем
+        // If none of the frames are suitable, we stay with the current one
         return false;
     }
     else
     {
-        // Фильтр выключен — старая логика
+        // Filter off - old logic
         if (appState.currentFrameIndex <= 0)
         {
             appState.currentFrameIndex = static_cast<int>(appState.frames.size()) - 1;
@@ -112,29 +112,29 @@ bool FrameService::NextFrame(AppState &appState)
     int startIndex = appState.currentFrameIndex;
 
     int newIndex = startIndex;
-    bool wrapped = false; // Флаг, чтобы не зациклиться бесконечно
+    bool wrapped = false; // A flag to avoid endless looping
 
-    // Если фильтр активен — ищем следующий подходящий кадр с зацикливанием
+    // If the filter is active, we search for the next suitable frame with a loop
     if (!filter.empty())
     {
         do
         {
-            // Двигаемся вперёд
+            // Moving forward
             newIndex++;
 
             if (newIndex >= static_cast<int>(appState.frames.size()))
             {
-                newIndex = 0; // Зацикливание: конец → начало
+                newIndex = 0; // Looping: end -> start
 
                 if (wrapped)
                 {
-                    break; // Уже прошли полный круг → стоп
+                    break; // We've already come full circle -> stop
                 }
 
                 wrapped = true;
             }
 
-            // Проверка на соответствие фильтру
+            // Checking for filter compliance
             if (MatchesFilter(appState.frames[newIndex], filter))
             {
                 appState.currentFrameIndex = newIndex;
@@ -142,14 +142,14 @@ bool FrameService::NextFrame(AppState &appState)
                 return true;
             }
 
-        } while (newIndex != startIndex); // Пока не вернулись к старту
+        } while (newIndex != startIndex); // Until we get back to the start
 
-        // Если ни один кадр не подошёл — остаёмся на текущем
+        // If none of the frames are suitable, we stay with the current one
         return false;
     }
     else
     {
-        // Фильтр выключен — старая логика (простой цикл)
+        // Filter off - old logic (simple loop)
         int lastIndex = static_cast<int>(appState.frames.size()) - 1;
 
         if (appState.currentFrameIndex >= lastIndex)
@@ -175,7 +175,7 @@ bool FrameService::CloneFrame(AppState &appState)
 {
     if (appState.frames.empty())
     {
-        return false; // Нечего клонировать
+        return false; // There is nothing to clone
     }
 
     try
@@ -210,29 +210,29 @@ bool FrameService::CloneFrame(AppState &appState)
 /// <returns></returns>
 bool FrameService::DeleteFrame(AppState &appState)
 {
-    // в проекте всегда должен оставаться минимум 1 кадр
+    // There should always be at least 1 frame left in the project
     if (appState.frames.size() <= 1)
     {
         return false;
     }
 
-    // Удаляем текущий кадр
+    // Delete the current frame
     appState.frames.erase(appState.frames.begin() + appState.currentFrameIndex);
 
-    // Корректировка индекса:
-    // Если мы удалили последний кадр в списке, currentFrameIndex станет равен size() (out of bounds).
-    // Сдвигаем его на предыдущий (теперь последний) кадр.
+    // Index adjustment:
+    // If we removed the last frame in the list, currentFrameIndex would become size() (out of bounds).
+    // We move it to the previous (now last) frame.
     if (appState.currentFrameIndex >= static_cast<int>(appState.frames.size()))
     {
         --appState.currentFrameIndex;
     }
 
-    return true; // Кадр успешно удалён
+    return true; // The frame was successfully deleted.
 }
 
 Frame &FrameService::GetCurrentFrame(AppState &state)
 {
-    // Простая защита от дурака (если кадров вдруг нет)
+    // Simple protection (if there are no frames)
     if (state.frames.empty())
     {
 
@@ -254,16 +254,16 @@ const Frame &FrameService::GetCurrentFrame(const AppState &state)
 
 bool FrameService::MatchesFilter(const Frame &frame, const std::wstring &filterTag)
 {
-    // All или пустая строка = показывать всё (защита от обоих вариантов)
+    // All or empty string = show all (protects against both)
     if (filterTag.empty() || filterTag == L"All")
         return true;
 
     if (filterTag == L"None")
     {
-        return frame.tag.empty(); // None = только кадры без тега
+        return frame.tag.empty(); // None = only frames without a tag
     }
 
-    return frame.tag == filterTag; // Обычный тег = точное совпадение
+    return frame.tag == filterTag; // Regular tag = exact match
 }
 
 } // namespace baresprite

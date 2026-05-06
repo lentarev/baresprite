@@ -77,10 +77,10 @@ INT_PTR CALLBACK ExportSpritesheetDialogProc(HWND hDlg, UINT message, WPARAM wPa
         // Dropdown List - Tag Filter
         HWND hCombo = GetDlgItem(hDlg, IDC_ESS_COMBO_TAG_FILTER);
 
-        // Всегда первый: All
+        // Always first: All
         ComboBox_AddString(hCombo, L"All");
 
-        // Собираем используемые теги
+        // Collecting used tags
         std::unordered_set<std::wstring> usedTags;
         bool hasNone = false;
 
@@ -95,14 +95,14 @@ INT_PTR CALLBACK ExportSpritesheetDialogProc(HWND hDlg, UINT message, WPARAM wPa
             }
         }
 
-        // Второй: None (если есть кадры без тега)
+        // Second: None (if there are frames without a tag)
         if (hasNone)
         {
             ComboBox_AddString(hCombo, L"None");
-            usedTags.erase(L"None"); // Убираем, чтобы не дублировать при сортировке
+            usedTags.erase(L"None"); // We remove them to avoid duplication when sorting.
         }
 
-        // Остальные: строго по алфавиту
+        // The rest: strictly alphabetically
         std::vector<std::wstring> sortedTags(usedTags.begin(), usedTags.end());
         std::sort(sortedTags.begin(), sortedTags.end());
 
@@ -111,7 +111,7 @@ INT_PTR CALLBACK ExportSpritesheetDialogProc(HWND hDlg, UINT message, WPARAM wPa
             ComboBox_AddString(hCombo, tag.c_str());
         }
 
-        // По умолчанию выбран All
+        // By default, All is selected.
         ComboBox_SetCurSel(hCombo, 0);
 
         // >>>>>>>>>>>>>>>>>>>>>>>>>>

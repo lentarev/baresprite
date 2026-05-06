@@ -1,6 +1,6 @@
 #include "export_frame_dialog.h"
-#include "Frame.h"
 #include "ExportService.h"
+#include "Frame.h"
 
 namespace baresprite
 {
@@ -21,7 +21,7 @@ bool ExportFrameDialog(HWND hWnd, AppState &appState)
 
     const Frame &currentFrame = appState.frames[appState.currentFrameIndex];
 
-    // Выделяем буфер сразу, и заполняем начальным именем
+    // We select the buffer immediately and fill it with the initial name
     std::wstring filePath(MAX_PATH, L'\0');
     swprintf_s(&filePath[0], MAX_PATH, L"frame_%03d.png", appState.currentFrameIndex);
 
@@ -30,7 +30,7 @@ bool ExportFrameDialog(HWND hWnd, AppState &appState)
     ofn.lStructSize = sizeof(OPENFILENAMEW);
     ofn.hwndOwner = hWnd;
     ofn.lpstrFilter = L"PNG Images\0*.png\0All Files\0*.*\0";
-    ofn.lpstrFile = &filePath[0]; // Передаем изменяемый буфер
+    ofn.lpstrFile = &filePath[0];
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
     ofn.lpstrDefExt = L"png";
@@ -38,7 +38,7 @@ bool ExportFrameDialog(HWND hWnd, AppState &appState)
 
     if (GetSaveFileNameW(&ofn))
     {
-        // Обрезаем лишние нули, оставшиеся от инициализации
+        // Trim off any extra zeros left over from initialization.
         filePath.resize(wcslen(&filePath[0]));
 
         if (ExportService::ExportFrameToPNG(currentFrame, filePath))
@@ -51,9 +51,7 @@ bool ExportFrameDialog(HWND hWnd, AppState &appState)
         }
     }
 
-
     return 0;
 }
 
-
-}
+} // namespace baresprite

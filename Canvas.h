@@ -77,11 +77,11 @@ class Canvas : public ChildWindow
     int _offsetY = 0;
 
     // Custom cursor
-    POINT _mousePosScreen = {-1, -1}; //  Точная позиция для плавного курсора
-    POINT _mousePos = {-1, -1};       // Позиция мыши в логических координатах
+    POINT _mousePosScreen = {-1, -1};
+    POINT _mousePos = {-1, -1};
     POINT _prevMousePos = {-1, -1};
-    int _brushSize = 1;             // Размер кисти: 1, 3, 5 (нечётные)
-    bool _showCustomCursor = false; // Показывать ли кастомный курсор
+    int _brushSize = 1;
+    bool _showCustomCursor = false;
 
     // Canvas Components
     std::unique_ptr<ChessBackground> _chessBackground;

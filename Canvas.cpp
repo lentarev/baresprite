@@ -41,7 +41,7 @@ Canvas::Canvas(HWND hWndParent, HINSTANCE hInstanceParent, AppState &appState) :
 
     if (!_hCanvas)
     {
-        return; // Не удалось создать окно
+        return;
     }
 
     _checkerSize = _appState.checkerSize;
@@ -86,23 +86,23 @@ void Canvas::SetCustomCursor(bool isCustom)
 {
     if (isCustom == _showCustomCursor)
     {
-        return; // Ничего не меняем, если состояние то же самое
+        return; // We don't change anything if the condition is the same.
     }
 
     _showCustomCursor = isCustom;
 
     if (!isCustom)
     {
-        // Скрываем курсор: стираем последнюю позицию
+        // Hiding the cursor: erasing the last position
         if (_mousePosScreen.x >= 0 && _mousePosScreen.y >= 0)
         {
             int cursorSize = _brushSize * _checkerSize;
-            int padding = 2; // Запас для рамки
+            int padding = 2; // Frame reserve
 
             RECT eraseRect = {_mousePosScreen.x - cursorSize / 2 - padding, _mousePosScreen.y - cursorSize / 2 - padding,
                               _mousePosScreen.x + cursorSize / 2 + padding, _mousePosScreen.y + cursorSize / 2 + padding};
 
-            // FALSE = не стирать фон, перерисуем через двойной буфер
+            // FALSE = Don't erase the background, redraw it using a double buffer
             InvalidateRect(_hCanvas, &eraseRect, FALSE);
         }
     }
@@ -119,11 +119,11 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
     int mx = GET_X_LPARAM(lParam);
     int my = GET_Y_LPARAM(lParam);
 
-    // Экран → логические координаты (центр кисти)
+    // Screen -> Logical Coordinates (Brush Center)
     int centerX = mx / _checkerSize;
     int centerY = my / _checkerSize;
 
-    // Определяем цвет
+    // Determine the color
     uint32_t color = 0x00000000;
     if (_appState.currentTool == ToolType::Brush)
     {
@@ -135,10 +135,10 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
         color = 0x00000000;
     }
 
-    // Рисуем квадрат _brushSize × _brushSize вокруг центра
-    int radius = _brushSize / 2; // Для 1→0, 3→1, 5→2
+    // Draw a square _brushSize × _brushSize around the center
+    int radius = _brushSize / 2; // Для 1->0, 3->1, 5->2
 
-    // Собираем область для перерисовки (оптимизация)
+    // Collecting the area to be redrawed (optimization)
     RECT dirtyRect = {(centerX - radius) * _checkerSize, (centerY - radius) * _checkerSize, (centerX + radius + 1) * _checkerSize,
                       (centerY + radius + 1) * _checkerSize};
 
@@ -149,7 +149,7 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
             int lx = centerX + dx;
             int ly = centerY + dy;
 
-            // Проверка границ холста
+            // Checking canvas boundaries
             if (lx >= 0 && lx < frame.width && ly >= 0 && ly < frame.height)
             {
                 frame.SetPixel(lx, ly, color);
@@ -157,7 +157,7 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
         }
     }
 
-    // Перерисовываем всю область кисти
+    // Redraw the entire brush area
     InvalidateRect(_hCanvas, &dirtyRect, FALSE);
 
     _appState.isDirty = true;
@@ -166,14 +166,13 @@ void Canvas::HandleDraw(WPARAM wParam, LPARAM lParam)
 bool Canvas::ZoomIn()
 {
     if (_zoom < 3)
-    { // Максимальный зум
+    { // Maximum zoom
         _zoom++;
 
         _canvasWidth = MIN_CANVAS_SIZE * _zoom;
         _canvasHeight = MIN_CANVAS_SIZE * _zoom;
         _checkerSize = _appState.checkerSize * _zoom;
 
-        // Здесь можно добавить логику центрирования при зуме, если нужно
         ApplyZoom();
 
         return true;
@@ -185,7 +184,7 @@ bool Canvas::ZoomIn()
 bool Canvas::ZoomOut()
 {
     if (_zoom > 1)
-    { // Минимальный зум
+    { // Minimum zoom
         _zoom--;
 
         _canvasWidth = MIN_CANVAS_SIZE * _zoom;
@@ -202,7 +201,7 @@ bool Canvas::ZoomOut()
 
 void Canvas::ApplyZoom()
 {
-    // Рассчитываем новый физический размер
+    // Calculating the new physical size
 
     _canvasWidth = MIN_CANVAS_SIZE * _zoom;
     _canvasHeight = MIN_CANVAS_SIZE * _zoom;
@@ -229,7 +228,7 @@ void Canvas::IncreaseBrushSize()
 
     if (_brushSize < MAX_BRUSH_SIZE)
     {
-        int oldSize = _brushSize; // Запоминаем старый размер
+        int oldSize = _brushSize; // Remember the old size
         _brushSize += 2;
         InvalidateCursorArea(oldSize);
     }
@@ -241,7 +240,7 @@ void Canvas::DecreaseBrushSize()
 
     if (_brushSize > MIN_BRUSH_SIZE)
     {
-        int oldSize = _brushSize; // Запоминаем старый размер
+        int oldSize = _brushSize; // Remember the old size
         _brushSize -= 2;
         InvalidateCursorArea(oldSize);
     }
@@ -251,21 +250,19 @@ void Canvas::InvalidateCursorArea(int oldSize) const
 {
     if (!_showCustomCursor || _mousePosScreen.x < 0)
     {
-        return; // Если курсор скрыт или не в холсте, не перерисовываем
+        return; // If the cursor is hidden or not in the canvas, do not redraw
     }
 
-    // Находим максимальный размер, чтобы стереть "хвост" от старого курсора
-    // и нарисовать новый.
+    // We find the maximum size to erase the "tail" of the old cursor and draw a new one.
     int maxDim = (oldSize > _brushSize) ? oldSize : _brushSize;
 
     int cursorSize = maxDim * _checkerSize;
     int padding = 2; // Запас для рамки
 
-    // Вычисляем область, которая покрывает и старый, и новый курсор
+    // We calculate the area that covers both the old and new cursors
     RECT dirtyRect = {_mousePosScreen.x - cursorSize / 2 - padding, _mousePosScreen.y - cursorSize / 2 - padding, _mousePosScreen.x + cursorSize / 2 + padding,
                       _mousePosScreen.y + cursorSize / 2 + padding};
 
-    // FALSE = не стирать фон (предотвращаем мерцание)
     InvalidateRect(_hCanvas, &dirtyRect, FALSE);
 }
 
@@ -301,11 +298,9 @@ void Canvas::ShiftCursorPos(int dx, int dy)
     if (!_showCustomCursor)
         return;
 
-    // Сдвигаем сохранённые клиентские координаты
     _mousePosScreen.x += dx;
     _mousePosScreen.y += dy;
 
-    // Перерисовываем только область курсора (без стирания фона)
     InvalidateCursorArea();
 }
 
@@ -321,7 +316,7 @@ POINT Canvas::GetMousePosScreen() const
 
 void Canvas::OnToolChanged(ToolType newTool)
 {
-    // Если переключились с Select на другой инструмент → сбрасываем выделение
+
     if (newTool != ToolType::Select && newTool != ToolType::Fill && newTool != ToolType::Move && newTool != ToolType::RotateR && newTool != ToolType::RotateL &&
         newTool != ToolType::MirrorV && newTool != ToolType::MirrorH && _appState.selection.isActive)
     {
@@ -452,15 +447,14 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         {
             SetFocus(pCanvas->_hCanvas);
 
-            // Конвертация: экран → логические координаты кадра
             int logX = x / pCanvas->_checkerSize;
             int logY = y / pCanvas->_checkerSize;
 
-            // Сохраняем точку старта отдельно
+            // We save the starting point separately
             pCanvas->_appState.selection.startX = logX;
             pCanvas->_appState.selection.startY = logY;
 
-            // Начинаем новое выделение
+            // Let's start a new selection
             pCanvas->_appState.selection.x = logX;
             pCanvas->_appState.selection.y = logY;
             pCanvas->_appState.selection.w = 0;
@@ -468,14 +462,13 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             pCanvas->_appState.selection.isDragging = true;
             pCanvas->_appState.selection.isActive = true;
 
-            // Перерисовываем для показа "призрачного" прямоугольника
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
             return 0;
         }
 
         else if (pCanvas->_appState.currentTool == ToolType::Fill)
         {
-            // 1. Конвертация: экран → логические координаты
+
             int logX = x / pCanvas->_checkerSize;
             int logY = y / pCanvas->_checkerSize;
 
@@ -487,15 +480,14 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
                 pCanvas->_appState.history.Commit(pCanvas->_appState.frames, pCanvas->_appState.selection.x, pCanvas->_appState.selection.y,
                                                   pCanvas->_appState.selection.w, pCanvas->_appState.selection.h, pCanvas->_appState.selection.isActive);
 
-                // Получаем цвет из палитры (преобразуем COLORREF → 0xAARRGGBB)
+                // We get a color from the palette (convert COLORREF -> 0xAARRGGBB)
                 COLORREF palColor = pCanvas->_appState.palette.color;
                 uint32_t fillColor = 0xFF000000 | (static_cast<uint32_t>(GetRValue(palColor)) << 16) | (static_cast<uint32_t>(GetGValue(palColor)) << 8) |
                                      static_cast<uint32_t>(GetBValue(palColor));
 
-                // Запускаем заливку (с учётом выделения)
+                // Let's start the filling
                 FillService::PerformFill(frame, pCanvas->_appState.selection, logX, logY, fillColor);
 
-                // Помечаем проект как изменённый и перерисовываем
                 pCanvas->_appState.isDirty = true;
 
                 InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
@@ -527,71 +519,70 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
 
-        // Экран → логические координаты
         int logX = x / pCanvas->_checkerSize;
         int logY = y / pCanvas->_checkerSize;
 
         // Для HandleDraw
         pCanvas->_mousePos = {logX, logY};
 
-        // Драг выделения для Select
+        // Drag selection for Select
         if (pCanvas->_appState.currentTool == ToolType::Select && pCanvas->_appState.selection.isDragging)
         {
-            // Читаем фиксированный старт
+            // Reading the fixed start
             int startX = pCanvas->_appState.selection.startX;
             int startY = pCanvas->_appState.selection.startY;
 
-            // Вычисляем границы
+            // Calculating the boundaries
             int left = min(startX, logX);
             int top = min(startY, logY);
             int right = max(startX, logX);
             int bottom = max(startY, logY);
 
-            // Обновляем x,y,w,h для отрисовки
+            // Update x,y,w,h for rendering
             pCanvas->_appState.selection.x = left;
             pCanvas->_appState.selection.y = top;
             pCanvas->_appState.selection.w = right - left + 1;
             pCanvas->_appState.selection.h = bottom - top + 1;
 
-            // Перерисовываем только область выделения (оптимизация)
+            // Redraw only the selection area (optimization)
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
             return 0;
         }
 
         if ((wParam & MK_LBUTTON) && (pCanvas->_appState.currentTool == ToolType::Brush || pCanvas->_appState.currentTool == ToolType::Eraser))
-        { // Рисуем только если зажата ЛКМ
+        { // Draw only if the LMB is pressed
             pCanvas->HandleDraw(wParam, lParam);
         }
 
-        // Обновление курсора
+        // Cursor update
         if (pCanvas->_showCustomCursor)
         {
             int cursorSize = pCanvas->_brushSize * pCanvas->_checkerSize;
-            int padding = 2; // Запас для 1px рамки и избежания артефактов на краях
+            int padding = 2;
 
-            // Область старого курсора (до обновления позиции)
+            // Old cursor area (before position update)
             RECT oldRect = {pCanvas->_mousePosScreen.x - cursorSize / 2 - padding, pCanvas->_mousePosScreen.y - cursorSize / 2 - padding,
                             pCanvas->_mousePosScreen.x + cursorSize / 2 + padding, pCanvas->_mousePosScreen.y + cursorSize / 2 + padding};
 
-            // Обновляем позицию
+            // Updating the position
             pCanvas->_mousePosScreen = {x, y};
 
-            // Область нового курсора
+            // New cursor area
             RECT newRect = {x - cursorSize / 2 - padding, y - cursorSize / 2 - padding, x + cursorSize / 2 + padding, y + cursorSize / 2 + padding};
 
-            // Объединяем области
+            // Combining areas
             RECT dirtyRect;
             UnionRect(&dirtyRect, &oldRect, &newRect);
 
             InvalidateRect(pCanvas->_hCanvas, &dirtyRect, FALSE);
         }
 
-        // Логика перетаскивания для Move
+        // Drag logic for Move
         if (pCanvas->_appState.currentTool == ToolType::Move && pCanvas->_appState.moveDrag.isDragging)
         {
             // Move drag (move mouse left)
             pCanvas->_moveDrag->ButtonMove(pCanvas->_appState, pCanvas->_hCanvas, x, y, pCanvas->_checkerSize);
-            
+
             return 0;
         }
 
@@ -603,19 +594,19 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
 
-        // Завершение выделения для Select
+        // Completing the selection for Select
         if (pCanvas->_appState.currentTool == ToolType::Select && pCanvas->_appState.selection.isDragging)
         {
             pCanvas->_appState.selection.isDragging = false;
 
-            // Нормализуем прямоугольник (на случай драга влево/вверх)
+            // Normalize the rectangle (in case of dragging to the left/up)
             pCanvas->_appState.selection.Normalize();
 
-            // Очистка startX/startY
+            // Cleaning startX/startY
             pCanvas->_appState.selection.startX = 0;
             pCanvas->_appState.selection.startY = 0;
 
-            // Перерисовываем для финального отображения
+            // Redrawing for final display
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
             return 0;
         }
@@ -634,11 +625,11 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
     }
 
     case WM_SETCURSOR: {
-        // Если курсор над клиентской областью — скрываем системный
+        // If the cursor is over the client area, hide the system
         if (LOWORD(lParam) == HTCLIENT)
         {
 
-            // Список инструментов, использующих системные курсоры
+            // List of tools that use system cursors
             bool useSystemCursor = (pCanvas->_appState.currentTool == ToolType::Select || pCanvas->_appState.currentTool == ToolType::Fill ||
                                     pCanvas->_appState.currentTool == ToolType::Move || pCanvas->_appState.currentTool == ToolType::RotateR ||
                                     pCanvas->_appState.currentTool == ToolType::RotateL);
@@ -654,7 +645,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
                 else if (pCanvas->_appState.currentTool == ToolType::RotateR || pCanvas->_appState.currentTool == ToolType::RotateL ||
                          pCanvas->_appState.currentTool == ToolType::MirrorV || pCanvas->_appState.currentTool == ToolType::MirrorH)
                 {
-                    hCur = LoadCursor(nullptr, IDC_ARROW); // Курсор для Rotate и Mirror
+                    hCur = LoadCursor(nullptr, IDC_ARROW); // Cursor for Rotate and Mirror
                 }
 
                 else
@@ -681,32 +672,32 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-        // Получаем размеры клиентской области
+        // Getting the dimensions of the client area
         RECT clientRect;
         GetClientRect(hWnd, &clientRect);
         int width = clientRect.right - clientRect.left;
         int height = clientRect.bottom - clientRect.top;
 
-        // Создаём DC и bitmap в памяти
+        // Create a DC and bitmap in memory
         HDC hdcMem = CreateCompatibleDC(hdc);
         HBITMAP hMemBmp = CreateCompatibleBitmap(hdc, width, height);
         HGDIOBJ oldBmp = SelectObject(hdcMem, hMemBmp);
 
-        // Очищаем фоном окна
+        // Clearing the window background
         HBRUSH hBrush = GetSysColorBrush(COLOR_3DFACE);
         FillRect(hdcMem, &clientRect, hBrush);
 
-        // Рисуем шахматный фон
+        // Drawing a checkerboard background
         pCanvas->_chessBackground->Render(ps, hdcMem, pCanvas->_checkerSize);
 
-        // Onion Skinning (предыдущие кадры)
+        // Onion Skinning (previous frames)
         if (pCanvas->_appState.onionSkinEnabled && !pCanvas->_appState.frames.empty())
         {
             int currentIndex = pCanvas->_appState.currentFrameIndex;
             int total = static_cast<int>(pCanvas->_appState.frames.size());
             float baseOp = pCanvas->_appState.onionSkinOpacity;
 
-            // Предыдущие кадры (затухание прозрачности)
+            // Previous frames (transparency fading)
             for (int i = 1; i <= pCanvas->_appState.onionSkinPrevFrames; ++i)
             {
                 int index = currentIndex - i;
@@ -719,7 +710,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
                 }
             }
 
-            // Следующие кадры (фиксированная прозрачность)
+            // Next frames (fixed transparency)
             for (int i = 1; i <= pCanvas->_appState.onionSkinNextFrames; ++i)
             {
                 int index = currentIndex + i;
@@ -732,17 +723,17 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             }
         }
 
-        // Рисуем кадр с прозрачностью
+        // Drawing a frame with transparency
         if (!pCanvas->_appState.frames.empty())
         {
             const Frame &frame = pCanvas->_appState.frames[pCanvas->_appState.currentFrameIndex];
             pCanvas->_frameRenderer->Render(frame, pCanvas->_checkerSize, hdcMem);
 
-            // Рисуем выделение, если идёт перетаскивание
+            // Draw a selection while dragging
             pCanvas->_moveRenderer->Render(frame, pCanvas->_checkerSize, pCanvas->_appState, hdcMem);
         }
 
-        // Рисуем кастомный курсор
+        // Drawing a custom cursor
         if (pCanvas->_showCustomCursor && pCanvas->_mousePos.x >= 0 && pCanvas->_mousePos.y >= 0)
         {
             int cursorSize = pCanvas->_brushSize * pCanvas->_checkerSize;
@@ -752,16 +743,16 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
             pCanvas->_cursorRenderer->Render(cursorSize, cursorX, cursorY, hdcMem);
         }
 
-        //  Рисуем рамку выделения (поверх кадра, под курсором)
+        //  Draw a selection frame (over the frame, under the cursor)
         if (pCanvas->_appState.selection.isActive && (pCanvas->_appState.currentTool == ToolType::Select || pCanvas->_appState.currentTool == ToolType::Fill))
         {
             pCanvas->_selectionRenderer->Render(hdcMem, pCanvas->_appState.selection, pCanvas->_checkerSize);
         }
 
-        // 5. Копируем на экран
+        // Copy to screen
         BitBlt(hdc, 0, 0, width, height, hdcMem, 0, 0, SRCCOPY);
 
-        // 6. Очистка
+        // Cleaning
         SelectObject(hdcMem, oldBmp);
         DeleteObject(hMemBmp);
         DeleteDC(hdcMem);
@@ -772,7 +763,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
     case WM_KEYDOWN: {
 
-        // Проверяем зажат ли Ctrl
+        // Check if Ctrl is pressed
         if (GetKeyState(VK_CONTROL) & 0x8000)
         {
             switch (wParam)
@@ -796,11 +787,11 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
         if (wParam == VK_ESCAPE && pCanvas->_appState.selection.isActive)
         {
-            // Сбрасываем выделение
+            // Reset the selection
             pCanvas->_appState.selection.Clear();
             pCanvas->_appState.clipboard.Clear(); // Freeing up allocated RAM
 
-            // Перерисовываем область, где была рамка
+            // Redraw the area where the frame was
             InvalidateRect(pCanvas->_hCanvas, nullptr, FALSE);
             return 0;
         }

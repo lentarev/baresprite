@@ -5,16 +5,14 @@ namespace baresprite
 
 struct SelectionState
 {
-    bool isActive = false;   // Выделение активно (показываем рамку)
-    bool isDragging = false; // Пользователь тянет прямоугольник
+    bool isActive = false;
+    bool isDragging = false;
 
-    // Координаты в логических пикселях кадра
-    int x = 0, y = 0; // Левый верхний угол
-    int w = 0, h = 0; // Ширина и высота (могут быть отрицательными при драге)
+    int x = 0, y = 0;
+    int w = 0, h = 0;
 
     float rotationAngle = 0.0f;
 
-    // Сброс выделения
     void Clear()
     {
         isActive = false;
@@ -23,10 +21,9 @@ struct SelectionState
         rotationAngle = 0.0f;
     }
 
-    // Для драга: фиксируем точку старта
-    int startX, startY; 
+    // For drag: fix the starting point
+    int startX, startY;
 
-    // Нормализация: гарантирует положительные w/h и корректные x/y
     void Normalize()
     {
         if (w < 0)
@@ -43,7 +40,7 @@ struct SelectionState
 
         if (w == 0)
         {
-            w = 1; // Минимальный размер 1x1
+            w = 1;
         }
 
         if (h == 0)

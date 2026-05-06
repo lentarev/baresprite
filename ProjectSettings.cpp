@@ -44,13 +44,13 @@ bool ProjectSettings::Load()
     {
         line = Trim(line);
 
-        // Пропускаем пустые строки и комментарии
+        // Skipping blank lines and comments
         if (line.empty() || line[0] == L';' || line[0] == L'#')
         {
             continue;
         }
 
-        // Определяем секцию
+        // Defining a section
         if (line[0] == L'[')
         {
             size_t end = line.find(L']');
@@ -61,11 +61,11 @@ bool ProjectSettings::Load()
             continue;
         }
 
-        // Парсим ключ=значение
+        // Parse key=value
         size_t eqPos = line.find(L'=');
         if (eqPos == std::wstring::npos)
         {
-            continue; // Пропускаем битые строки
+            continue; // Skipping broken lines
         }
 
         std::wstring key = Trim(line.substr(0, eqPos));
@@ -73,7 +73,7 @@ bool ProjectSettings::Load()
 
         try
         {
-            // === СЕКЦИЯ [PROJECT] ===
+            // === SECTION [PROJECT] ===
             if (currentSection == L"PROJECT")
             {
                 if (key == L"name")
@@ -93,30 +93,30 @@ bool ProjectSettings::Load()
                     _appState.currentFilterTag = value;
                 }
             }
-            // === СЕКЦИЯ [PALETTE] ===
+            // === SECTION [PALETTE] ===
             else if (currentSection == L"PALETTE")
             {
                 if (key.find(L"Color") == 0)
                 {
-                    // Извлекаем индекс из "Color0", "Color1", ...
+                    // Extract the index fromз "Color0", "Color1", ...
                     int idx = std::stoi(key.substr(5));
 
                     if (idx >= 0 && idx < 25)
                     {
-                        // Парсим HEX (RRGGBB) → unsigned long
+                        // Parse HEX (RRGGBB) -> unsigned long
                         unsigned long hex = std::stoul(value, nullptr, 16);
 
-                        // Извлекаем компоненты: 0xRRGGBB → R, G, B
+                        // Extracting the components: 0xRRGGBB → R, G, B
                         unsigned char r = (hex >> 16) & 0xFF;
                         unsigned char g = (hex >> 8) & 0xFF;
                         unsigned char b = hex & 0xFF;
 
-                        // COLORREF хранится как 0x00BBGGRR → используем макрос RGB()
+                        // COLORREF is stored as 0x00BBGGRR → use the RGB() macro
                         _appState.palette.colors[idx] = RGB(r, g, b);
                     }
                 }
             }
-            // === СЕКЦИЯ [PALETTE_LAST_INDEX] ===
+            // === SECTION [PALETTE_LAST_INDEX] ===
             else if (currentSection == L"PALETTE_LAST_INDEX")
             {
                 if (key == L"SelectedColorIndex")
@@ -129,7 +129,7 @@ bool ProjectSettings::Load()
                     }
                 }
             }
-            // === СЕКЦИЯ [ONION_SKIN] ===
+            // === SECTION [ONION_SKIN] ===
             else if (currentSection == L"ONION_SKIN")
             {
                 if (key == L"onionSkinEnabled")
@@ -160,7 +160,7 @@ bool ProjectSettings::Load()
                 }
             }
 
-            // === СЕКЦИЯ [ANIMATION] ===
+            // === SECTION [ANIMATION] ===
             else if (currentSection == L"ANIMATION")
             {
                 if (key == L"playbackFPS")
@@ -169,7 +169,7 @@ bool ProjectSettings::Load()
                 }
             }
 
-            // === СЕКЦИЯ [TAGS] ===
+            // === SECTION [TAGS] ===
             else if (currentSection == L"TAGS")
             {
                 if (key.find(L"Tag") == 0) // Tag0, Tag1, ...
@@ -178,7 +178,7 @@ bool ProjectSettings::Load()
                 }
             }
 
-            // === СЕКЦИЯ [FRAMES] ===
+            // === SECTION [FRAMES] ===
             else if (currentSection == L"FRAMES")
             {
                 if (key == L"Count")
@@ -189,13 +189,13 @@ bool ProjectSettings::Load()
                     _appState.currentFrameIndex = 0;
                 }
             }
-            // === СЕКЦИИ [FRAME_0], [FRAME_1], ... ===
+            // === SECTION [FRAME_0], [FRAME_1], ... ===
             else if (currentSection.find(L"FRAME_") == 0)
             {
-                // Извлекаем индекс кадра из "FRAME_0"
+                // Extract the frame index from "FRAME_0"
                 int frameIdx = std::stoi(currentSection.substr(6));
 
-                // Гарантируем, что вектор достаточно большой
+                // We guarantee that the vector is large enough
                 if (frameIdx >= static_cast<int>(_appState.frames.size()))
                 {
                     _appState.frames.resize(frameIdx + 1);
@@ -210,7 +210,7 @@ bool ProjectSettings::Load()
                 else if (key == L"height")
                 {
                     frame.height = std::stoi(value);
-                    // Перевыделяем буфер пикселей при изменении размера
+                    // Reallocate the pixel buffer when resizing
                     if (frame.pixels || (frame.width * frame.height > 0))
                     {
                         frame.pixels = std::make_unique<uint32_t[]>(static_cast<size_t>(frame.width) * frame.height);
@@ -226,7 +226,7 @@ bool ProjectSettings::Load()
                 }
                 else if (key == L"tag")
                 {
-                    // Декодируем \n и \r обратно
+                    // Decoding \n and \r back
                     std::wstring tag = value;
                     size_t pos = 0;
                     while ((pos = tag.find(L"\\n", pos)) != std::wstring::npos)
@@ -244,10 +244,10 @@ bool ProjectSettings::Load()
                 }
                 else if (key == L"pixels" && frame.pixels)
                 {
-                    // Парсим HEX-строку обратно в пиксели
+                    // Parse the HEX string back into pixels
                     size_t pixelCount = static_cast<size_t>(frame.width) * frame.height;
                     if (value.length() >= pixelCount * 8)
-                    { // 8 символов на пиксель
+                    { // 8 characters per pixel
                         for (size_t p = 0; p < pixelCount; ++p)
                         {
                             std::wstring hexStr = value.substr(p * 8, 8);
@@ -260,7 +260,7 @@ bool ProjectSettings::Load()
         catch (...)
         {
 
-            // Можно добавить логирование для отладки
+            // Logging can be added for debugging
 
             return false;
         }
@@ -284,7 +284,7 @@ void ProjectSettings::Save()
     std::wstring fullPath = _appState.projectPath + L"\\" + _configProjectFileName;
 
     std::wofstream file(fullPath);
-    file.imbue(std::locale("")); // Системная локаль
+    file.imbue(std::locale("")); // System locale
 
     if (!file.is_open())
     {
@@ -292,7 +292,7 @@ void ProjectSettings::Save()
         return;
     }
 
-    // Section [PROJECT]
+    // SECTION [PROJECT]
     file << L"[PROJECT]\n";
     file << L"name=" << _appState.name << L"\n";
     file << L"imageSize=" << _appState.imageSize << L"\n";
@@ -301,7 +301,7 @@ void ProjectSettings::Save()
 
     if (!_appState.palette.colors.empty())
     {
-        // Section [PALETTE]
+        // SECTION [PALETTE]
         file << L"\n[PALETTE]\n";
         for (int i = 0; i < 25; ++i)
         {
@@ -322,29 +322,29 @@ void ProjectSettings::Save()
             }
         }
 
-        // Секция [PALETTE_LAST_INDEX]
+        // SECTION [PALETTE_LAST_INDEX]
         file << L"\n[PALETTE_LAST_INDEX]\n";
         wchar_t idxStr[8];
         swprintf_s(idxStr, L"%d", _appState.palette.index);
         file << L"SelectedColorIndex=" << idxStr << L"\n";
     }
 
-    // Section [ONION_SKIN]
+    // SECTION [ONION_SKIN]
     file << L"\n[ONION_SKIN]\n";
     file << L"onionSkinEnabled=" << _appState.onionSkinEnabled << L"\n";
     file << L"onionSkinPrevFrames=" << _appState.onionSkinPrevFrames << L"\n";
     file << L"onionSkinNextFrames=" << _appState.onionSkinNextFrames << L"\n";
     file << L"onionSkinOpacity=" << static_cast<int>(_appState.onionSkinOpacity * 100) << L"\n";
 
-    // Section [ANIMATION]
+    // SECTION [ANIMATION]
     file << L"\n[ANIMATION]\n";
     file << L"playbackFPS=" << _appState.playbackFPS << L"\n";
 
-    // === СЕКЦИЯ [TAGS] ===
+    // === SECTION [TAGS] ===
     if (!_appState.availableTags.empty())
     {
         file << L"\n[TAGS]\n";
-        file << L"Count=" << _appState.availableTags.size() << L"\n"; // Опционально, для надёжности
+        file << L"Count=" << _appState.availableTags.size() << L"\n";
 
         for (size_t i = 0; i < _appState.availableTags.size(); ++i)
         {
@@ -364,7 +364,7 @@ void ProjectSettings::Save()
         file << L"duration=" << frame.duration << L"\n";
         file << L"isVisible=" << (frame.isVisible ? 1 : 0) << L"\n";
 
-        // Экранируем теги (заменяем \n и \r на \\n и \\r)
+        // Escape tags (replace \n and \r with \\n and \\r)
         std::wstring safeTag = frame.tag;
         size_t pos = 0;
         while ((pos = safeTag.find(L'\n', pos)) != std::wstring::npos)
@@ -380,7 +380,7 @@ void ProjectSettings::Save()
         }
         file << L"tag=" << safeTag << L"\n";
 
-        // Пиксели в HEX (формат 0xAARRGGBB → 8 символов на пиксель)
+        // Pixels in HEX (format 0xAARRGGBB → 8 characters per pixel)
         file << L"pixels=";
         size_t pixelCount = static_cast<size_t>(frame.width) * frame.height;
         for (size_t p = 0; p < pixelCount; ++p)

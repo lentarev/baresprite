@@ -1,6 +1,5 @@
 #include "FrameRenderer.h"
 
-
 namespace baresprite
 {
 FrameRenderer::FrameRenderer()
@@ -8,7 +7,6 @@ FrameRenderer::FrameRenderer()
 }
 
 FrameRenderer::~FrameRenderer() = default;
-
 
 void FrameRenderer::Render(const Frame &frame, int _checkerSize, HDC hdcMem)
 {
@@ -25,25 +23,25 @@ void FrameRenderer::Render(const Frame &frame, int _checkerSize, HDC hdcMem)
     int screenW = logicalW * _checkerSize;
     int screenH = logicalH * _checkerSize;
 
-    // Создаём временный DC для кадра
+    // Create a temporary DC for the frame
     HDC hdcFrame = CreateCompatibleDC(hdcMem);
     HBITMAP hFrameBmp = CreateCompatibleBitmap(hdcMem, logicalW, logicalH);
     HGDIOBJ oldFrameBmp = SelectObject(hdcFrame, hFrameBmp);
 
-    // Рисуем кадр во временный DC
+    // Draw a frame into a temporary DC
     SetDIBitsToDevice(hdcFrame, 0, 0, logicalW, logicalH, 0, 0, 0, logicalH, frame.pixels.get(), &bmi, DIB_RGB_COLORS);
 
-    // Настраиваем альфа-смешивание
+    // Setting up alpha blending
     BLENDFUNCTION blend = {};
     blend.BlendOp = AC_SRC_OVER;
     blend.BlendFlags = 0;
-    blend.SourceConstantAlpha = 255;  // Полная непрозрачность
-    blend.AlphaFormat = AC_SRC_ALPHA; // Используем альфа-канал из пикселей
+    blend.SourceConstantAlpha = 255;  // Complete opacity
+    blend.AlphaFormat = AC_SRC_ALPHA; // Using an alpha channel from pixels
 
-    // Растягиваем с альфа-смешиванием (прозрачные пиксели не перекроют шахматку)
+    // Stretch with alpha blending (transparent pixels won't overlap the checkerboard)
     AlphaBlend(hdcMem, 0, 0, screenW, screenH, hdcFrame, 0, 0, logicalW, logicalH, blend);
 
-    // Очистка временного DC
+    // Clearing the temporary DC
     SelectObject(hdcFrame, oldFrameBmp);
     DeleteObject(hFrameBmp);
     DeleteDC(hdcFrame);

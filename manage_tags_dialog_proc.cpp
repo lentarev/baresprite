@@ -24,7 +24,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 return TRUE;
             }
 
-            // Инициализируем режим: редактирование выключено
+            // Initializing the mode: editing disabled
             SetEditMode(hDlg, false);
 
             // Centered
@@ -55,7 +55,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
             if (hList)
             {
-                // Сортируем
+                // Sorting
                 std::sort(appState->availableTags.begin(), appState->availableTags.end(), [](const std::wstring &a, const std::wstring &b) {
                     if (a == L"None" && b != L"None")
                         return true;
@@ -64,16 +64,16 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     return a < b;
                 });
 
-                // Очищаем список
+                // Clearing the list
                 SendMessageW(hList, LB_RESETCONTENT, 0, 0);
 
-                // Добавляем все теги из AppState (уже отсортированного!)
+                // Add all tags from AppState (already sorted)
                 for (const auto &tag : appState->availableTags)
                 {
                     SendMessageW(hList, LB_ADDSTRING, 0, (LPARAM)tag.c_str());
                 }
 
-                // Выделяем первый элемент
+                // Select the first element
                 if (!appState->availableTags.empty())
                 {
                     SendMessageW(hList, LB_SETCURSEL, 0, 0);
@@ -99,20 +99,20 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
             return TRUE;
         }
 
-        // Обработка изменения выбора в списке
+        // Handling a change in selection in a list
         if (wmId == IDC_MANAGE_TAGS_LIST && wmEvent == LBN_SELCHANGE)
         {
             HWND hList = GetDlgItem(hDlg, IDC_MANAGE_TAGS_LIST);
 
-            // Если был активен режим редактирования — прерываем его
+            // If the editing mode was active, interrupt it.
             if (IsEditMode(hDlg))
             {
                 SetEditMode(hDlg, false);
                 SetWindowTextW(GetDlgItem(hDlg, IDC_MANAGE_TAGS_EDIT), L"");
-                // Событие EN_CHANGE сработает автоматически и заблокирует кнопку Add
+                // The EN_CHANGE event will fire automatically and disable the Add button.
             }
 
-            // Обновляем кнопку под новый выбранный элемент
+            // Update the button to reflect the newly selected element.
             UpdateRenameButtonState(hDlg, hList);
             return TRUE;
         }
@@ -142,7 +142,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 return TRUE;
             }
 
-            // Валидация: нет ли дубликата? (регистрозависимое сравнение)
+            // Validation: Is there a duplicate? (case-sensitive comparison)
             for (const auto &existingTag : appState->availableTags)
             {
                 if (existingTag == newTag)
@@ -166,18 +166,18 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 return a < b;
             });
 
-            // Обновляем ListBox
+            // Adding a tag to AppState
             SendMessageW(hList, LB_RESETCONTENT, 0, 0);
             for (const auto &tag : appState->availableTags)
             {
                 SendMessageW(hList, LB_ADDSTRING, 0, (LPARAM)tag.c_str());
             }
 
-            // Очищаем поле и блокируем кнопку
+            // Clear the field and lock the button
             SetWindowTextW(hEdit, L"");
             EnableWindow(GetDlgItem(hDlg, IDC_MANAGE_TAGS_BTN_ADD), FALSE);
 
-            // Помечаем проект как изменённый
+            // Mark the project as modified
             appState->isDirty = true;
 
             return TRUE;
@@ -192,7 +192,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
             if (!IsEditMode(hDlg))
             {
-                // === РЕЖИМ: НАЖАЛИ "EDIT" ===
+                // EDIT
                 int sel = (int)SendMessageW(hList, LB_GETCURSEL, 0, 0);
                 if (sel == LB_ERR)
                 {
@@ -200,25 +200,24 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     return TRUE;
                 }
 
-                // Загружаем тег в Edit
+                // Loading the tag into Edit
                 std::wstring tag = appState->availableTags[sel];
                 SetWindowTextW(hEdit, tag.c_str());
 
-                // Выделяем текст и ставим фокус
+                // Select the text and set the focus
                 SendMessageW(hEdit, EM_SETSEL, 0, -1);
                 SetFocus(hEdit);
 
-                // Переключаем в режим редактирования
+                // Switch to edit mode
                 SetEditMode(hDlg, true);
-                UpdateRenameButtonState(hDlg, hList); // Кнопка станет "Rename"
+                UpdateRenameButtonState(hDlg, hList); // The button will become "Rename"
 
                 return TRUE;
             }
             else
             {
-                // === РЕЖИМ: НАЖАЛИ "RENAME" (СОХРАНЕНИЕ) ===
+                // Mode: press rename (Save)
 
-                // Получаем новый текст
                 wchar_t buf[256] = {};
                 GetWindowTextW(hEdit, buf, 256);
                 std::wstring newTag(buf);
@@ -229,14 +228,13 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     return TRUE;
                 }
 
-                // Получаем старый тег
                 int sel = (int)SendMessageW(hList, LB_GETCURSEL, 0, 0);
                 if (sel == LB_ERR)
                     return TRUE;
 
                 std::wstring oldTag = appState->availableTags[sel];
 
-                // Если не изменился — просто выходим из режима
+                // If it hasn't changed, just exit the mode.
                 if (oldTag == newTag)
                 {
                     SetEditMode(hDlg, false);
@@ -246,7 +244,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     return TRUE;
                 }
 
-                // Проверка на дубликат
+                // Duplicate check
                 for (size_t i = 0; i < appState->availableTags.size(); ++i)
                 {
                     if (i != (size_t)sel && appState->availableTags[i] == newTag)
@@ -257,19 +255,19 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     }
                 }
 
-                //  Обновляем тег в кадрах
+                //  Updating the tag in frames
                 for (auto &frame : appState->frames)
                 {
                     if (frame.tag == oldTag)
                         frame.tag = newTag;
                 }
 
-                // Обновляем в списке и фильтре
+                // Update in the list and filter
                 appState->availableTags[sel] = newTag;
                 if (appState->currentFilterTag == oldTag)
                     appState->currentFilterTag = newTag;
 
-                // Сортируем
+                // Sorting
                 std::sort(appState->availableTags.begin(), appState->availableTags.end(), [](const std::wstring &a, const std::wstring &b) {
                     if (a == L"None" && b != L"None")
                         return true;
@@ -278,7 +276,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     return a < b;
                 });
 
-                // Находим новый индекс после сортировки
+                // Finding a new index after sorting
                 int newIndex = 0;
                 for (size_t i = 0; i < appState->availableTags.size(); ++i)
                 {
@@ -289,17 +287,17 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     }
                 }
 
-                // Обновляем ListBox
+                // Updating the ListBox
                 SendMessageW(hList, LB_RESETCONTENT, 0, 0);
                 for (const auto &tag : appState->availableTags)
                     SendMessageW(hList, LB_ADDSTRING, 0, (LPARAM)tag.c_str());
                 SendMessageW(hList, LB_SETCURSEL, newIndex, 0);
 
-                // Сброс режима
+                // Reset mode
                 SetEditMode(hDlg, false);
                 SetWindowTextW(hEdit, L"");
                 EnableWindow(GetDlgItem(hDlg, IDC_MANAGE_TAGS_BTN_ADD), FALSE);
-                UpdateRenameButtonState(hDlg, hList); // Кнопка вернётся в "Edit"
+                UpdateRenameButtonState(hDlg, hList); // The button will return to "Edit"
 
                 appState->isDirty = true;
                 return TRUE;
@@ -311,7 +309,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
         {
             HWND hList = GetDlgItem(hDlg, IDC_MANAGE_TAGS_LIST);
 
-            // Получаем индекс выбранного элемента
+            // We get the index of the selected element
             int selectedIndex = (int)SendMessageW(hList, LB_GETCURSEL, 0, 0);
             if (selectedIndex == LB_ERR)
             {
@@ -319,17 +317,17 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 return TRUE;
             }
 
-            // Получаем название тега
+            // Getting the tag name
             std::wstring tagToDelete = appState->availableTags[selectedIndex];
 
-            // Защита системного тега "None"
+            // Protecting the system tag "None"
             if (tagToDelete == L"None")
             {
                 MessageBoxW(hDlg, L"The 'None' tag is system-defined and cannot be removed.", L"Access Denied", MB_ICONWARNING);
                 return TRUE;
             }
 
-            // Проверка: используется ли тег в кадрах?
+            // Check: Is the tag used in frames?
             int usageCount = 0;
             for (const auto &frame : appState->frames)
             {
@@ -341,7 +339,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
             if (usageCount > 0)
             {
-                // Блокируем удаление, если тег используется
+                // Block deletion if the tag is used
                 wchar_t msg[512];
                 swprintf_s(msg,
                            L"Tag '%s' is used in %d frame(s).\n\n"
@@ -352,32 +350,32 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 return TRUE;
             }
 
-            // Подтверждение удаления (защита от случайного клика)
+            // Deletion confirmation (protection against accidental clicks)
             wchar_t confirmMsg[256];
             swprintf_s(confirmMsg, L"Delete tag '%s'?", tagToDelete.c_str());
 
             if (MessageBoxW(hDlg, confirmMsg, L"Confirm Delete", MB_YESNO | MB_ICONQUESTION) != IDYES)
             {
-                return TRUE; // Пользователь отменил
+                return TRUE; // User canceled
             }
 
-            // Удаляем тег из availableTags
+            // Removing a tag from availableTags
             appState->availableTags.erase(appState->availableTags.begin() + selectedIndex);
 
-            // Если этот тег был выбран в фильтре — сбрасываем на "All"
+            // If this tag was selected in the filter, reset it to "All"
             if (appState->currentFilterTag == tagToDelete)
             {
                 appState->currentFilterTag = L"";
             }
 
-            // Обновляем ListBox
+            // Updating the ListBox
             SendMessageW(hList, LB_RESETCONTENT, 0, 0);
             for (const auto &tag : appState->availableTags)
             {
                 SendMessageW(hList, LB_ADDSTRING, 0, (LPARAM)tag.c_str());
             }
 
-            // Сбрасываем выделение и режим редактирования (если был активен)
+            // Reset the selection and editing mode (if active)
             SendMessageW(hList, LB_SETCURSEL, -1, 0);
             if (IsEditMode(hDlg))
             {
@@ -387,7 +385,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
             UpdateRenameButtonState(hDlg, hList);
             UpdateAddButtonState(hDlg);
 
-            // Помечаем проект как изменённый
+            // Mark the project as modified
             appState->isDirty = true;
 
             return TRUE;
@@ -408,7 +406,7 @@ INT_PTR CALLBACK ManageTagsDialogProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
     case WM_CLOSE:
         RemovePropW(hDlg, PROP_EDIT_MODE);
-        EndDialog(hDlg, IDCANCEL); // Закрываем диалог
+        EndDialog(hDlg, IDCANCEL); // Close the dialog
         return TRUE;
     }
 
@@ -431,7 +429,7 @@ void UpdateAddButtonState(HWND hDlg)
 
     if (hEdit && hBtnAdd)
     {
-        // Если текст пустой — блокируем кнопку, иначе — разблокируем
+        // If the text is empty, we block the button, otherwise we unblock it.
         EnableWindow(hBtnAdd, !IsEditEmpty(hEdit));
     }
 }
@@ -446,19 +444,19 @@ void UpdateRenameButtonState(HWND hDlg, HWND hList)
 
     if (IsEditMode(hDlg))
     {
-        // Режим сохранения: кнопка "Rename", активна
+        // Save mode: "Rename" button is active
         SetWindowTextW(hBtn, L"Rename");
         EnableWindow(hBtn, TRUE);
     }
     else if (sel != LB_ERR)
     {
-        // Режим выбора: кнопка "Edit", активна
+        // Selection mode: "Edit" button is active
         SetWindowTextW(hBtn, L"Edit");
         EnableWindow(hBtn, TRUE);
     }
     else
     {
-        // Ничего не выбрано: кнопка "Edit", заблокирована
+        // Nothing selected: Edit button disabled
         SetWindowTextW(hBtn, L"Edit");
         EnableWindow(hBtn, FALSE);
     }

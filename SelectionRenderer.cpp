@@ -21,18 +21,18 @@ void SelectionRenderer::Render(HDC hdc, const SelectionState &selection, int che
 
     static int offset = 0;
 
-    // Обновляем смещение каждые 100мс
+    // We update the offset every 100ms
     if (now - lastTime > 100)
     {
         offset = (offset + 1) % 8;
         lastTime = now;
     }
 
-    // Рисуем 4 стороны
-    DrawDashedLine(hdc, left, top, right, top, offset);       // Верх
-    DrawDashedLine(hdc, right, top, right, bottom, offset);   // Право
-    DrawDashedLine(hdc, right, bottom, left, bottom, offset); // Низ
-    DrawDashedLine(hdc, left, bottom, left, top, offset);     // Лево
+    // Draw 4 sides
+    DrawDashedLine(hdc, left, top, right, top, offset);       // Top
+    DrawDashedLine(hdc, right, top, right, bottom, offset);   // Right
+    DrawDashedLine(hdc, right, bottom, left, bottom, offset); // Bottom
+    DrawDashedLine(hdc, left, bottom, left, top, offset);     // Left
 }
 
 void SelectionRenderer::DrawDashedLine(HDC hdc, int x1, int y1, int x2, int y2, int offset)
@@ -56,7 +56,7 @@ void SelectionRenderer::DrawDashedLine(HDC hdc, int x1, int y1, int x2, int y2, 
             int curX = x1 + i * stepX;
             int curY = y1 + i * stepY;
 
-            // Контрастная обводка (белый + черный)
+            // Contrast outline (white + black)
             int whiteX = curX + (isHorizontal ? 0 : -1);
             int whiteY = curY + (isHorizontal ? -1 : 0);
             SetPixelV(hdc, whiteX, whiteY, RGB(255, 255, 255));

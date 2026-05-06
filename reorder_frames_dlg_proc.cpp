@@ -54,17 +54,17 @@ INT_PTR CALLBACK ReorderFramesDlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
         data->hScrollBar = GetDlgItem(hDlg, IDC_REORDER_SCROLL);
         data->hComboTag = GetDlgItem(hDlg, IDC_REORDER_FRAME_COMBO_TAG_FILTER);
 
-        // Инициализация порядка
+        // Initialization of order
         data->frameOrder.resize(data->appState->frames.size());
         std::iota(data->frameOrder.begin(), data->frameOrder.end(), 0);
 
         // >>>>>>>>>>>>>>>>>>>>>>>>>>
         // Dropdown List
 
-        // Всегда первый: All
+        // Always first: All
         ComboBox_AddString(data->hComboTag, L"All");
 
-        // Собираем используемые теги
+        // Collecting used tags
         std::unordered_set<std::wstring> usedTags;
         bool hasNone = false;
 
@@ -79,14 +79,14 @@ INT_PTR CALLBACK ReorderFramesDlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
             }
         }
 
-        // Второй: None (если есть кадры без тега)
+        // Second: None (if there are frames without a tag)
         if (hasNone)
         {
             ComboBox_AddString(data->hComboTag, L"None");
-            usedTags.erase(L"None"); // Убираем, чтобы не дублировать при сортировке
+            usedTags.erase(L"None"); // We remove them to avoid duplication when sorting.
         }
 
-        // Остальные: строго по алфавиту
+        // The rest: strictly alphabetically
         std::vector<std::wstring> sortedTags(usedTags.begin(), usedTags.end());
         std::sort(sortedTags.begin(), sortedTags.end());
 
@@ -95,15 +95,15 @@ INT_PTR CALLBACK ReorderFramesDlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
             ComboBox_AddString(data->hComboTag, tag.c_str());
         }
 
-        // По умолчанию выбран All
+        // By default, All is selected.
         ComboBox_SetCurSel(data->hComboTag, 0);
 
         data->currentFilterTag = L"All";
 
-        // Подменяем процедуру для области отрисовки (STATIC)
+        // Replace the procedure for the drawing area (STATIC)
         SetWindowSubclass(data->hScrollArea, ScrollAreaSubclassProc, 0, reinterpret_cast<DWORD_PTR>(data));
 
-        UpdateScrollRange(data); // Инициализируем скроллбар
+        UpdateScrollRange(data); // Initializing the scrollbar
         UpdateVisibleIndices(data);
         return TRUE;
     }
@@ -113,7 +113,7 @@ INT_PTR CALLBACK ReorderFramesDlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
             return 0;
 
         int code = LOWORD(wParam);
-        int newPos = data->scrollPos; // Начинаем с текущей позиции
+        int newPos = data->scrollPos; // Let's start from the current position
 
         switch (code)
         {
@@ -130,7 +130,7 @@ INT_PTR CALLBACK ReorderFramesDlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
             newPos += 100;
             break;
         case SB_THUMBTRACK:
-            // Для SB_THUMBTRACK читаем nTrackPos
+            // For SB_THUMBTRACK we read nTrackPos
             {
                 SCROLLINFO si = {sizeof(SCROLLINFO)};
                 si.fMask = SIF_TRACKPOS;
@@ -151,18 +151,18 @@ INT_PTR CALLBACK ReorderFramesDlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
             return 0;
         }
 
-        // Ограничиваем
+        // Restriction
         newPos = std::max(0, std::min(newPos, data->maxScroll));
 
-        // Обновляем
+        // Update
         if (newPos != data->scrollPos)
         {
             data->scrollPos = newPos;
 
-            // Просто устанавливаем позицию
+            // We just set the position
             SetScrollPos(data->hScrollBar, SB_CTL, newPos, TRUE);
 
-            // Перерисовываем кадры
+            // Redrawing frames
             InvalidateRect(data->hScrollArea, nullptr, FALSE);
         }
         return TRUE;
@@ -230,15 +230,15 @@ LRESULT CALLBACK ScrollAreaSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         RECT clientRect;
         GetClientRect(hWnd, &clientRect);
 
-        // Создаём буфер в памяти
+        // Create a buffer in memory
         HDC memDC = CreateCompatibleDC(hdc);
         HBITMAP hMemBmp = CreateCompatibleBitmap(hdc, clientRect.right, clientRect.bottom);
         HGDIOBJ oldBmp = SelectObject(memDC, hMemBmp);
 
-        // Рисуем фон в буфер
+        // Draw the background to the buffer
         FillRect(memDC, &clientRect, GetSysColorBrush(COLOR_3DFACE));
 
-        // Рисуем кадры в буфер
+        // Drawing frames into the buffer
         int currentX = data->padding - data->scrollPos;
         int startY = data->padding;
 
@@ -253,7 +253,7 @@ LRESULT CALLBACK ScrollAreaSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
             DrawFrameThumbnail(memDC, frame, thumbRect);
 
-            // Рамка
+            // Frame
             HPEN hPen = CreatePen(PS_SOLID, 2, RGB(200, 200, 200));
             HPEN hOldPen = (HPEN)SelectObject(memDC, hPen);
             SelectObject(memDC, GetStockObject(NULL_BRUSH));
@@ -261,7 +261,7 @@ LRESULT CALLBACK ScrollAreaSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
             SelectObject(memDC, hOldPen);
             DeleteObject(hPen);
 
-            // Индикатор вставки
+            // Insert indicator
             if (data->isDragging && data->dropVisIdx == i)
             {
                 HPEN hDropPen = CreatePen(PS_SOLID, 3, RGB(255, 100, 50));
@@ -272,7 +272,7 @@ LRESULT CALLBACK ScrollAreaSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
                 DeleteObject(hDropPen);
             }
 
-            // Текст
+            // Text
             wchar_t infoStr[32];
             swprintf_s(infoStr, L"%d", frameIdx + 1);
             SetBkMode(memDC, TRANSPARENT);
@@ -281,10 +281,10 @@ LRESULT CALLBACK ScrollAreaSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
             currentX += data->thumbW + data->padding;
         }
 
-        // Копируем готовый кадр на экран ОДНОЙ операцией
+        // Copy the finished frame to the screen in 1 operation
         BitBlt(hdc, 0, 0, clientRect.right, clientRect.bottom, memDC, 0, 0, SRCCOPY);
 
-        // Очистка
+        // Cleaning
         SelectObject(memDC, oldBmp);
         DeleteObject(hMemBmp);
         DeleteDC(memDC);
@@ -296,10 +296,10 @@ LRESULT CALLBACK ScrollAreaSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
 
-        // Проверяем, что клик НЕ в зоне скролла (нижние 5 пикселей)
+        // We check that the click is NOT in the scroll zone (bottom 5 pixels)
         RECT rc;
         GetClientRect(hWnd, &rc);
-        if (y > rc.bottom - 10) // Если кликнули в нижние 10px — игнорируем
+        if (y > rc.bottom - 10)
             return 0;
 
         int visIdx = HitTestVisible(data, x);
@@ -372,7 +372,7 @@ void DrawFrameThumbnail(HDC hdc, const Frame &frame, RECT &dstRect)
     HBITMAP hBmp = CreateCompatibleBitmap(hdc, bmpW, bmpH);
     HGDIOBJ oldBmp = SelectObject(memDC, hBmp);
 
-    // Шахматный фон (рисуем относительно (0,0) битмапа)
+    // Checkerboard background (drawn relative to (0,0) of the bitmap)
     int checkerSize = 4;
     HBRUSH hLight = CreateSolidBrush(RGB(240, 240, 240));
     HBRUSH hDark = CreateSolidBrush(RGB(200, 200, 200));
@@ -388,7 +388,7 @@ void DrawFrameThumbnail(HDC hdc, const Frame &frame, RECT &dstRect)
     DeleteObject(hLight);
     DeleteObject(hDark);
 
-    // Масштабирование
+    // Scaling
     float scaleX = (float)bmpW / frame.width;
     float scaleY = (float)bmpH / frame.height;
     float scale = std::min(scaleX, scaleY);
@@ -396,7 +396,7 @@ void DrawFrameThumbnail(HDC hdc, const Frame &frame, RECT &dstRect)
     int offsetX = (int)((bmpW - frame.width * scale) / 2);
     int offsetY = (int)((bmpH - frame.height * scale) / 2);
 
-    // Отрисовка пикселей кадра
+    // Rendering frame pixels
     for (int y = 0; y < frame.height; ++y)
     {
         for (int x = 0; x < frame.width; ++x)
@@ -406,13 +406,12 @@ void DrawFrameThumbnail(HDC hdc, const Frame &frame, RECT &dstRect)
             {
                 COLORREF col = RGB((pixel >> 16) & 0xFF, (pixel >> 8) & 0xFF, pixel & 0xFF);
 
-                // Точные границы destination-пикселя
                 int destX = offsetX + (int)(x * scale);
                 int destY = offsetY + (int)(y * scale);
                 int destW = std::max(1, (int)((x + 1) * scale) - (int)(x * scale));
                 int destH = std::max(1, (int)((y + 1) * scale) - (int)(y * scale));
 
-                // Рисуем блок пикселей ровно под рассчитанный размер
+                // We draw a block of pixels exactly to the calculated size
                 for (int dy = 0; dy < destH; ++dy)
                     for (int dx = 0; dx < destW; ++dx)
                         SetPixelV(memDC, destX + dx, destY + dy, col);
@@ -420,7 +419,7 @@ void DrawFrameThumbnail(HDC hdc, const Frame &frame, RECT &dstRect)
         }
     }
 
-    // Копируем на экран
+    // Copy to screen
     BitBlt(hdc, dstRect.left, dstRect.top, bmpW, bmpH, memDC, 0, 0, SRCCOPY);
     SelectObject(memDC, oldBmp);
     DeleteObject(hBmp);
@@ -439,8 +438,8 @@ static void UpdateScrollRange(ReorderDlgData *data)
     SCROLLINFO si = {sizeof(SCROLLINFO)};
     si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
     si.nMin = 0;
-    si.nMax = totalW;   // Общая длина ВСЕХ кадров
-    si.nPage = clientW; // Видимая область (ширина контрола)
+    si.nMax = totalW;   // Total length of ALL frames
+    si.nPage = clientW; // Visible area (control width)
     si.nPos = 0;
 
     SetScrollInfo(data->hScrollBar, SB_CTL, &si, TRUE);

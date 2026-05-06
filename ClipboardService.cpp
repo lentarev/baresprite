@@ -5,7 +5,7 @@ namespace baresprite
 {
 
 /// <summary>
-/// Копирует или вырезает выделенную область в буфер обмена
+/// Copies or cuts the selected area to the clipboard.
 /// </summary>
 /// <param name="appState"></param>
 /// <param name="cut"></param>
@@ -18,7 +18,7 @@ void ClipboardService::CopySelectionToClipboard(AppState &appState, bool cut)
 
     Frame &frame = appState.frames[appState.currentFrameIndex];
 
-    // 1. Ограничиваем выделение границами кадра
+    // Limiting the selection to the frame boundaries
     int startX = (appState.selection.x < 0) ? 0 : appState.selection.x;
     int startY = (appState.selection.y < 0) ? 0 : appState.selection.y;
     int endX = (appState.selection.x + appState.selection.w > frame.width) ? frame.width : appState.selection.x + appState.selection.w;
@@ -29,7 +29,7 @@ void ClipboardService::CopySelectionToClipboard(AppState &appState, bool cut)
     if (copyW <= 0 || copyH <= 0)
         return;
 
-    // 2. Сохраняем в буфер
+    // Save to buffer
     appState.clipboard.pixels.resize(static_cast<size_t>(copyW) * copyH);
     appState.clipboard.width = copyW;
     appState.clipboard.height = copyH;
@@ -43,7 +43,7 @@ void ClipboardService::CopySelectionToClipboard(AppState &appState, bool cut)
             size_t frameIdx = static_cast<size_t>(y) * frame.width + x;
             appState.clipboard.pixels[idx++] = frame.pixels[frameIdx];
 
-            // Если Cut — очищаем исходник (0 = прозрачный/пустой)
+            // If Cut, clear the source (0 = transparent/empty)
             if (cut)
             {
                 frame.pixels[frameIdx] = 0;
@@ -61,7 +61,7 @@ void ClipboardService::CopySelectionToClipboard(AppState &appState, bool cut)
 }
 
 /// <summary>
-/// Вставляет буфер обмена в текущий кадр
+/// Pastes the clipboard into the current frame.
 /// </summary>
 /// <param name="appState"></param>
 void ClipboardService::PasteFromClipboard(AppState &appState)
@@ -71,21 +71,21 @@ void ClipboardService::PasteFromClipboard(AppState &appState)
 
     Frame &frame = appState.frames[appState.currentFrameIndex];
 
-    // Целевая позиция: верхний левый угол выделения (или 0,0 если выделения нет)
+    // Target position: top left corner of selection (or 0,0 if no selection)
     int targetX = appState.selection.isActive ? appState.selection.x : 0;
     int targetY = appState.selection.isActive ? appState.selection.y : 0;
 
-    // Вычисляем область пересечения с кадром
+    // Calculate the area of ​​intersection with the frame
     int pasteStartX = (targetX < 0) ? 0 : targetX;
     int pasteStartY = (targetY < 0) ? 0 : targetY;
     int pasteEndX = (targetX + appState.clipboard.width > frame.width) ? frame.width : targetX + appState.clipboard.width;
     int pasteEndY = (targetY + appState.clipboard.height > frame.height) ? frame.height : targetY + appState.clipboard.height;
 
-    // Смещение внутри буфера (если вставка начинается за пределами кадра слева/сверху)
+    // Offset within the buffer (if insertion starts outside the frame on the left/top)
     int srcOffsetX = (targetX < 0) ? -targetX : 0;
     int srcOffsetY = (targetY < 0) ? -targetY : 0;
 
-    // Копируем пиксели
+    // Copying pixels
     for (int y = pasteStartY; y < pasteEndY; ++y)
     {
         for (int x = pasteStartX; x < pasteEndX; ++x)
@@ -100,7 +100,7 @@ void ClipboardService::PasteFromClipboard(AppState &appState)
         }
     }
 
-    // Обновляем выделение под вставленную область
+    // Update the selection to match the pasted area
     appState.selection.x = targetX;
     appState.selection.y = targetY;
     appState.selection.w = appState.clipboard.width;

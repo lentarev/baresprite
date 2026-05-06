@@ -35,7 +35,7 @@ BottomToolbar::BottomToolbar(HWND hWnd, HINSTANCE hInstance, AppState &appState)
 
     if (!_hToolbar)
     {
-        return; // Не удалось создать окно
+        return; // Failed to create window
     }
 
     _framePanel = std::make_unique<FramePanel>(_hToolbar, hInstance, appState);
@@ -72,7 +72,7 @@ void BottomToolbar::OnSize(int clientW, int clientH)
     if (_tagPanel && _framePanel)
     {
 
-        int tagPanelStartX = _framePanel->GetRightEdge() + 20; // 20px отступ между панелями
+        int tagPanelStartX = _framePanel->GetRightEdge() + 20; // 20px padding between panels
         RECT rcTag = {tagPanelStartX, 0, clientW, HEIGHT};
         _tagPanel->SetBounds(rcTag);
     }
@@ -184,7 +184,6 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
                         _framePanel->UpdateFrameLabel();
                     }
 
-                    // Закрепляем выбор в комбобоксе (PopulateComboBoxes уже сбросил фокус)
                     _tagPanel->UpdateTagSelection();
                 }
 
@@ -230,7 +229,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 
 bool BottomToolbar::OnHScroll(int scrollCode, HWND hSlider)
 {
-    // Получаем ID контрола из его хэндла
+    // We get the control ID from its handle
     int controlId = GetDlgCtrlID(hSlider);
 
     // Onion slider
@@ -249,8 +248,7 @@ bool BottomToolbar::OnHScroll(int scrollCode, HWND hSlider)
         }
     }
 
-
-     // Play command
+    // Play command
     if (controlId >= 3072 && controlId < 3073)
     {
         const int index = controlId - 3072;

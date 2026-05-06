@@ -702,11 +702,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
             }
-            // Системный курсор восстановится через DefWindowProc
+            // The system cursor will be restored via DefWindowProc
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
 
-        // Курсор над клиентской областью — проверяем, над канвасом ли
+        // Cursor over the client area
         POINT screenPos;
         GetCursorPos(&screenPos);
         HWND hwndUnderCursor = WindowFromPoint(screenPos);
@@ -714,15 +714,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (gCanvasScrollView && gCanvasScrollView->GetCanvas() && hwndUnderCursor == gCanvasScrollView->GetCanvas()->GetHWndCanvas())
         {
 
-            // Конвертируем в координаты канваса
+            // Convert to canvas coordinates
             POINT clientPos = screenPos;
             ScreenToClient(gCanvasScrollView->GetCanvas()->GetHWndCanvas(), &clientPos);
 
-            // Логические координаты
+            // Logical coordinates
             int logX = clientPos.x / gAppState->checkerSize;
             int logY = clientPos.y / gAppState->checkerSize;
 
-            // Проверка границ холста
+            // Checking canvas boundaries
             bool isInside = false;
             if (!gAppState->frames.empty())
             {
@@ -732,13 +732,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             if (isInside)
             {
-                // Внутри холста: показываем кастомный курсор
+                // Inside the canvas: displaying a custom cursor
                 gCanvasScrollView->GetCanvas()->SetCustomCursor(true);
                 SetCursor(nullptr); // Скрыть системный
             }
             else
             {
-                // На серой области: системный курсор
+                // In the gray area: the system cursor
                 gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
                 SetCursor(LoadCursor(nullptr, IDC_ARROW));
             }
@@ -746,12 +746,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         else
         {
-            // Курсор над тулбаром или другой панелью — системный курсор
+            // The cursor over the toolbar or another panel is the system cursor.
             if (gCanvasScrollView && gCanvasScrollView->GetCanvas())
             {
                 gCanvasScrollView->GetCanvas()->SetCustomCursor(false);
             }
-            // Системный курсор восстановится автоматически
+            // The system cursor will be restored automatically.
         }
 
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -759,7 +759,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
 
     case WM_TIMER: {
-        if (wParam == 1) // Наш таймер анимации
+        if (wParam == 1) // animation timer
         {
 
             if (gAppState->isPlaying && gBottomToolbar)
@@ -781,7 +781,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_GETMINMAXINFO: {
         MINMAXINFO *mmi = reinterpret_cast<MINMAXINFO *>(lParam);
 
-        // Минимальный размер клиентской области (без рамок)
+        // Minimum client area size (without borders)
         constexpr int MIN_CLIENT_W = 900;
         constexpr int MIN_CLIENT_H = 650;
 

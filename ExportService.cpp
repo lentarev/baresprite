@@ -26,7 +26,7 @@ bool ExportService::ExportFrameToPNG(const Frame &frame, const std::wstring &fil
     if (frame.width == 0 || frame.height == 0)
         return false;
 
-    // Конвертируем пиксели из 0xAARRGGBB → RGBA байты (stbi требует именно такой порядок)
+    // Convert pixels from 0xAARRGGBB -> RGBA bytes (stbi requires this order)
     std::vector<unsigned char> rgbaBuffer(frame.width * frame.height * 4);
 
     for (int y = 0; y < frame.height; ++y)
@@ -35,13 +35,13 @@ bool ExportService::ExportFrameToPNG(const Frame &frame, const std::wstring &fil
         {
             uint32_t pixel = frame.GetPixel(x, y);
 
-            // Извлекаем компоненты из 0xAARRGGBB
+            // Extracting components from 0xAARRGGBB
             unsigned char a = (pixel >> 24) & 0xFF;
             unsigned char r = (pixel >> 16) & 0xFF;
             unsigned char g = (pixel >> 8) & 0xFF;
             unsigned char b = pixel & 0xFF;
 
-            // Записываем в буфер в порядке RGBA
+            // We write to the buffer in RGBA order
             int idx = (y * frame.width + x) * 4;
             rgbaBuffer[idx + 0] = r;
             rgbaBuffer[idx + 1] = g;
@@ -50,13 +50,13 @@ bool ExportService::ExportFrameToPNG(const Frame &frame, const std::wstring &fil
         }
     }
 
-    // Конвертируем путь в UTF-8 для stbi (он не поддерживает wchar_t напрямую)
+    // Convert the path to UTF-8 for stbi (it does not support wchar_t directly)
     int size = WideCharToMultiByte(CP_UTF8, 0, filePath.c_str(), -1, nullptr, 0, nullptr, nullptr);
     std::vector<char> utf8Path(size);
     WideCharToMultiByte(CP_UTF8, 0, filePath.c_str(), -1, utf8Path.data(), size, nullptr, nullptr);
 
-    // Записываем PNG
-    // Параметры: путь, ширина, высота, каналов (4=RGBA), данные, stride (0=по умолчанию)
+    // Writing PNG
+    // Parameters: path, width, height, channels (4=RGBA), data, stride (0=default)
     int result = stbi_write_png(utf8Path.data(), frame.width, frame.height, 4, rgbaBuffer.data(), 0);
 
     return result != 0;
@@ -100,7 +100,7 @@ bool ExportService::ExportSequence(const std::vector<Frame> &frames, const std::
         std::wstring frameTag = frame.tag.empty() ? L"None" : frame.tag;
         std::wstring filterTag = tagFilter.empty() ? L"None" : tagFilter;
 
-        // Пропускаем кадр, только если фильтр не "All" и теги не совпадают
+        // We skip the frame only if the filter is not "All" and the tags do not match.
         if (filterTag != L"All" && frameTag != filterTag)
         {
             continue;
@@ -108,15 +108,15 @@ bool ExportService::ExportSequence(const std::vector<Frame> &frames, const std::
 
         wchar_t filename[MAX_PATH];
 
-        // Используем имя выбранного тега как префикс (Idle, Walk, All и т.д.)
+        // Use the name of the selected tag as a prefix (Idle, Walk, All, etc.)
         std::wstring tagPrefix = tagFilter;
 
-        // На всякий случай, если фильтр пустой (хотя логика диалога это предотвращает)
+        // Just in case the filter is empty (although the dialog logic prevents this)
         if (tagPrefix.empty())
             tagPrefix = L"Frame";
 
-        // Формат: {Tag}_frame_{Index}.png
-        // Примеры: Idle_frame_000.png, Walk_frame_000.png, All_frame_000.png
+        // Format: {Tag}_frame_{Index}.png
+        // Examples: Idle_frame_000.png, Walk_frame_000.png, All_frame_000.png
         swprintf_s(filename, L"%s_frame_%03d.png", tagPrefix.c_str(), exportIndex);
 
         std::wstring fullPath = outputFolder + L"\\" + filename;

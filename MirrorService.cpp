@@ -15,7 +15,7 @@ void MirrorService::FlipHorizontal(AppState &appState, HWND hCanvas)
     int w = sel.w;
     int h = sel.h;
 
-    // 1. Считываем выделение в буфер
+    // Reading the selection into the buffer
     std::vector<uint32_t> buf(static_cast<size_t>(w) * h);
 
     for (int y = 0; y < h; ++y)
@@ -26,11 +26,11 @@ void MirrorService::FlipHorizontal(AppState &appState, HWND hCanvas)
         }
     }
 
-    // 2. Сохраняем историю ДО изменения пикселей
+    // Save the history BEFORE changing pixels
     appState.history.Commit(appState.frames, appState.selection.x, appState.selection.y, appState.selection.w, appState.selection.h,
                             appState.selection.isActive);
 
-    // 3. Записываем обратно с горизонтальным отражением
+    // We write back with horizontal reflection
     // Формула: новый X = w - 1 - старый X
     for (int y = 0; y < h; ++y)
     {
@@ -55,7 +55,7 @@ void MirrorService::FlipVertical(AppState &appState, HWND hCanvas)
     int w = sel.w;
     int h = sel.h;
 
-    // 1. Считываем выделение в буфер
+    // Reading the selection into the buffer
     std::vector<uint32_t> buf(static_cast<size_t>(w) * h);
 
     for (int y = 0; y < h; ++y)
@@ -66,12 +66,11 @@ void MirrorService::FlipVertical(AppState &appState, HWND hCanvas)
         }
     }
 
-    // Сохраняем историю
+    // Preserving history
     appState.history.Commit(appState.frames, appState.selection.x, appState.selection.y, appState.selection.w, appState.selection.h,
                             appState.selection.isActive);
 
-    // Записываем обратно с вертикальным отражением
-    // Формула: новый Y = h - 1 - старый Y
+    // We write back with vertical reflection
     for (int y = 0; y < h; ++y)
     {
         for (int x = 0; x < w; ++x)

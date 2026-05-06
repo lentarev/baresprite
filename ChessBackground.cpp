@@ -5,8 +5,8 @@ namespace baresprite
 
 ChessBackground::ChessBackground(AppState &appStat) : _appState(appStat)
 {
-    _hBrushLight = CreateSolidBrush(RGB(245, 245, 245)); // Светло-серый
-    _hBrushDark = CreateSolidBrush(RGB(215, 215, 215));  // Тёмно-серый
+    _hBrushLight = CreateSolidBrush(RGB(245, 245, 245));
+    _hBrushDark = CreateSolidBrush(RGB(215, 215, 215));
 }
 
 ChessBackground::~ChessBackground()
@@ -24,16 +24,14 @@ ChessBackground::~ChessBackground()
 
 void ChessBackground::Render(const PAINTSTRUCT &ps, HDC hdc, const int checkerSize) const
 {
-    // Настройки шахматки
+
     const int CELL_SIZE = checkerSize;
 
-    // Вычисляем диапазон клеток только для области обновления (ps.rcPaint)
     const int startX = ps.rcPaint.left / CELL_SIZE;
     const int startY = ps.rcPaint.top / CELL_SIZE;
     const int endX = (ps.rcPaint.right + CELL_SIZE - 1) / CELL_SIZE;
     const int endY = (ps.rcPaint.bottom + CELL_SIZE - 1) / CELL_SIZE;
 
-    // Рисуем только нужные клетки
     for (int y = startY; y < endY; ++y)
     {
         for (int x = startX; x < endX; ++x)
@@ -43,7 +41,7 @@ void ChessBackground::Render(const PAINTSTRUCT &ps, HDC hdc, const int checkerSi
             RECT drawArea;
             if (IntersectRect(&drawArea, &tile, &ps.rcPaint))
             {
-                // Чередование: чётная сумма координат -> светлая, нечётная -> тёмная
+
                 HBRUSH hBrush = ((x + y) % 2 == 0) ? _hBrushLight : _hBrushDark;
                 FillRect(hdc, &drawArea, hBrush);
             }

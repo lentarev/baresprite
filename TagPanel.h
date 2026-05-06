@@ -14,10 +14,10 @@ class TagPanel
 
     void SetBounds(const RECT &rc);
 
-    void PopulateComboBoxes(); // Заполнить тегами
+    void PopulateComboBoxes(); 
     void UpdateFilterSelection();
-    void UpdateTagSelection();                          // Обновить выбор при смене кадра
-    bool OnComboBoxChange(HWND hWndCtrl, int selIndex); // Обработка выбора
+    void UpdateTagSelection();                          
+    bool OnComboBoxChange(HWND hWndCtrl, int selIndex); 
 
     bool OnChangeFilter();
     bool OnChangeTag();
@@ -48,7 +48,6 @@ class TagPanel
     static constexpr int LEFT_TOOLBAR_WIDTH = 180;
     static constexpr int RIGHT_TOOLBAR_WIDTH = 180;
 
-    // Константы для лейбла
     static constexpr int _LABEL_W = 40;
     static constexpr int _LABEL_H = 30;
     static constexpr int _SPACING = 4;

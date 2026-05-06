@@ -61,7 +61,7 @@ void CanvasScrollView::OnSize(int clientW, int clientH)
     _offsetX = LEFT_TOOLBAR_WIDTH + (freeAreaW - _containerW) / 2;
     _offsetY = (freeAreaH - _containerH) / 2;
 
-    // 1. Сначала позиционируем контейнер
+    // Positioning the container
     SetWindowPos(_hCanvasScrollView, nullptr, _offsetX, _offsetY, _containerW, _containerH, SWP_NOZORDER | SWP_NOACTIVATE);
 
     if (_canvas)
@@ -69,25 +69,24 @@ void CanvasScrollView::OnSize(int clientW, int clientH)
         _canvas->OnSize(freeAreaW, freeAreaH);
         HWND hCanvas = _canvas->GetHWndCanvas();
 
-        // Получаем РЕАЛЬНЫЙ размер клиентской области (уже со скроллбарами!)
         RECT clientRect;
         GetClientRect(_hCanvasScrollView, &clientRect);
-        int availableW = clientRect.right;  // Реальная ширина без скролла
-        int availableH = clientRect.bottom; // Реальная высота без скролла
+        int availableW = clientRect.right;  // Actual width without scrolling
+        int availableH = clientRect.bottom; // Actual width without scrolling
 
-        // 3. Получаем размер самого канваса
+        // We get the size of the canvas itself
         RECT canvasRect;
         GetClientRect(hCanvas, &canvasRect);
         int canvasW = canvasRect.right;
         int canvasH = canvasRect.bottom;
 
-        // 4. Центрируем относительно availableW/H, а не _containerW/H
+        // Centering
         _canvasPosX = (canvasW < availableW) ? (availableW - canvasW) / 2 : 0;
         _canvasPosY = (canvasH < availableH) ? (availableH - canvasH) / 2 : 0;
 
         SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
-        // 5. Сброс и обновление скролла
+        // Reset and refresh the scroll
         _scrollX = 0;
         _scrollY = 0;
         UpdateScrollInfo();
@@ -106,7 +105,6 @@ void CanvasScrollView::UpdateScrollInfo()
 
     HWND hCanvas = _canvas->GetHWndCanvas();
 
-    // Получаем размер клиентской области canvas
     RECT rc;
     GetClientRect(hCanvas, &rc);
     int canvasW = rc.right;
@@ -135,7 +133,6 @@ void CanvasScrollView::RecalculateCanvasCentering()
 
     HWND hCanvas = _canvas->GetHWndCanvas();
 
-    // Запоминаем старую область канваса в координатах ScrollView
     RECT oldRect;
     GetWindowRect(hCanvas, &oldRect);
     ScreenToClient(_hCanvasScrollView, (LPPOINT)&oldRect);
@@ -144,7 +141,6 @@ void CanvasScrollView::RecalculateCanvasCentering()
     UpdateScrollInfo();
     UpdateWindow(_hCanvasScrollView);
 
-    // Получаем новые размеры
     RECT clientRect, canvasRect;
     GetClientRect(_hCanvasScrollView, &clientRect);
     GetClientRect(hCanvas, &canvasRect);
@@ -154,18 +150,16 @@ void CanvasScrollView::RecalculateCanvasCentering()
     int canvasW = canvasRect.right;
     int canvasH = canvasRect.bottom;
 
-    // Вычисляем новую позицию
     _canvasPosX = (canvasW < availableW) ? (availableW - canvasW) / 2 : 0;
     _canvasPosY = (canvasH < availableH) ? (availableH - canvasH) / 2 : 0;
 
-    // Применяем размер и позицию
+    // Apply size and position
     SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, canvasW, canvasH, SWP_NOZORDER);
 
-    // Если канвас уменьшился — принудительно обновляем ТОЛЬКО освободившуюся область
     if (canvasW < oldRect.right - oldRect.left || canvasH < oldRect.bottom - oldRect.top)
     {
-        // RDW_NOCHILDREN гарантирует, что перерисуется ТОЛЬКО фон родителя,
-        // а канвас не будет рисоваться дважды (это убирает мерцание)
+        // RDW_NOCHILDREN ensures that only the parent's background is redrawn,
+        // and the canvas is not drawn twice (this removes flickering)
         RedrawWindow(_hCanvasScrollView, &oldRect, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_NOCHILDREN | RDW_UPDATENOW);
     }
 }
@@ -177,7 +171,6 @@ void CanvasScrollView::ScrollVertical(int delta)
 
     HWND hCanvas = _canvas->GetHWndCanvas();
 
-    // Получаем размеры
     RECT clientRect, canvasRect;
     GetClientRect(_hCanvasScrollView, &clientRect);
     GetClientRect(hCanvas, &canvasRect);
@@ -186,40 +179,39 @@ void CanvasScrollView::ScrollVertical(int delta)
     int canvasH = canvasRect.bottom;
     int step = (abs(delta) / WHEEL_DELTA) * 40;
 
-    // Запоминаем старую позицию
     int oldPosY = _canvasPosY;
 
-    // Вычисляем новый скролл
+    // Calculating the new scroll
     if (delta > 0)
         _scrollY -= step;
     else
         _scrollY += step;
 
-    // Ограничиваем
+    // Restrict
     int maxScroll = (canvasH > availableH) ? (canvasH - availableH) : 0;
     if (_scrollY < 0)
         _scrollY = 0;
     if (_scrollY > maxScroll)
         _scrollY = maxScroll;
 
-    // Вычисляем позицию
+    // Calculating the position
     int initialY = (canvasH < availableH) ? (availableH - canvasH) / 2 : 0;
     _canvasPosY = initialY - _scrollY;
 
-    // Считаем сдвиг
+    // We calculate the shift
     int deltaY = _canvasPosY - oldPosY;
 
-    // Двигаем окно + SWP_NOCOPYBITS (убирает мерцание краёв)
+    // Move the window + SWP_NOCOPYBITS (removes edge flickering)
     SetWindowPos(hCanvas, nullptr, _canvasPosX, _canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOCOPYBITS);
 
-    // Корректируем клиентские координаты курсора
+    // Adjusting client cursor coordinates
     if (_canvas && _canvas->GetShowCustomCursor())
     {
 
         POINT mousePos = _canvas->GetMousePosScreen();
         mousePos.y -= deltaY;
 
-        _canvas->InvalidateCursorArea(); // Перерисовка курсора
+        _canvas->InvalidateCursorArea(); // Redrawing the cursor
     }
 
     UpdateScrollInfo();
@@ -278,7 +270,7 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
             break;
         }
 
-        // Ограничиваем
+        // Restrict
         int maxPos = max(0, si.nMax - (int)si.nPage + 1);
         if (newPos < 0)
             newPos = 0;
@@ -293,7 +285,7 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
 
                 HWND hCanvas = pScrollView->_canvas->GetHWndCanvas();
 
-                // Получаем актуальную клиентскую область (со скроллбарами)
+                // We get the current client area (with scrollbars)
                 RECT clientRect;
                 GetClientRect(hWnd, &clientRect); // hWnd — это сам CanvasScrollView
                 int availableW = clientRect.right;
@@ -302,10 +294,9 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
                 GetClientRect(hCanvas, &canvasRect);
                 int canvasW = canvasRect.right;
 
-                // Центрируем относительно availableW
+                // Center relative to availableW
                 int initialX = (canvasW < availableW) ? (availableW - canvasW) / 2 : 0;
 
-                // центр - скролл
                 pScrollView->_canvasPosX = initialX - newPos;
 
                 SetWindowPos(hCanvas, nullptr, pScrollView->_canvasPosX, pScrollView->_canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
@@ -344,7 +335,7 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
             break;
         }
 
-        // Ограничиваем
+        // Restrict
         int maxPos = max(0, si.nMax - (int)si.nPage + 1);
         if (newPos < 0)
             newPos = 0;
@@ -357,7 +348,7 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
             {
                 pScrollView->_scrollY = newPos;
 
-                // Вычисляем начальную позицию (центрирование)
+                // Calculate the initial position (centering)
                 HWND hCanvas = pScrollView->_canvas->GetHWndCanvas();
                 RECT rc;
                 GetClientRect(hCanvas, &rc);
@@ -369,7 +360,6 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
                     initialY = (pScrollView->_containerH - canvasH) / 2;
                 }
 
-                // Формула: начальная_позиция - скролл
                 pScrollView->_canvasPosY = initialY - newPos;
 
                 SetWindowPos(hCanvas, nullptr, pScrollView->_canvasPosX, pScrollView->_canvasPosY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
@@ -384,7 +374,7 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
     case WM_MOUSEWHEEL: {
         int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 
-        // Проверяем, зажат ли Ctrl
+        // Check if Ctrl is pressed
         bool isCtrl = (wParam & MK_CONTROL);
 
         if (isCtrl)
@@ -398,17 +388,17 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
 
             if (zoomed)
             {
-                // Если зум сработал, пересчитываем центрирование
+                // If the zoom worked, we recalculate the centering
                 pScrollView->RecalculateCanvasCentering();
             }
         }
         else
         {
             // === SCROLL (Просто Wheel) ===
-            // Вызываем локальный метод для вертикального скролла
+            // Calling a local method for vertical scrolling
             pScrollView->ScrollVertical(delta);
         }
-        return 0; // Событие обработано
+        return 0; 
     }
 
     case WM_ERASEBKGND:
@@ -416,7 +406,7 @@ LRESULT CALLBACK CanvasScrollView::_CanvasScrollViewWndProc(HWND hWnd, UINT mess
         HDC hdc = (HDC)wParam;
         RECT rc;
         GetClientRect(hWnd, &rc);
-        // Используем системную кисть (не создаёт мерцания)
+        // Use a system brush (doesn't create flickering)
         FillRect(hdc, &rc, GetSysColorBrush(COLOR_3DFACE + 1));
         return TRUE;
 

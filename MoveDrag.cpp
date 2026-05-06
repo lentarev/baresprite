@@ -17,11 +17,11 @@ void MoveDrag::ButtonDown(AppState &appState, HWND hCanvas, int x, int y, int ch
     {
         Frame &frame = appState.frames[appState.currentFrameIndex];
 
-        // Сохраняем для Undo
+        
         appState.history.Commit(appState.frames, appState.selection.x, appState.selection.y, appState.selection.w, appState.selection.h,
                                 appState.selection.isActive);
 
-        // Копируем пиксели в буфер
+        // Copy pixels to the buffer
         appState.moveDrag.pixelBuffer.resize(sel.w * sel.h);
         for (int dy = 0; dy < sel.h; ++dy)
         {
@@ -31,7 +31,7 @@ void MoveDrag::ButtonDown(AppState &appState, HWND hCanvas, int x, int y, int ch
             }
         }
 
-        // Очищаем выделение в кадре (делает дырку прозрачной)
+        // Clearing the selection in the frame
         for (int dy = 0; dy < sel.h; ++dy)
         {
             for (int dx = 0; dx < sel.w; ++dx)
@@ -40,7 +40,7 @@ void MoveDrag::ButtonDown(AppState &appState, HWND hCanvas, int x, int y, int ch
             }
         }
 
-        // Инициализируем драг
+        // Initializing drag
         appState.moveDrag.isDragging = true;
         appState.moveDrag.startLogX = logX;
         appState.moveDrag.startLogY = logY;
@@ -68,7 +68,7 @@ void MoveDrag::ButtonMove(AppState &appState, HWND hCanvas, int x, int y, int ch
     int w = appState.moveDrag.w;
     int h = appState.moveDrag.h;
 
-    // Ограничиваем границами холста
+    // Limiting the canvas boundaries
     if (newX < 0)
         newX = 0;
     if (newY < 0)
@@ -78,11 +78,11 @@ void MoveDrag::ButtonMove(AppState &appState, HWND hCanvas, int x, int y, int ch
     if (newY + h > frame.height)
         newY = frame.height - h;
 
-    // Обновляем координаты выделения (используем как превью-позицию)
+    // Updating the selection coordinates
     appState.selection.x = newX;
     appState.selection.y = newY;
 
-    // Перерисовываем весь холст (фон + кадр + превью выделения)
+    // Redraw the entire canvas
     InvalidateRect(hCanvas, nullptr, FALSE);
 }
 
@@ -93,7 +93,7 @@ void MoveDrag::ButtonUp(AppState &appState, HWND hCanvas)
     int finalX = appState.selection.x;
     int finalY = appState.selection.y;
 
-    // Коммитим буфер в кадр на финальную позицию
+    // Commit the buffer to the frame at the final position
     for (int cy = 0; cy < drag.h; ++cy)
     {
         for (int cx = 0; cx < drag.w; ++cx)
@@ -107,7 +107,7 @@ void MoveDrag::ButtonUp(AppState &appState, HWND hCanvas)
         }
     }
 
-    // Очищаем состояние драга
+    // Clearing the drag state
     appState.moveDrag.isDragging = false;
     appState.moveDrag.pixelBuffer.clear();
     appState.moveDrag.pixelBuffer.shrink_to_fit();
