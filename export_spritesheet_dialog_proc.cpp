@@ -126,12 +126,30 @@ INT_PTR CALLBACK ExportSpritesheetDialogProc(HWND hDlg, UINT message, WPARAM wPa
     case WM_COMMAND: {
         switch (LOWORD(wParam))
         {
+
+            // Handle button (Browse)
         case IDC_ESS_BUTTON_BROWSE: {
+
+            // Get the current path from the input field
+            HWND hEdit = GetDlgItem(hDlg, IDC_ESS_EDIT_OUTPUT_FOLDER);
+            wchar_t currentPath[MAX_PATH] = {0};
+            GetWindowTextW(hEdit, currentPath, MAX_PATH);
 
             BROWSEINFOW bi = {};
             bi.hwndOwner = hDlg;
             bi.lpszTitle = L"Select Output Folder";
             bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+            bi.lpfn = [](HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM pData) -> int {
+                UNREFERENCED_PARAMETER(lParam);
+
+                if (uMsg == BFFM_INITIALIZED && pData && wcslen((wchar_t *)pData) > 0)
+                {
+                    // Select the folder, but do not block navigation
+                    SendMessageW(hwnd, BFFM_SETSELECTIONW, TRUE, pData);
+                }
+                return 0;
+            };
+            bi.lParam = reinterpret_cast<LPARAM>(currentPath);
 
             PIDLIST_ABSOLUTE pidl = SHBrowseForFolderW(&bi);
 
