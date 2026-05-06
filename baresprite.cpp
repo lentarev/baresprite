@@ -23,9 +23,9 @@
 #include "export_spritesheet_dialog.h"
 #include "load_project_dialog_proc.h"
 #include "new_project_dialog_proc.h"
+#include "reorder_frames_dlg.h"
 #include "restart_to_wizard.h"
 #include "start_screen_dialog_proc.h"
-#include "reorder_frames_dlg.h"
 
 // Manifesto and Libraries.
 #pragma comment(                                                                                                                                               \
@@ -320,7 +320,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     // Create frame toolbar child window
     gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance, *gAppState);
 
-    // Если проект был загружен из файла конфигурации
+    // If the project was loaded from a configuration file
     if (gAppState->isProjectLoadedFromConfig)
     {
         if (gAppState->canvas && !gAppState->frames.empty())
@@ -328,6 +328,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
             gAppState->canvas->LoadFrame(gAppState->frames[gAppState->currentFrameIndex]);
         }
     }
+
+    // Update window title
+    std::wstring title = L"BareSprite - " + gProjectSettings->GetProjectNameFromPath(gAppState->projectPath);
+    SetWindowTextW(hWnd, title.c_str());
 
     RECT rc;
 

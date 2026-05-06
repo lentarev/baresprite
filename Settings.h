@@ -15,10 +15,6 @@ class Settings
 
     virtual void Save() = 0;
 
-  protected:
-    // Config file name
-    std::wstring _configProjectFileName = L"baresprite.ini";
-
     /// <summary>
     /// Get project name from path
     /// </summary>
@@ -33,6 +29,9 @@ class Settings
         return path.filename().wstring();
     }
 
+  protected:
+    // Config file name
+    std::wstring _configProjectFileName = L"baresprite.ini";
 
     /// <summary>
     /// Removes spaces and line breaks from the ends of a line.
