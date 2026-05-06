@@ -11,6 +11,7 @@
 #include "OnionFrameRenderer.h"
 #include "RotateService.h"
 #include "SelectionRenderer.h"
+#include "resource.h"
 #include <iostream>
 #include <windowsx.h>
 
@@ -650,7 +651,7 @@ LRESULT CALLBACK Canvas::_CanvasWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
                 else
                 {
-                    hCur = LoadCursor(nullptr, IDC_ARROW);
+                    hCur = LoadCursor(pCanvas->_hInstanceParent, MAKEINTRESOURCE(IDC_CUSTOM_CROSS_CURSOR));
                 }
 
                 SetCursor(hCur);

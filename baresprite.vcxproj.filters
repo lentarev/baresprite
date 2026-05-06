@@ -22,12 +22,6 @@
     <Filter Include="Source Files\Settings">
       <UniqueIdentifier>{e13fe75f-fb3b-4637-8671-ad084a0b82cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ChildWindows">
-      <UniqueIdentifier>{39004a90-855b-4eeb-a03b-5a899ac98e67}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\ChildWindows">
-      <UniqueIdentifier>{4741b583-b4e0-485c-8dec-217290c3eaaf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Canvas">
       <UniqueIdentifier>{2ee2ea5e-5414-4d44-9ff3-2b0ca27a5efa}</UniqueIdentifier>
     </Filter>
@@ -70,6 +64,12 @@
     <Filter Include="Source Files\Helpers">
       <UniqueIdentifier>{4fa116bf-0228-4619-952b-1aed2952e6bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Child">
+      <UniqueIdentifier>{4741b583-b4e0-485c-8dec-217290c3eaaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Child">
+      <UniqueIdentifier>{39004a90-855b-4eeb-a03b-5a899ac98e67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -100,19 +100,19 @@
       <Filter>Header Files\Settings</Filter>
     </ClInclude>
     <ClInclude Include="LeftToolbar.h">
-      <Filter>Header Files\ChildWindows</Filter>
+      <Filter>Header Files\Child</Filter>
     </ClInclude>
     <ClInclude Include="ChildWindow.h">
-      <Filter>Header Files\ChildWindows</Filter>
+      <Filter>Header Files\Child</Filter>
     </ClInclude>
     <ClInclude Include="BottomToolbar.h">
-      <Filter>Header Files\ChildWindows</Filter>
+      <Filter>Header Files\Child</Filter>
     </ClInclude>
     <ClInclude Include="RightToolbar.h">
-      <Filter>Header Files\ChildWindows</Filter>
+      <Filter>Header Files\Child</Filter>
     </ClInclude>
     <ClInclude Include="Canvas.h">
-      <Filter>Header Files\ChildWindows</Filter>
+      <Filter>Header Files\Child</Filter>
     </ClInclude>
     <ClInclude Include="ChessBackground.h">
       <Filter>Header Files\Canvas</Filter>
@@ -142,7 +142,7 @@
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
     <ClInclude Include="CanvasScrollView.h">
-      <Filter>Header Files\ChildWindows</Filter>
+      <Filter>Header Files\Child</Filter>
     </ClInclude>
     <ClInclude Include="FrameRenderer.h">
       <Filter>Header Files\Canvas</Filter>
@@ -267,16 +267,16 @@
       <Filter>Source Files\Settings</Filter>
     </ClCompile>
     <ClCompile Include="LeftToolbar.cpp">
-      <Filter>Source Files\ChildWindows</Filter>
+      <Filter>Source Files\Child</Filter>
     </ClCompile>
     <ClCompile Include="BottomToolbar.cpp">
-      <Filter>Source Files\ChildWindows</Filter>
+      <Filter>Source Files\Child</Filter>
     </ClCompile>
     <ClCompile Include="RightToolbar.cpp">
-      <Filter>Source Files\ChildWindows</Filter>
+      <Filter>Source Files\Child</Filter>
     </ClCompile>
     <ClCompile Include="Canvas.cpp">
-      <Filter>Source Files\ChildWindows</Filter>
+      <Filter>Source Files\Child</Filter>
     </ClCompile>
     <ClCompile Include="ChessBackground.cpp">
       <Filter>Source Files\Canvas</Filter>
@@ -297,7 +297,7 @@
       <Filter>Source Files\LeftToolbar</Filter>
     </ClCompile>
     <ClCompile Include="CanvasScrollView.cpp">
-      <Filter>Source Files\ChildWindows</Filter>
+      <Filter>Source Files\Child</Filter>
     </ClCompile>
     <ClCompile Include="FrameRenderer.cpp">
       <Filter>Source Files\Canvas</Filter>
@@ -396,5 +396,10 @@
     <Image Include="icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="custom_cross_cursor.cur">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
