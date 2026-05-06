@@ -55,6 +55,11 @@ FramePanel *BottomToolbar::GetFramePanel() const
     return _framePanel.get();
 }
 
+TagPanel *BottomToolbar::GetTagPanel() const
+{
+    return _tagPanel.get();
+}
+
 void BottomToolbar::OnSize(int clientW, int clientH)
 {
 

@@ -28,6 +28,7 @@ class BottomToolbar : public ChildWindow
     HWND GetHWndBottomToolbar() const;
 
     FramePanel *GetFramePanel() const;
+    TagPanel *GetTagPanel() const;
 
   private:
     HWND _hWnd;

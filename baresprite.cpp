@@ -16,6 +16,7 @@
 #include "LeftToolbar.h"
 #include "ProjectSettings.h"
 #include "RightToolbar.h"
+#include "TagPanel.h"
 #include "ask_save_dialog.h"
 #include "export_frame_dialog.h"
 #include "export_gif_dialog.h"
@@ -493,21 +494,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return 0;
         }
 
+        // Prev < (arrow left hotkey)
         if (wmId == ID_PREV_FRAME)
         {
             if (gBottomToolbar)
             {
-                gBottomToolbar->GetFramePanel()->OnButtonPrev();
+
+                if (gBottomToolbar->GetFramePanel()->OnButtonPrev())
+                {
+                    gBottomToolbar->GetTagPanel()->UpdateTagSelection();
+                }
             }
             return 0;
         }
 
-        // ID_NEXT_FRAME
+        // Next > (arrow right hotkey)
         if (wmId == ID_NEXT_FRAME)
         {
             if (gBottomToolbar)
             {
-                gBottomToolbar->GetFramePanel()->OnButtonNext();
+
+                if (gBottomToolbar->GetFramePanel()->OnButtonNext())
+                {
+                    gBottomToolbar->GetTagPanel()->UpdateTagSelection();
+                }
             }
             return 0;
         }
