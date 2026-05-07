@@ -58,6 +58,19 @@ BareSprite is built using:
 *   **Platform:** Native Windows (Win32 API, GDI)
 *   **Resource Compilation:** MSVC Resource Compiler
 
+## 🤝 Contributing
+
+BareSprite is currently developed as a **single-author project**. 
+
+**I appreciate your interest**, but I'm not accepting code contributions (Pull Requests) at this time to maintain a consistent architecture and vision.
+
+**However, you can still help:**
+- 🐛 Report bugs via [Issues](https://github.com/lentarev/baresprite/issues)
+- 💡 Suggest features via [Issues](https://github.com/lentarev/baresprite/issues)
+- ⭐ Star the repo to support development
+
+Your feedback is invaluable — just not in the form of code (for now). Thank you for understanding! ❤️
+
 ##  Third-Party Libraries
 
 This project utilizes the following header-only libraries for image processing:
