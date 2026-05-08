@@ -16,6 +16,13 @@
 *   **🛠 Native Win32 UI:** Custom dialogs, smooth scrolling, and professional resource management.
 *   **🖱 Custom Cursor:** High-precision crosshair cursor for pixel-perfect drawing.
 
+
+## Demo
+
+![BareSprite Demo](assets/demo/Jody-idle.gif)
+
+*A simple pixel art editor in action*
+
 ## 📸 Screenshots
 
 
