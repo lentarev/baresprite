@@ -1,5 +1,6 @@
 #include "FrameService.h"
 #include "Frame.h"
+#include <iostream>
 
 namespace baresprite
 {
@@ -15,7 +16,9 @@ bool FrameService::NewFrame(AppState &appState)
     {
         // Create frame
         Frame newFrame(appState.imageSize, appState.imageSize);
-        newFrame.tag = L"";
+        newFrame.tag = appState.selectedTag;
+
+        std::wcout << appState.selectedTag << std::endl;
 
         // Insert after the current one
         auto it = appState.frames.begin() + appState.currentFrameIndex + 1;
@@ -210,24 +213,36 @@ bool FrameService::CloneFrame(AppState &appState)
 /// <returns></returns>
 bool FrameService::DeleteFrame(AppState &appState)
 {
-    // There should always be at least 1 frame left in the project
     if (appState.frames.size() <= 1)
-    {
         return false;
-    }
 
-    // Delete the current frame
     appState.frames.erase(appState.frames.begin() + appState.currentFrameIndex);
 
-    // Index adjustment:
-    // If we removed the last frame in the list, currentFrameIndex would become size() (out of bounds).
-    // We move it to the previous (now last) frame.
     if (appState.currentFrameIndex >= static_cast<int>(appState.frames.size()))
     {
         --appState.currentFrameIndex;
     }
 
-    return true; // The frame was successfully deleted.
+    if (!appState.currentFilterTag.empty())
+    {
+        int count = GetNumberFramesByTag(appState);
+
+        if (count == 0)
+        {
+            appState.currentFilterTag = L"";
+
+            appState.startIndexByTag = FindFirstMatchingFrame(appState);
+            appState.numberFramesByTag = GetNumberFramesByTag(appState);
+
+            if (!appState.frames.empty() && (appState.currentFrameIndex < 0 || appState.currentFrameIndex >= static_cast<int>(appState.frames.size())))
+            {
+                appState.currentFrameIndex = 0;
+            }
+        }
+    }
+
+    appState.isDirty = true;
+    return true;
 }
 
 Frame &FrameService::GetCurrentFrame(AppState &state)
@@ -254,16 +269,74 @@ const Frame &FrameService::GetCurrentFrame(const AppState &state)
 
 bool FrameService::MatchesFilter(const Frame &frame, const std::wstring &filterTag)
 {
-    // All or empty string = show all (protects against both)
     if (filterTag.empty() || filterTag == L"All")
         return true;
 
     if (filterTag == L"None")
+        return frame.tag.empty() || frame.tag == L"None";
+
+    return frame.tag == filterTag;
+}
+
+/// <summary>
+/// Finds the index of the first frame matching the filter
+/// Returns -1 if there are no suitable frames.
+/// </summary>
+/// <param name="appState"></param>
+/// <returns></returns>
+int FrameService::FindFirstMatchingFrame(AppState &appState)
+{
+    const std::wstring &filter = appState.currentFilterTag;
+
+    if (filter.empty())
+        return 0;
+
+    for (size_t i = 0; i < appState.frames.size(); ++i)
     {
-        return frame.tag.empty(); // None = only frames without a tag
+        const std::wstring &frameTag = appState.frames[i].tag;
+
+        if (filter == L"None")
+        {
+
+            if (frameTag.empty() || frameTag == L"None")
+                return static_cast<int>(i);
+        }
+        else
+        {
+            if (frameTag == filter)
+                return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
+
+int FrameService::GetNumberFramesByTag(AppState &appState)
+{
+    const std::wstring &filter = appState.currentFilterTag;
+
+    int numberFrames = 0;
+
+    if (filter.empty())
+        return 0;
+
+    for (size_t i = 0; i < appState.frames.size(); ++i)
+    {
+        const std::wstring &frameTag = appState.frames[i].tag;
+
+        if (filter == L"None")
+        {
+            if (frameTag.empty() || frameTag == L"None")
+                numberFrames++;
+        }
+        else
+        {
+
+            if (frameTag == filter)
+                numberFrames++;
+        }
     }
 
-    return frame.tag == filterTag; // Regular tag = exact match
+    return numberFrames;
 }
 
 } // namespace baresprite

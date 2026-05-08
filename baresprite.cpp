@@ -158,8 +158,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
                     gProjectSettings->Save();
 
                     // Initialization
-                    gAppState->frames.emplace_back(gAppState->imageSize, gAppState->imageSize);
                     gAppState->availableTags = {L"None", L"Idle", L"Walk", L"Run", L"Jump", L"Die", L"Attack"};
+                    gAppState->frames.emplace_back(gAppState->imageSize, gAppState->imageSize);
+                    gAppState->frames[0].tag = L"None";
 
                     launchEditor = true;
 
@@ -309,6 +310,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
+    
+
     // Create left toolbar child window
     gLeftToolbar = std::make_unique<LeftToolbar>(hWnd, hInstance, *gAppState);
 
@@ -318,17 +321,30 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     // Create canvas scroll view container
     gCanvasScrollView = std::make_unique<CanvasScrollView>(hWnd, hInstance, *gAppState);
 
-    // Create frame toolbar child window
-    gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance, *gAppState);
-
     // If the project was loaded from a configuration file
     if (gAppState->isProjectLoadedFromConfig)
     {
+
         if (gAppState->canvas && !gAppState->frames.empty())
         {
+
             gAppState->canvas->LoadFrame(gAppState->frames[gAppState->currentFrameIndex]);
         }
+        else
+        {
+            gAppState->frames.emplace_back(gAppState->imageSize, gAppState->imageSize);
+
+            if (gAppState->availableTags.empty())
+            {
+                gAppState->availableTags = {L"None", L"Idle", L"Walk", L"Run", L"Jump", L"Die", L"Attack"};
+                gAppState->selectedTag = L"None";
+                gAppState->frames[gAppState->currentFrameIndex].tag = gAppState->selectedTag;
+            }
+        }
     }
+
+    // Create frame toolbar child window
+    gBottomToolbar = std::make_unique<BottomToolbar>(hWnd, hInstance, *gAppState);
 
     // Update window title
     std::wstring title = L"BareSprite - " + gProjectSettings->GetProjectNameFromPath(gAppState->projectPath);

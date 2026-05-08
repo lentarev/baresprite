@@ -29,6 +29,8 @@ struct AppState
     ToolType currentTool = ToolType::Brush;
     std::vector<Frame> frames;
     int currentFrameIndex = 0;
+    int numberFramesByTag = 0;
+    int startIndexByTag = 0;
     Canvas *canvas = nullptr;
 
     // Onion Skinning settings
@@ -39,6 +41,7 @@ struct AppState
 
     // Tagging system
     std::vector<std::wstring> availableTags = {};
+    std::wstring selectedTag = L"None";
     std::wstring currentFilterTag = L"";
 
     // Selection

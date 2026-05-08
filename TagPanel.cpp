@@ -1,6 +1,7 @@
 #include "TagPanel.h"
 #include "Canvas.h"
 #include "FrameService.h"
+#include <iostream>
 #include <set>
 
 namespace baresprite
@@ -150,12 +151,18 @@ void TagPanel::UpdateFilterSelection()
 
 void TagPanel::UpdateTagSelection()
 {
+
     if (_appState.frames.empty())
+    {
+
         return;
+    }
 
     const std::wstring &currentTag = _appState.frames[_appState.currentFrameIndex].tag;
 
-    if (currentTag.empty())
+    std::wcout << "currentTag: " << currentTag << std::endl;
+
+    if (currentTag == L"None")
     {
         SendMessageW(_hComboTag, CB_SETCURSEL, 0, 0);
     }
@@ -215,7 +222,7 @@ bool TagPanel::OnComboBoxChange(HWND hWndCtrl, int selIndex)
 
             else if (_appState.currentFilterTag == L"None")
             {
-                currentMatches = currentTag.empty();
+                currentMatches = (currentTag == L"None");
             }
 
             else
@@ -225,7 +232,7 @@ bool TagPanel::OnComboBoxChange(HWND hWndCtrl, int selIndex)
 
             if (!currentMatches)
             {
-                int firstMatch = FindFirstMatchingFrame();
+                int firstMatch = FrameService::FindFirstMatchingFrame(_appState);
                 if (firstMatch >= 0)
                 {
                     _appState.currentFrameIndex = firstMatch;
@@ -242,12 +249,20 @@ bool TagPanel::OnComboBoxChange(HWND hWndCtrl, int selIndex)
 
         return true;
     }
+
+    // Set tag to frame
     else if (hWndCtrl == _hComboTag)
     {
 
         if (selIndex < static_cast<int>(_appState.availableTags.size()))
         {
-            _appState.frames[_appState.currentFrameIndex].tag = _appState.availableTags[selIndex];
+            const std::wstring &newTag = _appState.availableTags[selIndex];
+
+            _appState.selectedTag = newTag.empty() ? L"None" : newTag;
+
+            _appState.frames[_appState.currentFrameIndex].tag = _appState.selectedTag;
+
+            std::wcout << _appState.selectedTag << std::endl;
         }
 
         _appState.isDirty = true;
@@ -262,6 +277,8 @@ bool TagPanel::OnChangeFilter()
 {
 
     int selIndex = (int)SendMessageW(_hComboFilter, CB_GETCURSEL, 0, 0);
+
+    // std::cout << "selIndex: " << selIndex << std::endl;
 
     if (selIndex < 0)
     {
@@ -278,6 +295,11 @@ bool TagPanel::OnChangeFilter()
         const std::wstring &currentTag = _appState.frames[_appState.currentFrameIndex].tag;
         const std::wstring &filter = _appState.currentFilterTag;
 
+        int firstMatch = FrameService::FindFirstMatchingFrame(_appState);
+
+        _appState.startIndexByTag = firstMatch;
+        _appState.numberFramesByTag = FrameService::GetNumberFramesByTag(_appState);
+
         bool currentMatches = false;
 
         if (filter.empty())
@@ -287,7 +309,7 @@ bool TagPanel::OnChangeFilter()
 
         else if (filter == L"None")
         {
-            currentMatches = currentTag.empty();
+            currentMatches = (currentTag.empty() || currentTag == L"None");
         }
 
         else
@@ -297,7 +319,7 @@ bool TagPanel::OnChangeFilter()
 
         if (!currentMatches)
         {
-            int firstMatch = FindFirstMatchingFrame();
+
             if (firstMatch >= 0 && firstMatch != _appState.currentFrameIndex)
             {
 
@@ -324,35 +346,32 @@ bool TagPanel::OnChangeTag()
         return false;
     }
 
-  
     if (!OnComboBoxChange(_hComboTag, selIndex))
     {
         return false;
     }
 
-   
     if (!_appState.currentFilterTag.empty() && !_appState.frames.empty())
     {
         const Frame &currentFrame = _appState.frames[_appState.currentFrameIndex];
         if (!FrameService::MatchesFilter(currentFrame, _appState.currentFilterTag))
         {
-            
+
             int nearest = -1;
             int current = _appState.currentFrameIndex;
             int size = static_cast<int>(_appState.frames.size());
             const std::wstring &filter = _appState.currentFilterTag;
 
-            
             for (int radius = 1; radius < size; ++radius)
             {
-               
+
                 int prev = current - radius;
                 if (prev >= 0 && FrameService::MatchesFilter(_appState.frames[prev], filter))
                 {
                     nearest = prev;
                     break;
                 }
-             
+
                 int next = current + radius;
                 if (next < size && FrameService::MatchesFilter(_appState.frames[next], filter))
                 {
@@ -361,7 +380,6 @@ bool TagPanel::OnChangeTag()
                 }
             }
 
-           
             if (nearest >= 0)
             {
                 _appState.currentFrameIndex = nearest;
@@ -370,69 +388,35 @@ bool TagPanel::OnChangeTag()
                     _appState.canvas->LoadFrame(_appState.frames[nearest]);
                 }
             }
-            
         }
     }
 
-   
     PopulateComboBoxes();
 
     return true;
 }
 
-/// <summary>
-/// Finds the index of the first frame matching the filter
-/// Returns -1 if there are no suitable frames.
-/// </summary>
-/// <returns></returns>
-int TagPanel::FindFirstMatchingFrame() const
-{
-
-    const std::wstring &filter = _appState.currentFilterTag;
-
-    
-    if (filter.empty())
-        return 0;
-
-    for (size_t i = 0; i < _appState.frames.size(); ++i)
-    {
-        const std::wstring &frameTag = _appState.frames[i].tag;
-
-        if (filter == L"None")
-        {
-           
-            if (frameTag.empty())
-                return static_cast<int>(i);
-        }
-        else
-        {
-            
-            if (frameTag == filter)
-                return static_cast<int>(i);
-        }
-    }
-    return -1; 
-}
-
 std::vector<std::wstring> TagPanel::GetActiveFilterTags() const
 {
-    std::set<std::wstring> uniqueTags; // set - automatically sorts and removes duplicates
+    std::set<std::wstring> uniqueTags;
     bool hasNone = false;
 
     for (const auto &frame : _appState.frames)
     {
-        if (frame.tag.empty())
-        {
-            hasNone = true;
-        }
 
-        else
+        if (!frame.tag.empty() && frame.tag != L"None")
         {
             uniqueTags.insert(frame.tag);
+        }
+
+        if (frame.tag.empty() || frame.tag == L"None")
+        {
+            hasNone = true;
         }
     }
 
     std::vector<std::wstring> result;
+
     if (hasNone)
     {
         result.push_back(L"None");
