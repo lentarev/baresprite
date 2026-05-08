@@ -11,8 +11,13 @@ namespace baresprite
 FramePanel::FramePanel(HWND hWndBottomTolbar, HINSTANCE hInstance, AppState &appState)
     : _hWndBottomTolbar(hWndBottomTolbar), _hInstance(hInstance), _appState(appState)
 {
+
+    _appState.startIndexByTag = FrameService::FindFirstMatchingFrame(_appState);
+    _appState.numberFramesByTag = FrameService::GetNumberFramesByTag(_appState);
+
     CreateControlButtons();
     CreateLabel();
+
     UpdateFrameLabel();
 
     CreateOnionControls();
@@ -391,6 +396,12 @@ void FramePanel::UpdateFrameLabel()
     int current = _appState.currentFrameIndex + 1;
     int total = static_cast<int>(_appState.frames.size());
 
+    int startIndexByTag = _appState.startIndexByTag;
+    int endIndexByTag = _appState.numberFramesByTag + _appState.startIndexByTag;
+
+    int numberFramesByTag = endIndexByTag - startIndexByTag;
+    int tagIndex = current - startIndexByTag;
+
     if (total < 1)
         total = 1;
     if (current < 1)
@@ -400,7 +411,15 @@ void FramePanel::UpdateFrameLabel()
 
     // Format the string
     wchar_t text[32];
-    swprintf_s(text, L"%d / %d", current, total);
+
+    if (numberFramesByTag == 0)
+    {
+        swprintf_s(text, L"%d / %d", current, total);
+    }
+    else
+    {
+        swprintf_s(text, L"%d / %d", tagIndex, numberFramesByTag);
+    }
 
     // Updating Win32 control
     SetWindowTextW(_hLabel, text);
@@ -512,7 +531,7 @@ bool FramePanel::OnButtonDelete()
 {
     if (FrameService::DeleteFrame(_appState))
     {
-        UpdateFrameLabel();
+       
 
         if (_appState.canvas)
         {
@@ -522,6 +541,8 @@ bool FramePanel::OnButtonDelete()
 
         _appState.selection.Clear();
         _appState.isDirty = true;
+
+         UpdateFrameLabel();
 
         return true;
     }

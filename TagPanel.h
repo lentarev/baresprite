@@ -14,10 +14,10 @@ class TagPanel
 
     void SetBounds(const RECT &rc);
 
-    void PopulateComboBoxes(); 
+    void PopulateComboBoxes();
     void UpdateFilterSelection();
-    void UpdateTagSelection();                          
-    bool OnComboBoxChange(HWND hWndCtrl, int selIndex); 
+    void UpdateTagSelection();
+    bool OnComboBoxChange(HWND hWndCtrl, int selIndex);
 
     bool OnChangeFilter();
     bool OnChangeTag();
@@ -61,7 +61,6 @@ class TagPanel
     // METHODS
     void CreateControls();
     void ResizeControls(int clientW, int clientH) const;
-    int FindFirstMatchingFrame() const;
 };
 
 } // namespace baresprite

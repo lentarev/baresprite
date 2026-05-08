@@ -40,6 +40,8 @@ BottomToolbar::BottomToolbar(HWND hWnd, HINSTANCE hInstance, AppState &appState)
 
     _framePanel = std::make_unique<FramePanel>(_hToolbar, hInstance, appState);
     _tagPanel = std::make_unique<TagPanel>(_hToolbar, hInstance, appState);
+
+  
 }
 
 BottomToolbar::~BottomToolbar()
@@ -98,7 +100,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 
                 if (_framePanel->OnButtonPrev())
                 {
-                    _tagPanel->UpdateTagSelection();
+                    _tagPanel->PopulateComboBoxes();
                     return true;
                 }
             }
@@ -107,7 +109,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             {
                 if (_framePanel->OnButtonNext())
                 {
-                    _tagPanel->UpdateTagSelection();
+                    _tagPanel->PopulateComboBoxes();
                     return true;
                 }
             }
@@ -116,7 +118,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             {
                 if (_framePanel->OnButtonNew())
                 {
-                    _tagPanel->UpdateTagSelection();
+                    _tagPanel->PopulateComboBoxes();
                     return true;
                 }
             }
@@ -126,7 +128,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 
                 if (_framePanel->OnButtonClone())
                 {
-                    _tagPanel->UpdateTagSelection();
+                    _tagPanel->PopulateComboBoxes();
                     return true;
                 }
             }
@@ -135,7 +137,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             {
                 if (_framePanel->OnButtonDelete())
                 {
-                    _tagPanel->UpdateTagSelection();
+                    _tagPanel->PopulateComboBoxes();
                     return true;
                 }
             }
