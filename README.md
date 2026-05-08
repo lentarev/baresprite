@@ -10,7 +10,7 @@
 ## 🚀 Features
 
 *   **⚡ Lightning Fast:** Instant startup. No waiting for heavy frameworks to load.
-*   **🧱 Zero Dependencies:** A single **764 KB** `.exe` file. No installation, no VC++ Redist required, no .NET runtime. Just download and run.
+*   **🧱 Zero Dependencies:** A single **769 KB** `.exe` file. No installation, no VC++ Redist required, no .NET runtime. Just download and run.
 *   **🎨 Full Animation Support:** Frame-by-frame editing, onion skinning, and playback controls.
 *   **📦 Export Formats:** Export your work as **PNG** (spritesheet or frames) or **GIF** animation.
 *   **🛠 Native Win32 UI:** Custom dialogs, smooth scrolling, and professional resource management.
@@ -32,7 +32,7 @@
 
 BareSprite is portable. No installation is required.
 
-1.  Download the latest release (`baresprite_v1.0.zip`).
+1.  Download the latest release (`baresprite_v1.0.1.zip`).
 2.  Extract the archive to any folder.
 3.  Run `baresprite.exe`.
 
@@ -44,7 +44,8 @@ BareSprite is portable. No installation is required.
 | **Previous / Next Frame** | `Left` / `Right` Arrow |
 | **Save Project** | `Ctrl + S` |
 | **Undo / Redo** | `Ctrl + Z` / `Ctrl + Y` |
-| **Zoom In / Out** | `Ctrl + Mouse Wheel` |
+| **Cut / Copy / Paste** | `Ctrl + X` / `Ctrl + C` / ` Ctrl + V` |
+| **Zoom In / Out** | `Ctrl + Mouse Wheel or Ctrl + - & Ctrl + =` |
 | **Brush Tool** | `B` |
 | **Eraser Tool** | `E` |
 | **Select Tool** | `S` |
