@@ -21,6 +21,7 @@
 
 ![BareSprite Demo - Idle](assets/demo/Jody-idle.gif)
 ![BareSprite Demo - Walk](assets/demo/Jody-walk.gif)
+![BareSprite Demo - Joo](assets/demo/Joo.png)
 
 *A simple pixel art editor in action*
 
