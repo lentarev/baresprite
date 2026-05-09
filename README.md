@@ -4,7 +4,7 @@
 
 [![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
-[![Size](https://img.shields.io/badge/size-764KB-orange.svg)]()
+[![Size](https://img.shields.io/badge/size-769KB-orange.svg)]()
 [![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)]()
 
 ## 🚀 Features
