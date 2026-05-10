@@ -46,12 +46,11 @@ bool GifExportService::ExportGif(const ExportSequenceData &exportData)
 
     // Default duration (from first frame)
     int defaultDuration = 100 / exportData.appState->playbackFPS;
-    
+
     if (defaultDuration < 1)
     {
         defaultDuration = 1;
     }
-    
 
     if (!GifBegin(&writer, utf8Path.data(), frameW, frameH, defaultDuration, exportData.infiniteLoop))
     {
@@ -78,11 +77,15 @@ bool GifExportService::ExportGif(const ExportSequenceData &exportData)
                     unsigned char g = (pixel >> 8) & 0xFF;
                     unsigned char b = pixel & 0xFF;
 
+                    //  normalize alfa for GIF (only 0 or 255)
+                    a = (a < 128) ? 0 : 255;
+
                     int idx = (y * exportData.appState->imageSize + x) * 4;
+
                     rgbaBuffer[idx + 0] = r;
                     rgbaBuffer[idx + 1] = g;
                     rgbaBuffer[idx + 2] = b;
-                    rgbaBuffer[idx + 3] = a;
+                    rgbaBuffer[idx + 3] = a; // normalize alfa
                 }
             }
         }
@@ -104,17 +107,22 @@ bool GifExportService::ExportGif(const ExportSequenceData &exportData)
                     unsigned char g = (pixel >> 8) & 0xFF;
                     unsigned char b = pixel & 0xFF;
 
+                    //  normalize alfa for GIF (only 0 or 255)
+                    a = (a < 128) ? 0 : 255;
+
                     int idx = (sy * frameW + sx) * 4;
+
                     rgbaBuffer[idx + 0] = r;
                     rgbaBuffer[idx + 1] = g;
                     rgbaBuffer[idx + 2] = b;
-                    rgbaBuffer[idx + 3] = a;
+                    rgbaBuffer[idx + 3] = a; // normalize alfa
                 }
             }
         }
 
         // Frame duration in deciseconds (uniform for all frames)
         int duration = 100 / exportData.appState->playbackFPS;
+
         if (duration < 1)
             duration = 1; // Minimum 1 decisecond (100ms)
 
