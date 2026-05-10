@@ -98,6 +98,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 
                 if (_framePanel->OnButtonPrev())
                 {
+                    _tagPanel->UpdateTagSelection();
 
                     return true;
                 }
@@ -107,6 +108,8 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             {
                 if (_framePanel->OnButtonNext())
                 {
+
+                    _tagPanel->UpdateTagSelection();
 
                     return true;
                 }
