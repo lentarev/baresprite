@@ -10,7 +10,7 @@
 ## 🚀 Features
 
 *   **⚡ Lightning Fast:** Instant startup. No waiting for heavy frameworks to load.
-*   **🧱 Zero Dependencies:** A single **769 KB** `.exe` file. No installation, no VC++ Redist required, no .NET runtime. Just download and run.
+*   **🧱 Zero Dependencies:** A single **760 KB** `.exe` file. No installation, no VC++ Redist required, no .NET runtime. Just download and run.
 *   **🎨 Full Animation Support:** Frame-by-frame editing, onion skinning, and playback controls.
 *   **📦 Export Formats:** Export your work as **PNG** (spritesheet or frames) or **GIF** animation.
 *   **🛠 Native Win32 UI:** Custom dialogs, smooth scrolling, and professional resource management.
