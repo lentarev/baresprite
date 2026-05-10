@@ -40,8 +40,6 @@ BottomToolbar::BottomToolbar(HWND hWnd, HINSTANCE hInstance, AppState &appState)
 
     _framePanel = std::make_unique<FramePanel>(_hToolbar, hInstance, appState);
     _tagPanel = std::make_unique<TagPanel>(_hToolbar, hInstance, appState);
-
-  
 }
 
 BottomToolbar::~BottomToolbar()
@@ -100,7 +98,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 
                 if (_framePanel->OnButtonPrev())
                 {
-                    _tagPanel->PopulateComboBoxes();
+
                     return true;
                 }
             }
@@ -109,7 +107,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             {
                 if (_framePanel->OnButtonNext())
                 {
-                    _tagPanel->PopulateComboBoxes();
+
                     return true;
                 }
             }
@@ -118,7 +116,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             {
                 if (_framePanel->OnButtonNew())
                 {
-                    _tagPanel->PopulateComboBoxes();
+
                     return true;
                 }
             }
@@ -128,7 +126,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
 
                 if (_framePanel->OnButtonClone())
                 {
-                    _tagPanel->PopulateComboBoxes();
+
                     return true;
                 }
             }
@@ -190,8 +188,6 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
                     {
                         _framePanel->UpdateFrameLabel();
                     }
-
-                    _tagPanel->UpdateTagSelection();
                 }
 
                 return true;
@@ -201,7 +197,6 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
         // Manage tags (button)
         if (notifyCode == BN_CLICKED)
         {
-            std::cout << "index: " << index << std::endl;
 
             if (index == 2)
             {

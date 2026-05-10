@@ -18,8 +18,6 @@ bool FrameService::NewFrame(AppState &appState)
         Frame newFrame(appState.imageSize, appState.imageSize);
         newFrame.tag = appState.selectedTag;
 
-        std::wcout << appState.selectedTag << std::endl;
-
         // Insert after the current one
         auto it = appState.frames.begin() + appState.currentFrameIndex + 1;
         appState.frames.insert(it, std::move(newFrame));

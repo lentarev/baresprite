@@ -160,8 +160,6 @@ void TagPanel::UpdateTagSelection()
 
     const std::wstring &currentTag = _appState.frames[_appState.currentFrameIndex].tag;
 
-    std::wcout << "currentTag: " << currentTag << std::endl;
-
     if (currentTag == L"None")
     {
         SendMessageW(_hComboTag, CB_SETCURSEL, 0, 0);
@@ -277,8 +275,6 @@ bool TagPanel::OnChangeFilter()
 {
 
     int selIndex = (int)SendMessageW(_hComboFilter, CB_GETCURSEL, 0, 0);
-
-    // std::cout << "selIndex: " << selIndex << std::endl;
 
     if (selIndex < 0)
     {

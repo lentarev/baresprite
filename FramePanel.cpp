@@ -403,11 +403,19 @@ void FramePanel::UpdateFrameLabel()
     int tagIndex = current - startIndexByTag;
 
     if (total < 1)
+    {
         total = 1;
+    }
+
     if (current < 1)
+    {
         current = 1;
+    }
+
     if (current > total)
+    {
         current = total;
+    }
 
     // Format the string
     wchar_t text[32];
@@ -433,13 +441,17 @@ bool FramePanel::OnButtonNew()
 {
     if (FrameService::NewFrame(_appState))
     {
-        UpdateFrameLabel();
 
         if (_appState.canvas)
         {
             const Frame &current = FrameService::GetCurrentFrame(_appState);
             _appState.canvas->LoadFrame(current);
+
+            // Recalculate frames by selected tag
+            _appState.numberFramesByTag = FrameService::GetNumberFramesByTag(_appState);
         }
+
+        UpdateFrameLabel();
 
         _appState.selection.Clear();
         _appState.isDirty = true;
@@ -458,13 +470,14 @@ bool FramePanel::OnButtonPrev()
 {
     if (FrameService::PrevFrame(_appState))
     {
-        UpdateFrameLabel();
 
         if (_appState.canvas)
         {
             const Frame &current = FrameService::GetCurrentFrame(_appState);
             _appState.canvas->LoadFrame(current);
         }
+
+        UpdateFrameLabel();
 
         _appState.selection.Clear();
 
@@ -482,13 +495,14 @@ bool FramePanel::OnButtonNext()
 {
     if (FrameService::NextFrame(_appState))
     {
-        UpdateFrameLabel();
 
         if (_appState.canvas)
         {
             const Frame &current = FrameService::GetCurrentFrame(_appState);
             _appState.canvas->LoadFrame(current);
         }
+
+        UpdateFrameLabel();
 
         _appState.selection.Clear();
 
@@ -506,13 +520,17 @@ bool FramePanel::OnButtonClone()
 {
     if (FrameService::CloneFrame(_appState))
     {
-        UpdateFrameLabel();
 
         if (_appState.canvas)
         {
             const Frame &current = _appState.frames[_appState.currentFrameIndex];
             _appState.canvas->LoadFrame(current);
+
+            // Recalculate frames by selected tag
+            _appState.numberFramesByTag = FrameService::GetNumberFramesByTag(_appState);
         }
+
+        UpdateFrameLabel();
 
         _appState.selection.Clear();
         _appState.isDirty = true;
@@ -531,18 +549,20 @@ bool FramePanel::OnButtonDelete()
 {
     if (FrameService::DeleteFrame(_appState))
     {
-       
 
         if (_appState.canvas)
         {
             const Frame &current = _appState.frames[_appState.currentFrameIndex];
             _appState.canvas->LoadFrame(current);
+
+            // Recalculate frames by selected tag
+            _appState.numberFramesByTag = FrameService::GetNumberFramesByTag(_appState);
         }
 
         _appState.selection.Clear();
         _appState.isDirty = true;
 
-         UpdateFrameLabel();
+        UpdateFrameLabel();
 
         return true;
     }
