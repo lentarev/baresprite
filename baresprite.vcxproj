@@ -145,11 +145,20 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Bin\vcpkg\packages\giflib_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Bin\vcpkg\packages\giflib_x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>gif.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if "$(ConfigurationName)" == "Debug" xcopy /Y /D "C:\Bin\vcpkg\packages\giflib_x64-windows\bin\gif.dll" "$(TargetDir)" &gt; nul</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Копирование gif.dll (Debug)</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ASan|x64'">
     <ClCompile>
@@ -174,10 +183,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>C:\Bin\vcpkg\packages\giflib_x64-windows-static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Bin\vcpkg\packages\giflib_x64-windows-static\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>gif.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -207,7 +219,6 @@
     <ClInclude Include="BottomToolbar.h" />
     <ClInclude Include="FrameService.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="gif.h" />
     <ClInclude Include="GifExportService.h" />
     <ClInclude Include="HistoryService.h" />
     <ClInclude Include="HistoryState.h" />

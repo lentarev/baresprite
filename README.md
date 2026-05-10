@@ -86,13 +86,15 @@ Your feedback is invaluable — just not in the form of code (for now). Thank yo
 This project utilizes the following header-only libraries for image processing:
 
 *   **[stb_image_write.h](https://github.com/nothings/stb)** by Sean Barrett — Used for PNG export. *(Public Domain / MIT)*
-*   **[gif.h](https://github.com/charlietangora/gif-h)** by Charlie Tangora — Used for GIF encoding. *(Unlicense)*
+*   **[giflib]https://giflib.sourceforge.net/?spm=a2ty_o01.29997173.0.0.6be155fbxdbAdF** by Eric S. Raymond — Used for GIF encoding with global palette support. *(MIT License)*
 
 Both libraries are statically compiled into the executable, ensuring zero external runtime dependencies.
 
 ## 📝 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+> Full license texts for third-party libraries (giflib, stb_image_write) are included in [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt).
 
 ---
 

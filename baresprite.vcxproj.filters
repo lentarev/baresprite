@@ -231,9 +231,6 @@
     <ClInclude Include="export_gif_dialog.h">
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="gif.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GifExportService.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
