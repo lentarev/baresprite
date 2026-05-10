@@ -2,9 +2,9 @@
 
 **BareSprite** is a minimalist, native pixel art editor for Windows. Built with pure C++ and Win32 API, it delivers a fast, lightweight, and dependency-free experience for sprite animation and editing.
 
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
-[![Size](https://img.shields.io/badge/size-769KB-orange.svg)]()
+[![Size](https://img.shields.io/badge/size-760KB-orange.svg)]()
 [![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)]()
 
 ## 🚀 Features
@@ -22,6 +22,7 @@
 ![BareSprite Demo - Idle](assets/demo/Jody-idle.gif)
 ![BareSprite Demo - Walk](assets/demo/Jody-walk.gif)
 ![BareSprite Demo - Joo](assets/demo/Joo.png)
+![BareSprite Demo - Joo-welcome](assets/demo/Joo-welcome.gif)
 
 *A simple pixel art editor in action*
 
@@ -41,7 +42,7 @@
 
 BareSprite is portable. No installation is required.
 
-1.  Download the latest release (`baresprite_v1.0.1.zip`).
+1.  Download the latest release (`baresprite_v1.0.2.zip`).
 2.  Extract the archive to any folder.
 3.  Run `baresprite.exe`.
 
