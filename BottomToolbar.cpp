@@ -190,6 +190,7 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
                     if (_framePanel)
                     {
                         _framePanel->UpdateFrameLabel();
+                        _tagPanel->OnChangeFilter();
                     }
                 }
 

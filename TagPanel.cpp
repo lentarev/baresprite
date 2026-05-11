@@ -260,8 +260,6 @@ bool TagPanel::OnComboBoxChange(HWND hWndCtrl, int selIndex)
             _appState.selectedTag = newTag.empty() ? L"None" : newTag;
 
             _appState.frames[_appState.currentFrameIndex].tag = _appState.selectedTag;
-
-            std::wcout << _appState.selectedTag << std::endl;
         }
 
         _appState.isDirty = true;
