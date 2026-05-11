@@ -159,6 +159,7 @@ void TagPanel::UpdateTagSelection()
     }
 
     const std::wstring &currentTag = _appState.frames[_appState.currentFrameIndex].tag;
+    _appState.selectedTag = currentTag;
 
     if (currentTag == L"None")
     {

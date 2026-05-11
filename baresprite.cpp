@@ -337,7 +337,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
             if (gAppState->availableTags.empty())
             {
                 gAppState->availableTags = {L"None", L"Idle", L"Walk", L"Run", L"Jump", L"Die", L"Attack"};
-                gAppState->selectedTag = L"None";
                 gAppState->frames[gAppState->currentFrameIndex].tag = gAppState->selectedTag;
             }
         }

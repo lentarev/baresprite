@@ -211,36 +211,99 @@ bool FrameService::CloneFrame(AppState &appState)
 /// <returns></returns>
 bool FrameService::DeleteFrame(AppState &appState)
 {
+    // Do not delete the last frame from the entire list
     if (appState.frames.size() <= 1)
         return false;
 
-    appState.frames.erase(appState.frames.begin() + appState.currentFrameIndex);
+    if (appState.currentFilterTag.empty())
+    {
+        // Delete a frame by global index
+        appState.frames.erase(appState.frames.begin() + appState.currentFrameIndex);
+    }
 
+    // Standard adjustment of the global index
     if (appState.currentFrameIndex >= static_cast<int>(appState.frames.size()))
     {
         --appState.currentFrameIndex;
     }
 
+    // Delete a frame by tag
+    DeleteFrameByTag(appState);
+
+    appState.isDirty = true;
+
+    return true;
+}
+
+/// <summary>
+/// Удаление кадра из списка тегов
+///
+/// Суть метода: нахождении ближайшего индекса удаленного элемента и установка этого же индекса как текущего.
+/// </summary>
+/// <param name="appState"></param>
+/// <returns></returns>
+int FrameService::DeleteFrameByTag(AppState &appState)
+{
     if (!appState.currentFilterTag.empty())
     {
         int count = GetNumberFramesByTag(appState);
 
-        if (count == 0)
+        std::vector<int> indices = {};
+
+        // Записываем в вектор глобальные индексы по выбранному тэгу
+        for (int i = 0; i < appState.frames.size(); i++)
+        {
+
+            const std::wstring &frameTag = appState.frames[i].tag;
+
+            // Если тег в фильтре совпал с тегом кадра
+            if (frameTag == appState.currentFilterTag)
+            {
+
+                indices.push_back(i);
+            }
+        }
+
+        appState.frames.erase(appState.frames.begin() + appState.currentFrameIndex);
+
+        // Проверка, количество кадров для выбранного тега
+        if (1 < count)
+        {
+
+            // Проходимся по всем индексам отфильтрованного по тегу
+            for (size_t i = 0; i < indices.size(); i++)
+            {
+                // Находим индекс удаленного кадра
+                if (appState.currentFrameIndex == indices[i])
+                {
+                    // Если удаляемый элемент находится в позиции (2/4)
+                    if (i + 1 < indices.size())
+                    {
+                        // Устанавливаем индекс фрейма, для кадра после предыдущего удаления
+                        appState.currentFrameIndex = indices[i];
+                    }
+
+                    // Если удаляемый элемент находится в позиции (4/4)
+                    else
+                    {
+                        appState.currentFrameIndex = indices[i - 1];
+                    }
+
+                    break;
+                }
+            }
+        }
+        else
         {
             appState.currentFilterTag = L"";
 
             appState.startIndexByTag = FindFirstMatchingFrame(appState);
             appState.numberFramesByTag = GetNumberFramesByTag(appState);
-
-            if (!appState.frames.empty() && (appState.currentFrameIndex < 0 || appState.currentFrameIndex >= static_cast<int>(appState.frames.size())))
-            {
-                appState.currentFrameIndex = 0;
-            }
+            appState.currentFrameIndex = appState.startIndexByTag;
         }
     }
 
-    appState.isDirty = true;
-    return true;
+    return 0;
 }
 
 Frame &FrameService::GetCurrentFrame(AppState &state)

@@ -96,6 +96,10 @@ bool ProjectSettings::Load()
                 {
                     _appState.currentFrameIndex = std::stoi(value);
                 }
+                else if (key == L"selectedTag")
+                {
+                    _appState.selectedTag = value;
+                }
             }
             // === SECTION [PALETTE] ===
             else if (currentSection == L"PALETTE")
@@ -303,6 +307,7 @@ void ProjectSettings::Save()
     file << L"checkerSize=" << _appState.checkerSize << L"\n";
     file << L"filterTag=" << _appState.currentFilterTag << L"\n";
     file << L"currentFrameIndex=" << _appState.currentFrameIndex << L"\n";
+    file << L"selectedTag=" << _appState.selectedTag << L"\n";
 
     if (!_appState.palette.colors.empty())
     {
