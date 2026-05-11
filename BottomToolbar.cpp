@@ -187,10 +187,12 @@ bool BottomToolbar::OnCommand(int commandId, int notifyCode)
             {
                 if (_tagPanel->OnChangeTag())
                 {
+                    _tagPanel->OnChangeFilter();
+
                     if (_framePanel)
                     {
                         _framePanel->UpdateFrameLabel();
-                        _tagPanel->OnChangeFilter();
+                        
                     }
                 }
 
