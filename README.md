@@ -25,6 +25,7 @@
 ![BareSprite Demo - Joo-welcome](assets/demo/Joo-welcome-128.gif)
 ![BareSprite Demo - Joo-welcome](assets/demo/Joo-walk-128.gif)
 ![BareSprite Demo - Clipper](assets/demo/Clipper.png)
+![BareSprite Demo - Suzy](assets/demo/Suzy.png)
 
 *A simple pixel art editor in action*
 
