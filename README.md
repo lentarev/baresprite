@@ -23,6 +23,7 @@
 ![BareSprite Demo - Walk](assets/demo/Jody-walk.gif)
 ![BareSprite Demo - Joo](assets/demo/Joo.png)
 ![BareSprite Demo - Joo-welcome](assets/demo/Joo-welcome-128.gif)
+![BareSprite Demo - Joo-welcome](assets/demo/Joo-walk-128.gif)
 
 *A simple pixel art editor in action*
 
