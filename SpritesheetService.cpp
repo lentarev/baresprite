@@ -130,7 +130,7 @@ bool SpritesheetService::BuildSpritesheet(ExportSequenceData &exportData)
 
                 jsonFile << L"    \"" << frameName << L"\": {\n";
                 jsonFile << L"      \"frame\": { \"x\": " << frameX << L", \"y\": " << frameY << L", \"w\": " << frameW << L", \"h\": " << frameH << L" },\n";
-                jsonFile << L"      \"duration\": 100,\n";
+                jsonFile << L"      \"duration\": " << 1000 / exportData.appState->playbackFPS << ",\n ";
                 jsonFile << L"      \"tag\": \"" << filteredFrames[i]->tag << L"\"\n";
                 jsonFile << L"    }";
 
