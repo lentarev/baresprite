@@ -400,4 +400,42 @@ int FrameService::GetNumberFramesByTag(AppState &appState)
     return numberFrames;
 }
 
+int FrameService::GetCurrentIndexByTag(AppState &appState)
+{
+    const std::wstring &filter = appState.currentFilterTag;
+
+    std::vector<int> indices = {};
+
+    if (filter.empty())
+        return 0;
+
+    for (size_t i = 0; i < appState.frames.size(); ++i)
+    {
+        const std::wstring &frameTag = appState.frames[i].tag;
+
+        if (filter == L"None")
+        {
+            if (frameTag.empty() || frameTag == L"None")
+                indices.push_back(static_cast<int>(i));
+        }
+        else
+        {
+
+            if (frameTag == filter)
+                indices.push_back(static_cast<int>(i));
+        }
+    }
+
+    for (size_t i = 0; i < indices.size(); ++i)
+    {
+        if (indices[i] == appState.currentFrameIndex)
+        {
+            return static_cast<int>(i); 
+        }
+    }
+
+    return -1;
+
+}
+
 } // namespace baresprite

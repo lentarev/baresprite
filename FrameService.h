@@ -25,6 +25,7 @@ class FrameService
     static bool MatchesFilter(const Frame &frame, const std::wstring &filterTag);
     static int FindFirstMatchingFrame(AppState &appState);
     static int GetNumberFramesByTag(AppState &appState);
+    static int GetCurrentIndexByTag(AppState &appState);
 
   private:
     static int DeleteFrameByTag(AppState &appState);

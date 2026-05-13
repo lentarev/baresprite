@@ -400,7 +400,7 @@ void FramePanel::UpdateFrameLabel()
     int endIndexByTag = _appState.numberFramesByTag + _appState.startIndexByTag;
 
     int numberFramesByTag = endIndexByTag - startIndexByTag;
-    int tagIndex = current - startIndexByTag;
+    int tagIndex = FrameService::GetCurrentIndexByTag(_appState);
 
     if (total < 1)
     {
@@ -426,7 +426,7 @@ void FramePanel::UpdateFrameLabel()
     }
     else
     {
-        swprintf_s(text, L"%d / %d", tagIndex, numberFramesByTag);
+        swprintf_s(text, L"%d / %d", tagIndex + 1, numberFramesByTag);
     }
 
     // Updating Win32 control
