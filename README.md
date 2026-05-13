@@ -2,7 +2,7 @@
 
 **BareSprite** is a minimalist, native pixel art editor for Windows. Built with pure C++ and Win32 API, it delivers a fast, lightweight, and dependency-free experience for sprite animation and editing.
 
-[![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.5-blue.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 [![Size](https://img.shields.io/badge/size-760KB-orange.svg)]()
 [![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)]()
@@ -49,7 +49,7 @@
 
 BareSprite is portable. No installation is required.
 
-1.  Download the latest release (`baresprite_v1.0.4.zip`).
+1.  Download the latest release (`baresprite_v1.0.5.zip`).
 2.  Extract the archive to any folder.
 3.  Run `baresprite.exe`.
 
@@ -89,12 +89,19 @@ BareSprite is currently developed as a **single-author project**.
 
 Your feedback is invaluable — just not in the form of code (for now). Thank you for understanding! ❤️
 
-##  Third-Party Libraries
+## 📚 Third-Party Libraries
 
-This project utilizes the following header-only libraries for image processing:
+This project utilizes the following third-party libraries:
 
-*   **[stb_image_write.h](https://github.com/nothings/stb)** by Sean Barrett — Used for PNG export. *(Public Domain / MIT)*
-*   **[giflib]https://giflib.sourceforge.net/?spm=a2ty_o01.29997173.0.0.6be155fbxdbAdF** by Eric S. Raymond — Used for GIF encoding with global palette support. *(MIT License)*
+### Header-Only
+- **stb_image_write.h** by Sean Barrett — Used for PNG export.  
+  License: Public Domain / MIT  
+  Source: https://github.com/nothings/stb
+
+### Compiled Library (Static Linking)
+- **giflib** by Eric S. Raymond et al. — Used for GIF encoding with global palette support.  
+  License: MIT License  
+  Source: https://giflib.sourceforge.net/
 
 Both libraries are statically compiled into the executable, ensuring zero external runtime dependencies.
 
