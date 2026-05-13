@@ -250,6 +250,11 @@ int FrameService::DeleteFrameByTag(AppState &appState)
 
         std::vector<int> indices = {};
 
+        // Удаляемая позиция
+        int localIndex = GetCurrentIndexByTag(appState);
+
+        appState.frames.erase(appState.frames.begin() + appState.currentFrameIndex);
+
         // Записываем в вектор глобальные индексы по выбранному тэгу
         for (int i = 0; i < appState.frames.size(); i++)
         {
@@ -264,34 +269,20 @@ int FrameService::DeleteFrameByTag(AppState &appState)
             }
         }
 
-        appState.frames.erase(appState.frames.begin() + appState.currentFrameIndex);
+        int framesByTag = GetNumberFramesByTag(appState);
 
         // Проверка, количество кадров для выбранного тега
-        if (1 < count)
+        if (framesByTag > 0)
         {
 
-            // Проходимся по всем индексам отфильтрованного по тегу
-            for (size_t i = 0; i < indices.size(); i++)
+            int safeIndex = localIndex;
+
+            if (safeIndex >= framesByTag)
             {
-                // Находим индекс удаленного кадра
-                if (appState.currentFrameIndex == indices[i])
-                {
-                    // Если удаляемый элемент находится в позиции (2/4)
-                    if (i + 1 < indices.size())
-                    {
-                        // Устанавливаем индекс фрейма, для кадра после предыдущего удаления
-                        appState.currentFrameIndex = indices[i];
-                    }
-
-                    // Если удаляемый элемент находится в позиции (4/4)
-                    else
-                    {
-                        appState.currentFrameIndex = indices[i - 1];
-                    }
-
-                    break;
-                }
+                safeIndex = framesByTag - 1;
             }
+
+            appState.currentFrameIndex = indices[safeIndex];
         }
         else
         {
@@ -430,12 +421,11 @@ int FrameService::GetCurrentIndexByTag(AppState &appState)
     {
         if (indices[i] == appState.currentFrameIndex)
         {
-            return static_cast<int>(i); 
+            return static_cast<int>(i);
         }
     }
 
     return -1;
-
 }
 
 } // namespace baresprite
