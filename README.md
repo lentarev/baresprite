@@ -29,6 +29,7 @@
 ![BareSprite Demo - Walk](assets/demo/Jody-walk.gif)
 ![BareSprite Demo - Joo-welcome](assets/demo/Joo-welcome-128.gif)
 ![BareSprite Demo - Joo-welcome](assets/demo/Joo-walk-128.gif)
+![BareSprite Demo - Joo-welcome](assets/demo/Gnome-walk.gif)
 
 
 
