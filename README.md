@@ -30,6 +30,7 @@
 ![BareSprite Demo - Joo-welcome](assets/demo/Joo-welcome-128.gif)
 ![BareSprite Demo - Joo-welcome](assets/demo/Joo-walk-128.gif)
 ![BareSprite Demo - Gnome-walk](assets/demo/Gnome-walk.gif)
+![BareSprite Demo - Gnome-run](assets/demo/Gnome-run.gif)
 
 
 
