@@ -22,6 +22,7 @@
 ![BareSprite Demo - Joo](assets/demo/Joo.png)
 ![BareSprite Demo - Clipper](assets/demo/Clipper.png)
 ![BareSprite Demo - Suzy](assets/demo/Suzy.png)
+![BareSprite Demo - Gnome](assets/demo/gnome-welcome.png)
 
 ## Animation
 ![BareSprite Demo - Idle](assets/demo/Jody-idle.gif)
